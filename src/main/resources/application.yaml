@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: papaya-client
+
+papaya:
+  port: 3390
+  workspace: /home/tronxi/papaya
+
