@@ -2,56 +2,99 @@ package dev.tronxi.papayaclient.ui;
 
 import dev.tronxi.papayaclient.PapayaClientApplication;
 import dev.tronxi.papayaclient.files.FileManager;
-import dev.tronxi.papayaclient.udp.UdpClient;
+import dev.tronxi.papayaclient.udp.UdpSocketManager;
+import dev.tronxi.papayaclient.ui.components.CreatePapayaFileComponent;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Optional;
 
 @Service
 public class UIInitializer extends Application {
 
     private FileManager fileManager;
-    private UdpClient udpClient;
+    private UdpSocketManager udpSocketManager;
 
     @Override
     public void init() {
         fileManager = PapayaClientApplication.getContext().getBean(FileManager.class);
-        udpClient = PapayaClientApplication.getContext().getBean(UdpClient.class);
+        udpSocketManager = PapayaClientApplication.getContext().getBean(UdpSocketManager.class);
     }
 
     @Override
     public void start(Stage stage) {
-        String javaVersion = System.getProperty("java.version");
-        String javafxVersion = System.getProperty("javafx.version");
-        Button splitButton = new Button("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
-        splitButton.setOnMouseClicked(mouseEvent -> {
-            try {
-                fileManager.split("p2p.webp");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        Button createPapayaFileButton = createPapayaFileButton(stage);
+        Button checkButton = new Button("Check");
+        checkButton.setOnMouseClicked(event -> {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            File selectedDirectory = directoryChooser.showDialog(stage);
+            if (selectedDirectory != null) {
+                Optional<Path> maybePath = fileManager.joinStore(selectedDirectory);
+                maybePath.ifPresentOrElse(path -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Papaya File Joined");
+                    alert.setHeaderText(path.toAbsolutePath().toString());
+                    alert.show();
+                }, () -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Papaya File Incomplete");
+                    alert.setHeaderText(selectedDirectory.getName() + " incomplete");
+                    alert.show();
+                });
             }
         });
         TextArea logs = new TextArea();
         logs.setEditable(false);
         logs.setText("");
         logs.setMaxHeight(100);
-        udpClient.start(logs);
-        Scene scene = new Scene(new VBox(splitButton, logs), 640, 480);
+        udpSocketManager.start(logs);
+
+        Button sendButton = new Button("Send");
+        sendButton.setOnMouseClicked(mouseEvent -> {
+            udpSocketManager.send("holi");
+        });
+
+        Scene scene = new Scene(new VBox(createPapayaFileButton, checkButton, logs, sendButton), 640, 480);
+        stage.setTitle("Papaya Client");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private Button createPapayaFileButton(Stage stage) {
+        return new CreatePapayaFileComponent().
+                create(stage, selectedFile -> {
+                    if (selectedFile != null) {
+                        try {
+                            Path path = fileManager.split(selectedFile);
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("Papaya File Created");
+                            alert.setHeaderText(path.toAbsolutePath().toString());
+                            alert.show();
+                        } catch (IOException e) {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Papaya File Creation Failed");
+                            alert.show();
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
     }
 
     @Override
     public void stop() {
         System.out.println("Shutting down");
-        udpClient.stop();
+        udpSocketManager.stop();
         SpringApplication.exit(PapayaClientApplication.getContext(), () -> 0);
     }
 }

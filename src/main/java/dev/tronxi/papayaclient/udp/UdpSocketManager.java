@@ -12,10 +12,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 
 @Service
-public class UdpClient {
+public class UdpSocketManager {
 
     @Value("${papaya.port}")
     private int port;
@@ -24,13 +25,13 @@ public class UdpClient {
 
     private final GatewayDevice gatewayDevice;
 
-    public UdpClient(GatewayDevice gatewayDevice) {
+    public UdpSocketManager(GatewayDevice gatewayDevice) {
         this.gatewayDevice = gatewayDevice;
     }
 
     public void start(TextArea textArea) {
         try {
-            socket = new DatagramSocket(3390);
+            socket = new DatagramSocket(port);
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() {
@@ -53,6 +54,15 @@ public class UdpClient {
             };
             new Thread(task).start();
         } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void send(String message) {
+        byte[] buffer = message.getBytes();
+        try {
+            socket.send(new DatagramPacket(buffer, buffer.length, InetAddress.getByName("localhost"), port));
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
