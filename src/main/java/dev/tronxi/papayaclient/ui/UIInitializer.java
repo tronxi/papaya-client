@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
@@ -36,6 +37,7 @@ public class UIInitializer extends Application {
         Button createPapayaFileButton = generateCreatePapayaFileButton(stage);
         Button joinButton = generateJoinButton(stage);
         Button statusButton = generateStatusButton(stage);
+        HBox hBox = new HBox(createPapayaFileButton, joinButton, statusButton);
 
         TextArea logs = new TextArea();
         logs.setEditable(false);
@@ -48,7 +50,7 @@ public class UIInitializer extends Application {
             udpSocketManager.send("holi");
         });
 
-        Scene scene = new Scene(new VBox(createPapayaFileButton, joinButton, statusButton, logs, sendButton), 640, 480);
+        Scene scene = new Scene(new VBox(hBox, logs, sendButton), 640, 480);
         stage.setTitle("Papaya Client");
         stage.setScene(scene);
         stage.show();

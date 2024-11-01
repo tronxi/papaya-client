@@ -48,25 +48,25 @@ public class FileManager {
 
         PapayaFile papayaFile = new PapayaFile(inputFile.getName(), hash);
 
-        Path store = calculateStorePath(inputFile.getName(), hash);
+        Path store = storePath.resolve(hash);
         if (!store.toFile().exists()) {
             store.toFile().mkdirs();
         }
 
-        int parts = 100;
-        int partSize = (int) Math.ceil((double) bytes.length / parts);
-
+        int partSize = 250;
+        int numPart = 0;
         for (int i = 0; i < bytes.length; i += partSize) {
             int end = Math.min(bytes.length, i + partSize);
             byte[] part = Arrays.copyOfRange(bytes, i, end);
-            String partName = String.valueOf(i);
+            String partName = String.valueOf(numPart);
             String partHash = hashGenerator.generateHash(part);
             PartFile partFile = new PartFile(partName, partHash);
             papayaFile.addPartFile(partFile);
             Files.write(store.resolve(partName), part);
+            numPart++;
         }
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(store.resolve(inputFile.getName() + "_" + hash + ".papaya").toFile(), papayaFile);
+        objectMapper.writeValue(store.resolve(hash + ".papaya").toFile(), papayaFile);
         return store;
     }
 
@@ -131,10 +131,13 @@ public class FileManager {
                 PapayaStatusFile papayaStatusFile = new PapayaStatusFile(papayaFile.getFileName(), papayaFile.getFileHash());
                 for (PartFile partFile : papayaFile.getPartFiles()) {
                     Path partPath = storeFile.toPath().resolve(partFile.getFileName());
-                    if(partPath.toFile().exists()) {
+                    if (partPath.toFile().exists()) {
                         try {
                             byte[] partByte = Files.readAllBytes(partPath);
                             String partHash = hashGenerator.generateHash(partByte);
+                            System.out.println(partFile.getFileName() + " " + partByte.length);
+                            System.out.println("hash length: " + partHash.getBytes().length);
+                            System.out.println("name length: " + partFile.getFileName().getBytes().length);
                             PartStatusFile partStatusFile;
                             if (partHash.equals(partFile.getFileHash())) {
                                 partStatusFile = new PartStatusFile(partFile.getFileName(), partFile.getFileHash(), PapayaStatus.COMPLETE);
@@ -152,7 +155,7 @@ public class FileManager {
                     }
                 }
 
-                Path papayaStatusFilePath = storeFile.toPath().resolve(papayaFile.getFileName() + "_" + papayaFile.getFileHash() + ".papayastatus");
+                Path papayaStatusFilePath = storeFile.toPath().resolve(papayaFile.getFileHash() + ".papayastatus");
                 objectMapper.writeValue(papayaStatusFilePath.toFile(), papayaStatusFile);
                 return Optional.of(papayaStatusFilePath);
             } catch (IOException e) {
@@ -161,10 +164,5 @@ public class FileManager {
         } catch (IOException e) {
             return Optional.empty();
         }
-    }
-
-    private Path calculateStorePath(String inputFileName, String hash) {
-        String fileNameWithoutExtension = inputFileName.contains(".") ? inputFileName.substring(0, inputFileName.lastIndexOf(".")) : inputFileName;
-        return storePath.resolve(fileNameWithoutExtension + "_" + hash);
     }
 }
