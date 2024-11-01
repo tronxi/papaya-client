@@ -3,19 +3,18 @@ package dev.tronxi.papayaclient.ui;
 import dev.tronxi.papayaclient.PapayaClientApplication;
 import dev.tronxi.papayaclient.files.FileManager;
 import dev.tronxi.papayaclient.udp.UdpSocketManager;
-import dev.tronxi.papayaclient.ui.components.CreatePapayaFileComponent;
+import dev.tronxi.papayaclient.ui.components.CreateDirectoryChooserButton;
+import dev.tronxi.papayaclient.ui.components.CreateFileChooserButton;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -34,26 +33,10 @@ public class UIInitializer extends Application {
 
     @Override
     public void start(Stage stage) {
-        Button createPapayaFileButton = createPapayaFileButton(stage);
-        Button checkButton = new Button("Check");
-        checkButton.setOnMouseClicked(event -> {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            File selectedDirectory = directoryChooser.showDialog(stage);
-            if (selectedDirectory != null) {
-                Optional<Path> maybePath = fileManager.joinStore(selectedDirectory);
-                maybePath.ifPresentOrElse(path -> {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Papaya File Joined");
-                    alert.setHeaderText(path.toAbsolutePath().toString());
-                    alert.show();
-                }, () -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Papaya File Incomplete");
-                    alert.setHeaderText(selectedDirectory.getName() + " incomplete");
-                    alert.show();
-                });
-            }
-        });
+        Button createPapayaFileButton = generateCreatePapayaFileButton(stage);
+        Button joinButton = generateJoinButton(stage);
+        Button statusButton = generateStatusButton(stage);
+
         TextArea logs = new TextArea();
         logs.setEditable(false);
         logs.setText("");
@@ -65,15 +48,49 @@ public class UIInitializer extends Application {
             udpSocketManager.send("holi");
         });
 
-        Scene scene = new Scene(new VBox(createPapayaFileButton, checkButton, logs, sendButton), 640, 480);
+        Scene scene = new Scene(new VBox(createPapayaFileButton, joinButton, statusButton, logs, sendButton), 640, 480);
         stage.setTitle("Papaya Client");
         stage.setScene(scene);
         stage.show();
     }
 
-    private Button createPapayaFileButton(Stage stage) {
-        return new CreatePapayaFileComponent().
-                create(stage, selectedFile -> {
+    private Button generateStatusButton(Stage stage) {
+        return new CreateDirectoryChooserButton().create("Status", stage, file -> {
+            Optional<Path> maybePath = fileManager.generateStatus(file);
+            maybePath.ifPresentOrElse(path -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Papaya File Status Created");
+                alert.setHeaderText(path.toAbsolutePath().toString());
+                alert.show();
+            }, () -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error generating status");
+                alert.setHeaderText(file.getName() + " error");
+                alert.show();
+            });
+        });
+    }
+
+    private Button generateJoinButton(Stage stage) {
+        return new CreateDirectoryChooserButton().create("Join", stage, file -> {
+            Optional<Path> maybePath = fileManager.joinStore(file);
+            maybePath.ifPresentOrElse(path -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Papaya File Joined");
+                alert.setHeaderText(path.toAbsolutePath().toString());
+                alert.show();
+            }, () -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Papaya File Incomplete");
+                alert.setHeaderText(file.getName() + " incomplete");
+                alert.show();
+            });
+        });
+    }
+
+    private Button generateCreatePapayaFileButton(Stage stage) {
+        return new CreateFileChooserButton().
+                create("Create", stage, selectedFile -> {
                     if (selectedFile != null) {
                         try {
                             Path path = fileManager.split(selectedFile);

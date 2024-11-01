@@ -1,6 +1,11 @@
 package dev.tronxi.papayaclient.files;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
+import dev.tronxi.papayaclient.files.papayafile.PartFile;
+import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatus;
+import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatusFile;
+import dev.tronxi.papayaclient.files.papayastatusfile.PartStatusFile;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -104,6 +109,52 @@ public class FileManager {
                 Path papayaFilePath = storeFile.toPath().resolve(papayaFile.getFileName());
                 Files.write(papayaFilePath, combinedBytes);
                 return Optional.of(papayaFilePath);
+            } catch (IOException e) {
+                return Optional.empty();
+            }
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Path> generateStatus(File storeFile) {
+        List<Path> papayaFiles = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(storeFile.toPath(), "*.papaya")) {
+            stream.forEach(papayaFiles::add);
+            if (papayaFiles.size() != 1) {
+                return Optional.empty();
+            }
+            Path papayaPath = papayaFiles.getFirst();
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                PapayaFile papayaFile = objectMapper.readValue(papayaPath.toFile(), PapayaFile.class);
+                PapayaStatusFile papayaStatusFile = new PapayaStatusFile(papayaFile.getFileName(), papayaFile.getFileHash());
+                for (PartFile partFile : papayaFile.getPartFiles()) {
+                    Path partPath = storeFile.toPath().resolve(partFile.getFileName());
+                    if(partPath.toFile().exists()) {
+                        try {
+                            byte[] partByte = Files.readAllBytes(partPath);
+                            String partHash = hashGenerator.generateHash(partByte);
+                            PartStatusFile partStatusFile;
+                            if (partHash.equals(partFile.getFileHash())) {
+                                partStatusFile = new PartStatusFile(partFile.getFileName(), partFile.getFileHash(), PapayaStatus.COMPLETE);
+                            } else {
+                                partStatusFile = new PartStatusFile(partFile.getFileName(), partFile.getFileHash(), PapayaStatus.INCOMPLETE);
+                            }
+                            papayaStatusFile.addPartStatusFile(partStatusFile);
+                        } catch (IOException e) {
+                            PartStatusFile partStatusFile = new PartStatusFile(partFile.getFileName(), partFile.getFileHash(), PapayaStatus.INCOMPLETE);
+                            papayaStatusFile.addPartStatusFile(partStatusFile);
+                        }
+                    } else {
+                        PartStatusFile partStatusFile = new PartStatusFile(partFile.getFileName(), partFile.getFileHash(), PapayaStatus.INCOMPLETE);
+                        papayaStatusFile.addPartStatusFile(partStatusFile);
+                    }
+                }
+
+                Path papayaStatusFilePath = storeFile.toPath().resolve(papayaFile.getFileName() + "_" + papayaFile.getFileHash() + ".papayastatus");
+                objectMapper.writeValue(papayaStatusFilePath.toFile(), papayaStatusFile);
+                return Optional.of(papayaStatusFilePath);
             } catch (IOException e) {
                 return Optional.empty();
             }

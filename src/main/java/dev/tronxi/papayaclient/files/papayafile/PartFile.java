@@ -1,4 +1,4 @@
-package dev.tronxi.papayaclient.files;
+package dev.tronxi.papayaclient.files.papayafile;
 
 public class PartFile {
     private String fileName;
