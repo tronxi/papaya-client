@@ -8,4 +8,6 @@ public interface PeerConnectionManager {
     void start(TextArea textArea);
     void send(PapayaFile papayaFile);
     void stop();
+    void download(PapayaFile papayaFile);
+
 }

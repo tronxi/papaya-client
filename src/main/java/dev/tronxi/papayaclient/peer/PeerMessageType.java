@@ -3,7 +3,8 @@ package dev.tronxi.papayaclient.peer;
 public enum PeerMessageType {
 
     INVALID(-1),
-    PART_FILE(0);
+    PART_FILE(0),
+    ASK_FOR_RESOURCES(1);
 
 
     private final int value;

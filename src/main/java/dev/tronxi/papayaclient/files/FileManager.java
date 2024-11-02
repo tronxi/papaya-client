@@ -184,8 +184,8 @@ public class FileManager {
         }
     }
 
-    public Optional<PapayaFile> retrievePapayaFile(File storeFile) {
-        logger.info("Start retrieve papaya file");
+    public Optional<PapayaFile> retrievePapayaFileFromStore(File storeFile) {
+        logger.info("Start retrieve papaya file from store");
         List<Path> papayaFiles = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(storeFile.toPath(), "*.papaya")) {
             stream.forEach(papayaFiles::add);
@@ -213,6 +213,23 @@ public class FileManager {
         }
     }
 
+    public Optional<PapayaFile> retrievePapayaFileFromFile(File papayaFile) {
+        logger.info("Start retrieve papaya file from file");
+        if(papayaFile.exists()) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                PapayaFile pf = objectMapper.readValue(papayaFile, PapayaFile.class);
+                return Optional.of(pf);
+            } catch (IOException e) {
+                logger.severe(e.getMessage());
+                return Optional.empty();
+            }
+        } else {
+            logger.severe("Papaya file not found");
+            return Optional.empty();
+        }
+    }
+
     public void writePart(String fileId, String partFileName, ByteArrayOutputStream content) {
         Path output = Path.of(workspace).resolve("output");
         Path file = output.resolve(fileId);
@@ -227,5 +244,24 @@ public class FileManager {
             logger.severe(e.getMessage());
         }
 
+    }
+
+    public void createStoreFromPapayaFile(PapayaFile papayaFile) {
+        logger.info("Creating store from papaya file: " + papayaFile.getFileName());
+        File store = storePath.resolve(papayaFile.getFileId()).toFile();
+        if(!store.exists()) {
+            store.mkdirs();
+            logger.info("Created store from papaya file: " + papayaFile.getFileName());
+            Path papayaFilePath = store.toPath().resolve(papayaFile.getFileId() + ".papaya");
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                logger.info("Creating papaya file");
+                objectMapper.writeValue(papayaFilePath.toFile(), papayaFile);
+            } catch (IOException e) {
+                logger.severe(e.getMessage());
+            }
+        } else {
+            logger.severe("Papaya store already exists");
+        }
     }
 }

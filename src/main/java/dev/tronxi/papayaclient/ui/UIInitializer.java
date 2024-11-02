@@ -38,22 +38,30 @@ public class UIInitializer extends Application {
     @Override
     public void start(Stage stage) {
         Label createPapayaFileRunning = new Label("CreatePapayaFileRunning...");
+        createPapayaFileRunning.managedProperty().bind(createPapayaFileRunning.visibleProperty());
         createPapayaFileRunning.setVisible(false);
         Button createPapayaFileButton = generateCreatePapayaFileButton(stage, createPapayaFileRunning);
 
         Label joinRunning = new Label("JoinRunning...");
+        joinRunning.managedProperty().bind(joinRunning.visibleProperty());
         joinRunning.setVisible(false);
         Button joinButton = generateJoinButton(stage, joinRunning);
 
         Label statusRunning = new Label("StatusRunning...");
+        statusRunning.managedProperty().bind(statusRunning.visibleProperty());
         statusRunning.setVisible(false);
         Button statusButton = generateStatusButton(stage, statusRunning);
 
         Label sendingRunning = new Label("SendingRunning...");
+        sendingRunning.managedProperty().bind(sendingRunning.visibleProperty());
         sendingRunning.setVisible(false);
         Button sendButton = generateSendButton(stage, sendingRunning);
-        HBox hBox = new HBox(createPapayaFileButton, joinButton, statusButton, sendButton,
+
+        Button downloadButton = generateDownloadButton(stage);
+
+        HBox hBox = new HBox(createPapayaFileButton, joinButton, statusButton, sendButton, downloadButton,
                 createPapayaFileRunning, joinRunning, statusRunning, sendingRunning);
+        hBox.setSpacing(10);
 
         TextArea logs = new TextArea();
         logs.setEditable(false);
@@ -62,11 +70,28 @@ public class UIInitializer extends Application {
         logs.setMinHeight(400);
         peerConnectionManager.start(logs);
 
-
-        Scene scene = new Scene(new VBox(hBox, logs), 800, 480);
-        stage.setTitle("Papaya Client");
+        VBox vBox = new VBox(hBox, logs);
+        vBox.setSpacing(10);
+        Scene scene = new Scene(vBox, 800, 480);
+        stage.setTitle("Papaya");
         stage.setScene(scene);
         stage.show();
+    }
+
+    private Button generateDownloadButton(Stage stage) {
+        return new CreateFileChooserButton().create("Download", stage, file -> {
+            Optional<PapayaFile> maybePapayaFile = fileManager.retrievePapayaFileFromFile(file);
+            maybePapayaFile.ifPresent(papayaFile -> {
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() {
+                        peerConnectionManager.download(papayaFile);
+                        return null;
+                    }
+                };
+                new Thread(task).start();
+            });
+        });
     }
 
     private Button generateStatusButton(Stage stage, Label label) {
@@ -163,7 +188,7 @@ public class UIInitializer extends Application {
 
     private Button generateSendButton(Stage stage, Label label) {
         return new CreateDirectoryChooserButton().create("Send", stage, file -> {
-            Optional<PapayaFile> maybePapayaFile = fileManager.retrievePapayaFile(file);
+            Optional<PapayaFile> maybePapayaFile = fileManager.retrievePapayaFileFromStore(file);
             maybePapayaFile.ifPresent(papayaFile -> {
                 Task<Void> task = new Task<>() {
                     @Override
