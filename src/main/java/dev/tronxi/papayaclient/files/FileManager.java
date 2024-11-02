@@ -99,29 +99,25 @@ public class FileManager {
             try {
                 PapayaFile papayaFile = objectMapper.readValue(papayaPath.toFile(), PapayaFile.class);
                 Path papayaFilePath = storeFile.toPath().resolve(papayaFile.getFileName());
-                List<byte[]> partsData = new ArrayList<>();
-                for (PartFile partFile : papayaFile.getPartFiles()) {
-                    logger.info("Reading for join:  " + partFile.getFileName());
-                    Path partPath = storeFile.toPath().resolve(partFile.getFileName());
-                    try {
-                        byte[] partByte = Files.readAllBytes(partPath);
-                        String partHash = hashGenerator.generateHash(partByte);
-                        if (!partHash.equals(partFile.getFileHash())) {
-                            logger.severe("part hash does not match: " + partFile.getFileName());
-                            return Optional.empty();
-                        }
-                        partsData.add(partByte);
-                    } catch (IOException e) {
-                        logger.severe(e.getMessage());
-                        return Optional.empty();
-                    }
-                }
                 logger.info("Start writing for join: " + papayaFilePath);
 
                 try (FileOutputStream fileOutputStream = new FileOutputStream(papayaFilePath.toFile())) {
-                    for (byte[] part : partsData) {
-                        logger.info("Writing for join:  " + part.length);
-                        fileOutputStream.write(part);
+                    for (PartFile partFile : papayaFile.getPartFiles()) {
+                        logger.info("Reading for join:  " + partFile.getFileName());
+                        Path partPath = storeFile.toPath().resolve(partFile.getFileName());
+                        try {
+                            byte[] partByte = Files.readAllBytes(partPath);
+                            String partHash = hashGenerator.generateHash(partByte);
+                            if (!partHash.equals(partFile.getFileHash())) {
+                                logger.severe("part hash does not match: " + partFile.getFileName());
+                                return Optional.empty();
+                            }
+                            logger.info("Writing for join:  " + partByte.length);
+                            fileOutputStream.write(partByte);
+                        } catch (IOException e) {
+                            logger.severe(e.getMessage());
+                            return Optional.empty();
+                        }
                     }
                 } catch (IOException e) {
                     logger.severe(e.getMessage());
