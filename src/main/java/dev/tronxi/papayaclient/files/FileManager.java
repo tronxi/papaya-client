@@ -215,7 +215,7 @@ public class FileManager {
 
     public Optional<PapayaFile> retrievePapayaFileFromFile(File papayaFile) {
         logger.info("Start retrieve papaya file from file");
-        if(papayaFile.exists()) {
+        if (papayaFile.exists()) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
                 PapayaFile pf = objectMapper.readValue(papayaFile, PapayaFile.class);
@@ -249,7 +249,7 @@ public class FileManager {
     public void createStoreFromPapayaFile(PapayaFile papayaFile) {
         logger.info("Creating store from papaya file: " + papayaFile.getFileName());
         File store = storePath.resolve(papayaFile.getFileId()).toFile();
-        if(!store.exists()) {
+        if (!store.exists()) {
             store.mkdirs();
             logger.info("Created store from papaya file: " + papayaFile.getFileName());
             Path papayaFilePath = store.toPath().resolve(papayaFile.getFileId() + ".papaya");

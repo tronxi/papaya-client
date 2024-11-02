@@ -18,10 +18,12 @@ public class PeerSignalingService {
     }
 
     List<Peer> peers = new ArrayList<>();
+
     {
         peers.add(new Peer("localhost", 3390));
         peers.add(new Peer("192.168.1.134", 3390));
     }
+
     private Peer peer;
 
     public List<Peer> retrievePeers() {
@@ -39,7 +41,7 @@ public class PeerSignalingService {
     @Scheduled(fixedRate = 300000)
     public void refreshSend() {
         logger.log(Level.INFO, "Refresh peer send: " + peer);
-        if(peer != null) {
+        if (peer != null) {
             send(peer);
         } else {
             logger.severe("Peer is null");
@@ -47,7 +49,7 @@ public class PeerSignalingService {
     }
 
     private void send(Peer peer) {
-        if(!peers.contains(peer)) {
+        if (!peers.contains(peer)) {
             peers.add(peer);
             logger.log(Level.INFO, "Peer " + peer + " added to list");
         }

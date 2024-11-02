@@ -81,7 +81,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                         message = receivePartFile(clientSocket, receivedData);
                                     }
                                     case ASK_FOR_RESOURCES -> {
-                                        message = "Asking for resources";
+                                        message = receiveAskForResources(clientSocket, receivedData);
                                     }
                                     case INVALID -> {
                                         message = "Invalid";
@@ -89,7 +89,13 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                 }
                                 String finalMessage = message;
                                 Platform.runLater(() -> {
-                                    textArea.setText(finalMessage);
+                                    textArea.appendText("\n" + finalMessage);
+                                    String[] lines = textArea.getText().split("\n");
+                                    if (lines.length > 100) {
+                                        String newText = String.join("\n", Arrays.copyOfRange(lines, lines.length - 100, lines.length));
+                                        textArea.setText(newText);
+                                        textArea.appendText("");
+                                    }
                                 });
                             } else {
                                 logger.info("Received empty message");
@@ -105,6 +111,18 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }
+    }
+
+    private String receiveAskForResources(Socket clientSocket, byte[] receivedData) {
+        String message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort();
+        try {
+            ByteArrayOutputStream fileId = new ByteArrayOutputStream();
+            fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
+            message += " AskForResources with fileId: " + fileId;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return message;
     }
 
     private String receivePartFile(Socket clientSocket, byte[] receivedData) {
