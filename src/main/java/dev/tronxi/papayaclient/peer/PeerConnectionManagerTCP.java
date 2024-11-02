@@ -67,12 +67,12 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                             while ((length = inputStream.read(buffer)) != -1) {
                                 outputStream.write(buffer, 0, length);
                             }
-
                             if (outputStream.size() > 0) {
                                 byte[] receivedData = outputStream.toByteArray();
                                 int typeByte = receivedData[0];
                                 String message = "";
                                 PeerMessageType peerMessageType = PeerMessageType.fromValue(typeByte);
+                                logger.info("Receiving: " + peerMessageType);
                                 switch (peerMessageType) {
                                     case PART_FILE -> {
                                         message = receivePartFile(clientSocket, receivedData);
@@ -85,6 +85,8 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                 Platform.runLater(() -> {
                                     textArea.setText(finalMessage);
                                 });
+                            } else {
+                                logger.info("Received empty message");
                             }
                         } catch (IOException e) {
                             logger.severe(e.getMessage());
