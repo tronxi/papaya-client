@@ -4,6 +4,8 @@ import dev.tronxi.papayaclient.PapayaClientApplication;
 import dev.tronxi.papayaclient.files.FileManager;
 import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.peer.PeerConnectionManager;
+import dev.tronxi.papayaclient.peer.PeerConnectionManagerTCP;
+import dev.tronxi.papayaclient.peer.PeerConnectionManagerUDP;
 import dev.tronxi.papayaclient.ui.components.CreateDirectoryChooserButton;
 import dev.tronxi.papayaclient.ui.components.CreateFileChooserButton;
 import javafx.application.Application;
@@ -18,7 +20,6 @@ import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class UIInitializer extends Application {
     @Override
     public void init() {
         fileManager = PapayaClientApplication.getContext().getBean(FileManager.class);
-        peerConnectionManager = PapayaClientApplication.getContext().getBean(PeerConnectionManager.class);
+        peerConnectionManager = PapayaClientApplication.getContext().getBean(PeerConnectionManagerTCP.class);
     }
 
     @Override
@@ -87,10 +88,12 @@ public class UIInitializer extends Application {
             Task<Optional<Path>> task = new Task<>() {
                 @Override
                 protected Optional<Path> call() {
+                    System.out.println("joining");
                     return fileManager.joinStore(file);
                 }
             };
             task.setOnSucceeded(workerStateEvent -> {
+                System.out.println("joined");
                 Optional<Path> maybePath = task.getValue();
                 maybePath.ifPresentOrElse(path -> {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);

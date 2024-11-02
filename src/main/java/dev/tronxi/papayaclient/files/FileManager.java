@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -54,7 +55,7 @@ public class FileManager {
                 store.toFile().mkdirs();
             }
 
-            int partSize = 65000;
+            int partSize = 1000000;
             int numPart = 0;
             for (int i = 0; i < bytes.length; i += partSize) {
                 int end = Math.min(bytes.length, i + partSize);
@@ -96,27 +97,26 @@ public class FileManager {
                             System.out.println("part hash does not match: " + partFile.getFileName());
                             return Optional.empty();
                         }
-                        partsData.add(Files.readAllBytes(partPath));
+                        partsData.add(partByte);
                     } catch (IOException e) {
                         e.printStackTrace();
                         return Optional.empty();
                     }
                 }
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                Path papayaFilePath = storeFile.toPath().resolve(papayaFile.getFileName());
 
-                for (byte[] partData : partsData) {
-                    outputStream.write(partData);
+                try(FileOutputStream fileOutputStream = new FileOutputStream(papayaFilePath.toFile())) {
+                    for (byte[] part : partsData) {
+                        fileOutputStream.write(part);
+                    }
                 }
-
-                byte[] combinedBytes = outputStream.toByteArray();
+                byte[] combinedBytes = Files.readAllBytes(papayaFilePath);
                 String combinedHash = hashGenerator.generateHash(combinedBytes);
                 if (!combinedHash.equals(papayaFile.getFileHash())) {
                     System.out.println("combined hash does not match");
+                    papayaFilePath.toFile().delete();
                     return Optional.empty();
                 }
-                Path papayaFilePath = storeFile.toPath().resolve(papayaFile.getFileName());
-                Files.write(papayaFilePath, combinedBytes);
-                System.out.println("ok");
                 return Optional.of(papayaFilePath);
             } catch (IOException e) {
                 e.printStackTrace();
