@@ -145,7 +145,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                     dataStream.write(Files.readAllBytes(partFilePath));
                     outputStream.write(dataStream.toByteArray());
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    logger.severe(e.getMessage());
                 }
             } else {
                 logger.severe("File not found: " + partFilePath);

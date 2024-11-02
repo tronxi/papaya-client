@@ -30,21 +30,21 @@ public class UpnpConfiguration {
         GatewayDevice gatewayDevice = gatewayDiscover.getValidGateway();
         if (null != gatewayDevice) {
             logger.info("Found gateway device: " + gatewayDevice.getModelName() + " " + gatewayDevice.getModelDescription());
+            InetAddress localAddress = gatewayDevice.getLocalAddress();
+            logger.info("Found local address: " + localAddress);
+            String externalIPAddress = gatewayDevice.getExternalIPAddress();
+            logger.info("Found external IP address: " + externalIPAddress);
+
+            PortMappingEntry portMapping = new PortMappingEntry();
+            if (gatewayDevice.getSpecificPortMappingEntry(port, "TCP", portMapping)) {
+                logger.info("Port was already mapped");
+            } else {
+                gatewayDevice.addPortMapping(port, port, localAddress.getHostAddress(), "TCP", "papaya");
+            }
+            return gatewayDevice;
         } else {
             logger.severe("Could not find gateway device");
-            return null;
+            return new GatewayDevice();
         }
-        InetAddress localAddress = gatewayDevice.getLocalAddress();
-        logger.info("Found local address: " + localAddress);
-        String externalIPAddress = gatewayDevice.getExternalIPAddress();
-        logger.info("Found external IP address: " + externalIPAddress);
-
-        PortMappingEntry portMapping = new PortMappingEntry();
-        if (gatewayDevice.getSpecificPortMappingEntry(port, "UDP", portMapping)) {
-            logger.info("Port was already mapped");
-        } else {
-            gatewayDevice.addPortMapping(port, port, localAddress.getHostAddress(), "UDP", "papaya");
-        }
-        return gatewayDevice;
     }
 }
