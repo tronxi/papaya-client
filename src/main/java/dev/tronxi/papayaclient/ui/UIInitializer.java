@@ -7,6 +7,7 @@ import dev.tronxi.papayaclient.peer.PeerConnectionManager;
 import dev.tronxi.papayaclient.ui.components.CreateDirectoryChooserButton;
 import dev.tronxi.papayaclient.ui.components.CreateFileChooserButton;
 import javafx.application.Application;
+import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -57,35 +58,53 @@ public class UIInitializer extends Application {
 
     private Button generateStatusButton(Stage stage) {
         return new CreateDirectoryChooserButton().create("Status", stage, file -> {
-            Optional<Path> maybePath = fileManager.generateStatus(file);
-            maybePath.ifPresentOrElse(path -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Papaya File Status Created");
-                alert.setHeaderText(path.toAbsolutePath().toString());
-                alert.show();
-            }, () -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error generating status");
-                alert.setHeaderText(file.getName() + " error");
-                alert.show();
+            Task<Optional<Path>> task = new Task<>() {
+                @Override
+                protected Optional<Path> call() {
+                    return fileManager.generateStatus(file);
+                }
+            };
+            task.setOnSucceeded(workerStateEvent -> {
+                Optional<Path> maybePath = task.getValue();
+                maybePath.ifPresentOrElse(path -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Papaya File Status Created");
+                    alert.setHeaderText(path.toAbsolutePath().toString());
+                    alert.show();
+                }, () -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error generating status");
+                    alert.setHeaderText(file.getName() + " error");
+                    alert.show();
+                });
             });
+            new Thread(task).start();
         });
     }
 
     private Button generateJoinButton(Stage stage) {
         return new CreateDirectoryChooserButton().create("Join", stage, file -> {
-            Optional<Path> maybePath = fileManager.joinStore(file);
-            maybePath.ifPresentOrElse(path -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Papaya File Joined");
-                alert.setHeaderText(path.toAbsolutePath().toString());
-                alert.show();
-            }, () -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Papaya File Incomplete");
-                alert.setHeaderText(file.getName() + " incomplete");
-                alert.show();
+            Task<Optional<Path>> task = new Task<>() {
+                @Override
+                protected Optional<Path> call() {
+                    return fileManager.joinStore(file);
+                }
+            };
+            task.setOnSucceeded(workerStateEvent -> {
+                Optional<Path> maybePath = task.getValue();
+                maybePath.ifPresentOrElse(path -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Papaya File Joined");
+                    alert.setHeaderText(path.toAbsolutePath().toString());
+                    alert.show();
+                }, () -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Papaya File Incomplete");
+                    alert.setHeaderText(file.getName() + " incomplete");
+                    alert.show();
+                });
             });
+            new Thread(task).start();
         });
     }
 
@@ -93,27 +112,50 @@ public class UIInitializer extends Application {
         return new CreateFileChooserButton().
                 create("Create", stage, selectedFile -> {
                     if (selectedFile != null) {
-                        try {
-                            Path path = fileManager.split(selectedFile);
-                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                            alert.setTitle("Papaya File Created");
-                            alert.setHeaderText(path.toAbsolutePath().toString());
+                        Task<Optional<Path>> task = new Task<>() {
+                            @Override
+                            protected Optional<Path> call() {
+                                return fileManager.split(selectedFile);
+                            }
+                        };
+                        task.setOnRunning(workerStateEvent -> {
+                            System.out.println("Running task");
+                        });
+                        task.setOnSucceeded(workerStateEvent -> {
+                            Optional<Path> maybePath = task.getValue();
+                            Alert alert;
+                            if (maybePath.isPresent()) {
+                                alert = new Alert(Alert.AlertType.INFORMATION);
+                                alert.setTitle("Papaya File Created");
+                                alert.setHeaderText(maybePath.get().toAbsolutePath().toString());
+                            } else {
+                                alert = new Alert(Alert.AlertType.ERROR);
+                                alert.setTitle("Papaya File Creation Failed");
+                            }
                             alert.show();
-                        } catch (IOException e) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Papaya File Creation Failed");
-                            alert.show();
-                            throw new RuntimeException(e);
-                        }
+                        });
+                        new Thread(task).start();
                     }
                 });
     }
 
     private Button generateSendButton(Stage stage) {
         return new CreateDirectoryChooserButton().create("Send", stage, file -> {
+            System.out.println("retrieving file");
             Optional<PapayaFile> maybePapayaFile = fileManager.retrievePapayaFile(file);
+            System.out.println("Tenemos File");
             maybePapayaFile.ifPresent(papayaFile -> {
-                peerConnectionManager.send(papayaFile);
+                Task<Void> task = new Task<>() {
+                    @Override
+                    protected Void call() {
+                        peerConnectionManager.send(papayaFile);
+                        return null;
+                    }
+                };
+                task.setOnSucceeded(workerStateEvent -> {
+                    System.out.println("Sent file");
+                });
+                new Thread(task).start();
             });
         });
     }

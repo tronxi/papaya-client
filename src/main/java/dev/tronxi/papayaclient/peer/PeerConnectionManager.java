@@ -56,7 +56,7 @@ public class PeerConnectionManager {
                     while (true) {
                         try {
                             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                            byte[] buffer = new byte[1024];
+                            byte[] buffer = new byte[80000];
                             DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length);
                             socket.receive(datagramPacket);
                             int length = datagramPacket.getLength();
@@ -68,7 +68,7 @@ public class PeerConnectionManager {
                                 PeerMessageType peerMessageType = PeerMessageType.fromValue(typeByte);
                                 switch (peerMessageType) {
                                     case PART_FILE -> {
-                                        message = receivePartFile(receivedData);
+                                        message = receivePartFile(datagramPacket, receivedData);
                                     }
                                     case INVALID -> {
                                         message = "Invalid";
@@ -76,7 +76,7 @@ public class PeerConnectionManager {
                                 }
                                 String finalMessage = message;
                                 Platform.runLater(() -> {
-                                    textArea.setText(textArea.getText() + "\n" + finalMessage);
+                                    textArea.setText(finalMessage);
                                 });
                             }
                         } catch (IOException e) {
@@ -91,7 +91,7 @@ public class PeerConnectionManager {
         }
     }
 
-    private String receivePartFile(byte[] receivedData) {
+    private String receivePartFile(DatagramPacket datagramPacket, byte[] receivedData) {
         String message;
         ByteArrayOutputStream fileHash = new ByteArrayOutputStream();
         try {
@@ -111,7 +111,7 @@ public class PeerConnectionManager {
             ByteArrayOutputStream outputStreamWithoutHeaders = new ByteArrayOutputStream();
             outputStreamWithoutHeaders.write(dataWithoutHeaders);
             fileManager.writePart(fileHash.toString(), partFileName.toString(), outputStreamWithoutHeaders);
-            message = "FileHash: " + fileHash + " : PartHash: " + partFileName + " Content:" + outputStreamWithoutHeaders.size();
+            message = "From: "+ datagramPacket.getAddress() + ":" + datagramPacket.getPort() + " FileHash: " + fileHash + " : PartHash: " + partFileName + " Content:" + outputStreamWithoutHeaders.size();
             return message;
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -41,33 +41,37 @@ public class FileManager {
     }
 
 
-    public Path split(File inputFile) throws IOException {
-        Path inputFilePatch = inputFile.toPath();
-        byte[] bytes = Files.readAllBytes(inputFilePatch);
-        String hash = hashGenerator.generateHash(bytes);
+    public Optional<Path> split(File inputFile) {
+        try {
+            Path inputFilePatch = inputFile.toPath();
+            byte[] bytes = Files.readAllBytes(inputFilePatch);
+            String hash = hashGenerator.generateHash(bytes);
 
-        PapayaFile papayaFile = new PapayaFile(inputFile.getName(), hash);
+            PapayaFile papayaFile = new PapayaFile(inputFile.getName(), hash);
 
-        Path store = storePath.resolve(hash);
-        if (!store.toFile().exists()) {
-            store.toFile().mkdirs();
+            Path store = storePath.resolve(hash);
+            if (!store.toFile().exists()) {
+                store.toFile().mkdirs();
+            }
+
+            int partSize = 65000;
+            int numPart = 0;
+            for (int i = 0; i < bytes.length; i += partSize) {
+                int end = Math.min(bytes.length, i + partSize);
+                byte[] part = Arrays.copyOfRange(bytes, i, end);
+                String partName = String.valueOf(numPart);
+                String partHash = hashGenerator.generateHash(part);
+                PartFile partFile = new PartFile(partName, partHash);
+                papayaFile.addPartFile(partFile);
+                Files.write(store.resolve(partName), part);
+                numPart++;
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(store.resolve(hash + ".papaya").toFile(), papayaFile);
+            return Optional.of(store);
+        } catch (IOException e) {
+            return Optional.empty();
         }
-
-        int partSize = 250;
-        int numPart = 0;
-        for (int i = 0; i < bytes.length; i += partSize) {
-            int end = Math.min(bytes.length, i + partSize);
-            byte[] part = Arrays.copyOfRange(bytes, i, end);
-            String partName = String.valueOf(numPart);
-            String partHash = hashGenerator.generateHash(part);
-            PartFile partFile = new PartFile(partName, partHash);
-            papayaFile.addPartFile(partFile);
-            Files.write(store.resolve(partName), part);
-            numPart++;
-        }
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(store.resolve(hash + ".papaya").toFile(), papayaFile);
-        return store;
     }
 
     public Optional<Path> joinStore(File storeFile) {
@@ -75,6 +79,7 @@ public class FileManager {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(storeFile.toPath(), "*.papaya")) {
             stream.forEach(papayaFiles::add);
             if (papayaFiles.size() != 1) {
+                System.out.println("no papaya file found");
                 return Optional.empty();
             }
             Path papayaPath = papayaFiles.getFirst();
@@ -88,10 +93,12 @@ public class FileManager {
                         byte[] partByte = Files.readAllBytes(partPath);
                         String partHash = hashGenerator.generateHash(partByte);
                         if (!partHash.equals(partFile.getFileHash())) {
+                            System.out.println("part hash does not match: " + partFile.getFileName());
                             return Optional.empty();
                         }
                         partsData.add(Files.readAllBytes(partPath));
                     } catch (IOException e) {
+                        e.printStackTrace();
                         return Optional.empty();
                     }
                 }
@@ -104,15 +111,19 @@ public class FileManager {
                 byte[] combinedBytes = outputStream.toByteArray();
                 String combinedHash = hashGenerator.generateHash(combinedBytes);
                 if (!combinedHash.equals(papayaFile.getFileHash())) {
+                    System.out.println("combined hash does not match");
                     return Optional.empty();
                 }
                 Path papayaFilePath = storeFile.toPath().resolve(papayaFile.getFileName());
                 Files.write(papayaFilePath, combinedBytes);
+                System.out.println("ok");
                 return Optional.of(papayaFilePath);
             } catch (IOException e) {
+                e.printStackTrace();
                 return Optional.empty();
             }
         } catch (IOException e) {
+            e.printStackTrace();
             return Optional.empty();
         }
     }
