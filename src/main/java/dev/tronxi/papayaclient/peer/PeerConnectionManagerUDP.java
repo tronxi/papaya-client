@@ -122,13 +122,13 @@ public class PeerConnectionManagerUDP implements PeerConnectionManager {
     @Override
     public void send(PapayaFile papayaFile) {
         papayaFile.getPartFiles().forEach(partFile -> {
-            Path partFilePath = storePath.resolve(papayaFile.getFileHash())
+            Path partFilePath = storePath.resolve(papayaFile.getFileId())
                     .resolve(partFile.getFileName());
             if (partFilePath.toFile().exists()) {
                 try {
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                     outputStream.write(PeerMessageType.PART_FILE.getValue());
-                    outputStream.write(papayaFile.getFileHash().getBytes());
+                    outputStream.write(papayaFile.getFileId().getBytes());
                     outputStream.write(partFile.getFileName().getBytes());
                     outputStream.write("#".getBytes());
                     outputStream.write(Files.readAllBytes(partFilePath));

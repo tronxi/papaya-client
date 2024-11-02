@@ -17,9 +17,14 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class PeerConnectionManagerTCP implements PeerConnectionManager {
+
+    private static final Logger logger = Logger.getLogger(PeerConnectionManagerTCP.class.getName());
+
 
     private final FileManager fileManager;
     @Value("${papaya.port}")
@@ -33,6 +38,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
     private final GatewayDevice gatewayDevice;
 
     public PeerConnectionManagerTCP(GatewayDevice gatewayDevice, FileManager fileManager) {
+        logger.setLevel(Level.INFO);
         this.gatewayDevice = gatewayDevice;
         this.fileManager = fileManager;
     }
@@ -44,6 +50,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
 
     @Override
     public void start(TextArea textArea) {
+        logger.info("Start peer connection manager tcp");
         try {
             serverSocket = new ServerSocket(port);
             Task<Void> task = new Task<>() {
@@ -53,6 +60,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                         try (Socket clientSocket = serverSocket.accept();
                              InputStream inputStream = clientSocket.getInputStream();
                              ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                            logger.info("Receiving...");
 
                             byte[] buffer = new byte[80000];
                             int length;
@@ -79,6 +87,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                 });
                             }
                         } catch (IOException e) {
+                            logger.severe(e.getMessage());
                             return null;
                         }
                     }
@@ -86,15 +95,16 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
             };
             new Thread(task).start();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.severe(e.getMessage());
         }
     }
 
     private String receivePartFile(Socket clientSocket, byte[] receivedData) {
         String message;
-        ByteArrayOutputStream fileHash = new ByteArrayOutputStream();
+        ByteArrayOutputStream fileId = new ByteArrayOutputStream();
         try {
-            fileHash.write(Arrays.copyOfRange(receivedData, 1, 33));
+            logger.info("Receiving part file...");
+            fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
             ByteArrayOutputStream partFileName = new ByteArrayOutputStream();
             int i = 33;
             char charAtIndex;
@@ -105,23 +115,23 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                 }
                 i++;
             } while (charAtIndex != '#');
-
-            byte[] dataWithoutHeaders = Arrays.copyOfRange(receivedData, i, receivedData.length);
             ByteArrayOutputStream outputStreamWithoutHeaders = new ByteArrayOutputStream();
-            outputStreamWithoutHeaders.write(dataWithoutHeaders);
-            fileManager.writePart(fileHash.toString(), partFileName.toString(), outputStreamWithoutHeaders);
+            outputStreamWithoutHeaders.write(Arrays.copyOfRange(receivedData, i, receivedData.length));
+            fileManager.writePart(fileId.toString(), partFileName.toString(), outputStreamWithoutHeaders);
             message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() +
-                    " FileHash: " + fileHash + " : PartHash: " + partFileName + " Content: " + outputStreamWithoutHeaders.size();
+                    " FileId: " + fileId + " : PartHash: " + partFileName + " Content: " + outputStreamWithoutHeaders.size();
             return message;
         } catch (IOException e) {
+            logger.severe(e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public void send(PapayaFile papayaFile) {
+        logger.info("Sending file...");
         papayaFile.getPartFiles().forEach(partFile -> {
-            Path partFilePath = storePath.resolve(papayaFile.getFileHash())
+            Path partFilePath = storePath.resolve(papayaFile.getFileId())
                     .resolve(partFile.getFileName());
             if (partFilePath.toFile().exists()) {
                 try (Socket socket = new Socket("localhost", port);
@@ -129,30 +139,36 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
 
                     ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
                     dataStream.write(PeerMessageType.PART_FILE.getValue());
-                    dataStream.write(papayaFile.getFileHash().getBytes());
+                    dataStream.write(papayaFile.getFileId().getBytes());
                     dataStream.write(partFile.getFileName().getBytes());
                     dataStream.write("#".getBytes());
                     dataStream.write(Files.readAllBytes(partFilePath));
-                    byte[] partByte = dataStream.toByteArray();
-                    outputStream.write(partByte);
+                    outputStream.write(dataStream.toByteArray());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else {
-                System.out.println("File not found: " + partFilePath);
+                logger.severe("File not found: " + partFilePath);
             }
         });
     }
 
     @Override
     public void stop() {
+        logger.info("Stop...");
         try {
+            logger.info("Delete port mapping");
+            gatewayDevice.deletePortMapping(port, "TCP");
+        } catch (IOException | SAXException e) {
+            logger.severe(e.getMessage());
+        }
+        try {
+            logger.info("Close socket");
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
             }
-            gatewayDevice.deletePortMapping(port, "TCP");
-        } catch (IOException | SAXException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
         }
     }
 }

@@ -5,12 +5,12 @@ import java.util.List;
 
 public class PapayaStatusFile {
     private String fileName;
-    private String fileHash;
+    private String fileId;
     private List<PartStatusFile> partStatusFiles;
 
-    public PapayaStatusFile(String fileName, String fileHash) {
+    public PapayaStatusFile(String fileName, String fileId) {
         this.fileName = fileName;
-        this.fileHash = fileHash;
+        this.fileId = fileId;
         this.partStatusFiles = new ArrayList<>();
     }
 
@@ -27,12 +27,12 @@ public class PapayaStatusFile {
         return PapayaStatus.COMPLETE;
     }
 
-    public String getFileHash() {
-        return fileHash;
+    public String getFileId() {
+        return fileId;
     }
 
-    public PapayaStatusFile setFileHash(String fileHash) {
-        this.fileHash = fileHash;
+    public PapayaStatusFile setFileId(String fileId) {
+        this.fileId = fileId;
         return this;
     }
 

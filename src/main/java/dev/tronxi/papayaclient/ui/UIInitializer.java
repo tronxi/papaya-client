@@ -5,7 +5,6 @@ import dev.tronxi.papayaclient.files.FileManager;
 import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.peer.PeerConnectionManager;
 import dev.tronxi.papayaclient.peer.PeerConnectionManagerTCP;
-import dev.tronxi.papayaclient.peer.PeerConnectionManagerUDP;
 import dev.tronxi.papayaclient.ui.components.CreateDirectoryChooserButton;
 import dev.tronxi.papayaclient.ui.components.CreateFileChooserButton;
 import javafx.application.Application;
@@ -13,6 +12,7 @@ import javafx.concurrent.Task;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -37,11 +37,23 @@ public class UIInitializer extends Application {
 
     @Override
     public void start(Stage stage) {
-        Button createPapayaFileButton = generateCreatePapayaFileButton(stage);
-        Button joinButton = generateJoinButton(stage);
-        Button statusButton = generateStatusButton(stage);
-        Button sendButton = generateSendButton(stage);
-        HBox hBox = new HBox(createPapayaFileButton, joinButton, statusButton, sendButton);
+        Label createPapayaFileRunning = new Label("CreatePapayaFileRunning...");
+        createPapayaFileRunning.setVisible(false);
+        Button createPapayaFileButton = generateCreatePapayaFileButton(stage, createPapayaFileRunning);
+
+        Label joinRunning = new Label("JoinRunning...");
+        joinRunning.setVisible(false);
+        Button joinButton = generateJoinButton(stage, joinRunning);
+
+        Label statusRunning = new Label("StatusRunning...");
+        statusRunning.setVisible(false);
+        Button statusButton = generateStatusButton(stage, statusRunning);
+
+        Label sendingRunning = new Label("SendingRunning...");
+        sendingRunning.setVisible(false);
+        Button sendButton = generateSendButton(stage, sendingRunning);
+        HBox hBox = new HBox(createPapayaFileButton, joinButton, statusButton, sendButton,
+                createPapayaFileRunning, joinRunning, statusRunning, sendingRunning);
 
         TextArea logs = new TextArea();
         logs.setEditable(false);
@@ -51,13 +63,13 @@ public class UIInitializer extends Application {
         peerConnectionManager.start(logs);
 
 
-        Scene scene = new Scene(new VBox(hBox, logs), 640, 480);
+        Scene scene = new Scene(new VBox(hBox, logs), 800, 480);
         stage.setTitle("Papaya Client");
         stage.setScene(scene);
         stage.show();
     }
 
-    private Button generateStatusButton(Stage stage) {
+    private Button generateStatusButton(Stage stage, Label label) {
         return new CreateDirectoryChooserButton().create("Status", stage, file -> {
             Task<Optional<Path>> task = new Task<>() {
                 @Override
@@ -65,7 +77,11 @@ public class UIInitializer extends Application {
                     return fileManager.generateStatus(file);
                 }
             };
+            task.setOnRunning(workerStateEvent -> {
+                label.setVisible(true);
+            });
             task.setOnSucceeded(workerStateEvent -> {
+                label.setVisible(false);
                 Optional<Path> maybePath = task.getValue();
                 maybePath.ifPresentOrElse(path -> {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -83,17 +99,19 @@ public class UIInitializer extends Application {
         });
     }
 
-    private Button generateJoinButton(Stage stage) {
+    private Button generateJoinButton(Stage stage, Label label) {
         return new CreateDirectoryChooserButton().create("Join", stage, file -> {
             Task<Optional<Path>> task = new Task<>() {
                 @Override
                 protected Optional<Path> call() {
-                    System.out.println("joining");
                     return fileManager.joinStore(file);
                 }
             };
+            task.setOnRunning(workerStateEvent -> {
+                label.setVisible(true);
+            });
             task.setOnSucceeded(workerStateEvent -> {
-                System.out.println("joined");
+                label.setVisible(false);
                 Optional<Path> maybePath = task.getValue();
                 maybePath.ifPresentOrElse(path -> {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -111,7 +129,7 @@ public class UIInitializer extends Application {
         });
     }
 
-    private Button generateCreatePapayaFileButton(Stage stage) {
+    private Button generateCreatePapayaFileButton(Stage stage, Label label) {
         return new CreateFileChooserButton().
                 create("Create", stage, selectedFile -> {
                     if (selectedFile != null) {
@@ -122,9 +140,10 @@ public class UIInitializer extends Application {
                             }
                         };
                         task.setOnRunning(workerStateEvent -> {
-                            System.out.println("Running task");
+                            label.setVisible(true);
                         });
                         task.setOnSucceeded(workerStateEvent -> {
+                            label.setVisible(false);
                             Optional<Path> maybePath = task.getValue();
                             Alert alert;
                             if (maybePath.isPresent()) {
@@ -142,11 +161,9 @@ public class UIInitializer extends Application {
                 });
     }
 
-    private Button generateSendButton(Stage stage) {
+    private Button generateSendButton(Stage stage, Label label) {
         return new CreateDirectoryChooserButton().create("Send", stage, file -> {
-            System.out.println("retrieving file");
             Optional<PapayaFile> maybePapayaFile = fileManager.retrievePapayaFile(file);
-            System.out.println("Tenemos File");
             maybePapayaFile.ifPresent(papayaFile -> {
                 Task<Void> task = new Task<>() {
                     @Override
@@ -155,8 +172,11 @@ public class UIInitializer extends Application {
                         return null;
                     }
                 };
+                task.setOnRunning(workerStateEvent -> {
+                    label.setVisible(true);
+                });
                 task.setOnSucceeded(workerStateEvent -> {
-                    System.out.println("Sent file");
+                    label.setVisible(false);
                 });
                 new Thread(task).start();
             });
@@ -165,7 +185,6 @@ public class UIInitializer extends Application {
 
     @Override
     public void stop() {
-        System.out.println("Shutting down");
         peerConnectionManager.stop();
         SpringApplication.exit(PapayaClientApplication.getContext(), () -> 0);
     }

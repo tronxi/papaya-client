@@ -2,27 +2,28 @@ package dev.tronxi.papayaclient.files.papayafile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class PapayaFile {
     private String fileName;
-    private String fileHash;
+    private String fileId;
     private List<PartFile> partFiles;
 
-    public PapayaFile(String fileName, String fileHash) {
+    public PapayaFile(String fileName) {
         this.fileName = fileName;
-        this.fileHash = fileHash;
+        this.fileId = UUID.randomUUID().toString().replace("-", "").substring(0, 32);;
         partFiles = new ArrayList<>();
     }
 
     public PapayaFile() {
     }
 
-    public String getFileHash() {
-        return fileHash;
+    public String getFileId() {
+        return fileId;
     }
 
-    public PapayaFile setFileHash(String fileHash) {
-        this.fileHash = fileHash;
+    public PapayaFile setFileId(String fileId) {
+        this.fileId = fileId;
         return this;
     }
 
@@ -47,7 +48,7 @@ public class PapayaFile {
     public String toString() {
         return "PapayaFile{" +
                 "fileName='" + fileName + '\'' +
-                ", fileHash='" + fileHash + '\'' +
+                ", fileHash='" + fileId + '\'' +
                 ", partFiles=" + partFiles +
                 '}';
     }
