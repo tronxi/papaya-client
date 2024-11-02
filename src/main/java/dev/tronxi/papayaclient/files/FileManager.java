@@ -135,9 +135,6 @@ public class FileManager {
                         try {
                             byte[] partByte = Files.readAllBytes(partPath);
                             String partHash = hashGenerator.generateHash(partByte);
-                            System.out.println(partFile.getFileName() + " " + partByte.length);
-                            System.out.println("hash length: " + partHash.getBytes().length);
-                            System.out.println("name length: " + partFile.getFileName().getBytes().length);
                             PartStatusFile partStatusFile;
                             if (partHash.equals(partFile.getFileHash())) {
                                 partStatusFile = new PartStatusFile(partFile.getFileName(), partFile.getFileHash(), PapayaStatus.COMPLETE);
@@ -164,5 +161,35 @@ public class FileManager {
         } catch (IOException e) {
             return Optional.empty();
         }
+    }
+
+    public Optional<PapayaFile> retrievePapayaFile(File storeFile) {
+        Path papayaFilePath = storeFile.toPath().resolve(storeFile.getName() + ".papaya");
+        if (papayaFilePath.toFile().exists()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                PapayaFile papayaFile = objectMapper.readValue(papayaFilePath.toFile(), PapayaFile.class);
+                return Optional.of(papayaFile);
+            } catch (IOException e) {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public void writePart(String fileHash, String partFileName, ByteArrayOutputStream content) {
+        Path output = Path.of(workspace).resolve("output");
+        Path file = output.resolve(fileHash);
+        Path partFile = file.resolve(partFileName);
+        if (!file.toFile().exists()) {
+            file.toFile().mkdirs();
+        }
+        try {
+            Files.write(partFile, content.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

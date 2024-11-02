@@ -2,7 +2,8 @@ package dev.tronxi.papayaclient.ui;
 
 import dev.tronxi.papayaclient.PapayaClientApplication;
 import dev.tronxi.papayaclient.files.FileManager;
-import dev.tronxi.papayaclient.udp.UdpSocketManager;
+import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
+import dev.tronxi.papayaclient.peer.PeerConnectionManager;
 import dev.tronxi.papayaclient.ui.components.CreateDirectoryChooserButton;
 import dev.tronxi.papayaclient.ui.components.CreateFileChooserButton;
 import javafx.application.Application;
@@ -24,12 +25,12 @@ import java.util.Optional;
 public class UIInitializer extends Application {
 
     private FileManager fileManager;
-    private UdpSocketManager udpSocketManager;
+    private PeerConnectionManager peerConnectionManager;
 
     @Override
     public void init() {
         fileManager = PapayaClientApplication.getContext().getBean(FileManager.class);
-        udpSocketManager = PapayaClientApplication.getContext().getBean(UdpSocketManager.class);
+        peerConnectionManager = PapayaClientApplication.getContext().getBean(PeerConnectionManager.class);
     }
 
     @Override
@@ -37,20 +38,18 @@ public class UIInitializer extends Application {
         Button createPapayaFileButton = generateCreatePapayaFileButton(stage);
         Button joinButton = generateJoinButton(stage);
         Button statusButton = generateStatusButton(stage);
-        HBox hBox = new HBox(createPapayaFileButton, joinButton, statusButton);
+        Button sendButton = generateSendButton(stage);
+        HBox hBox = new HBox(createPapayaFileButton, joinButton, statusButton, sendButton);
 
         TextArea logs = new TextArea();
         logs.setEditable(false);
         logs.setText("");
-        logs.setMaxHeight(100);
-        udpSocketManager.start(logs);
+        logs.setMaxHeight(400);
+        logs.setMinHeight(400);
+        peerConnectionManager.start(logs);
 
-        Button sendButton = new Button("Send");
-        sendButton.setOnMouseClicked(mouseEvent -> {
-            udpSocketManager.send("holi");
-        });
 
-        Scene scene = new Scene(new VBox(hBox, logs, sendButton), 640, 480);
+        Scene scene = new Scene(new VBox(hBox, logs), 640, 480);
         stage.setTitle("Papaya Client");
         stage.setScene(scene);
         stage.show();
@@ -110,10 +109,19 @@ public class UIInitializer extends Application {
                 });
     }
 
+    private Button generateSendButton(Stage stage) {
+        return new CreateDirectoryChooserButton().create("Send", stage, file -> {
+            Optional<PapayaFile> maybePapayaFile = fileManager.retrievePapayaFile(file);
+            maybePapayaFile.ifPresent(papayaFile -> {
+                peerConnectionManager.send(papayaFile);
+            });
+        });
+    }
+
     @Override
     public void stop() {
         System.out.println("Shutting down");
-        udpSocketManager.stop();
+        peerConnectionManager.stop();
         SpringApplication.exit(PapayaClientApplication.getContext(), () -> 0);
     }
 }
