@@ -118,9 +118,19 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
         try {
             ByteArrayOutputStream fileId = new ByteArrayOutputStream();
             fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
-            message += " AskForResources with fileId: " + fileId;
+            ByteArrayOutputStream port = new ByteArrayOutputStream();
+            int i = 33;
+            int charAtIndex;
+            do {
+                charAtIndex = (char) receivedData[i];
+                if (charAtIndex != '#') {
+                    port.write(receivedData[i]);
+                }
+                i++;
+            } while (charAtIndex != '#');
+            message += " AskForResources with fileId: " + fileId + " Port: " + port;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.severe(e.getMessage());
         }
         return message;
     }
@@ -216,6 +226,8 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
             ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
             dataStream.write(PeerMessageType.ASK_FOR_RESOURCES.getValue());
             dataStream.write(papayaFile.getFileId().getBytes());
+            dataStream.write(String.valueOf(port).getBytes());
+            dataStream.write("#".getBytes());
             outputStream.write(dataStream.toByteArray());
         } catch (IOException e) {
             logger.severe(e.getMessage());
