@@ -83,6 +83,9 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                     case ASK_FOR_RESOURCES -> {
                                         message = receiveAskForResources(clientSocket, receivedData);
                                     }
+                                    case RESPONSE_ASK_FOR_RESOURCES ->  {
+                                        message = receiveResponseAskForResources(clientSocket, receivedData);
+                                    }
                                     case INVALID -> {
                                         message = "Invalid";
                                     }
@@ -128,7 +131,35 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                 }
                 i++;
             } while (charAtIndex != '#');
+            Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), 3390);
             message += " AskForResources with fileId: " + fileId + " Port: " + port;
+            responseAskForResources(peer, fileId.toString());
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
+        return message;
+    }
+
+    private void responseAskForResources(Peer peer, String fileId) {
+        logger.info("response ask for resources: " + fileId + " to " + peer);
+        try (Socket socket = new Socket(peer.address(), peer.port());
+             OutputStream outputStream = socket.getOutputStream()) {
+            ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
+            dataStream.write(PeerMessageType.RESPONSE_ASK_FOR_RESOURCES.getValue());
+            dataStream.write(fileId.getBytes());
+            dataStream.write("#".getBytes());
+            outputStream.write(dataStream.toByteArray());
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
+    }
+
+    private String receiveResponseAskForResources(Socket clientSocket, byte[] receivedData) {
+        String message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort();
+        ByteArrayOutputStream fileId = new ByteArrayOutputStream();
+        try {
+            fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
+            message += " ResponseAskForResources with fileId: " + fileId;
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }
