@@ -14,10 +14,7 @@ import java.io.*;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -262,6 +259,25 @@ public class FileManager {
             }
         } else {
             logger.severe("Papaya store already exists");
+        }
+    }
+
+    public List<String> getCompletedParts(String fileId) {
+        Path papayaStatusPath = storePath.resolve(fileId).resolve(fileId + ".papayastatus");
+        if (!papayaStatusPath.toFile().exists()) {
+            return Collections.emptyList();
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            PapayaStatusFile papayaStatus = objectMapper.readValue(papayaStatusPath.toFile(), PapayaStatusFile.class);
+            return papayaStatus.getPartStatusFiles()
+                    .stream()
+                    .filter(partStatusFile -> partStatusFile.getStatus() == PapayaStatus.COMPLETE)
+                    .map(PartStatusFile::getFileHash)
+                    .toList();
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+            return Collections.emptyList();
         }
     }
 }

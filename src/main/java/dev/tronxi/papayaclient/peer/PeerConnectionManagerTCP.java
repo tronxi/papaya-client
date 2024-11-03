@@ -16,6 +16,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -83,7 +84,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                     case ASK_FOR_RESOURCES -> {
                                         message = receiveAskForResources(clientSocket, receivedData);
                                     }
-                                    case RESPONSE_ASK_FOR_RESOURCES ->  {
+                                    case RESPONSE_ASK_FOR_RESOURCES -> {
                                         message = receiveResponseAskForResources(clientSocket, receivedData);
                                     }
                                     case INVALID -> {
@@ -148,7 +149,15 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
             dataStream.write(PeerMessageType.RESPONSE_ASK_FOR_RESOURCES.getValue());
             dataStream.write(fileId.getBytes());
             dataStream.write("#".getBytes());
-            outputStream.write(dataStream.toByteArray());
+            List<String> completedParts = fileManager.getCompletedParts(fileId);
+            logger.info("found: " + completedParts.size() + " parts");
+            if (!completedParts.isEmpty()) {
+                for (String completedPart : completedParts) {
+                    dataStream.write(completedPart.getBytes());
+                    dataStream.write("#".getBytes());
+                }
+                outputStream.write(dataStream.toByteArray());
+            }
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }
@@ -159,7 +168,22 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
         ByteArrayOutputStream fileId = new ByteArrayOutputStream();
         try {
             fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
-            message += " ResponseAskForResources with fileId: " + fileId;
+            int i = 34;
+            List<String> completedParts = new ArrayList<>();
+            do {
+                ByteArrayOutputStream part = new ByteArrayOutputStream();
+                int charAtIndex;
+                do {
+                    charAtIndex = (char) receivedData[i];
+                    if (charAtIndex != '#') {
+                        part.write(receivedData[i]);
+                    }
+                    i++;
+                } while (charAtIndex != '#');
+                completedParts.add(part.toString());
+            } while (i < receivedData.length);
+            logger.info("found: " + completedParts.size() + " parts");
+            message += " ResponseAskForResources with fileId: " + fileId + " parts: " + completedParts.size();
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }

@@ -1,8 +1,12 @@
 package dev.tronxi.papayaclient.files.papayastatusfile;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PapayaStatusFile {
     private String fileName;
     private String fileId;
@@ -19,8 +23,8 @@ public class PapayaStatusFile {
     }
 
     public PapayaStatus getStatus() {
-        for(PartStatusFile partStatusFile : partStatusFiles) {
-            if(partStatusFile.getStatus() != PapayaStatus.COMPLETE) {
+        for (PartStatusFile partStatusFile : partStatusFiles) {
+            if (partStatusFile.getStatus() != PapayaStatus.COMPLETE) {
                 return PapayaStatus.INCOMPLETE;
             }
         }
