@@ -151,6 +151,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                 ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
                 dataStream.write(PeerMessageType.RESPONSE_ASK_FOR_RESOURCES.getValue());
                 dataStream.write(fileId.getBytes());
+                dataStream.write(String.valueOf(port).getBytes());
                 dataStream.write("#".getBytes());
                 for (String completedPart : completedParts) {
                     dataStream.write(completedPart.getBytes());
@@ -171,9 +172,17 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
             fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
             int i = 34;
             List<String> completedParts = new ArrayList<>();
+            ByteArrayOutputStream port = new ByteArrayOutputStream();
+            int charAtIndex;
+            do {
+                charAtIndex = (char) receivedData[i];
+                if (charAtIndex != '#') {
+                    port.write(receivedData[i]);
+                }
+                i++;
+            } while (charAtIndex != '#');
             do {
                 ByteArrayOutputStream part = new ByteArrayOutputStream();
-                int charAtIndex;
                 do {
                     charAtIndex = (char) receivedData[i];
                     if (charAtIndex != '#') {
@@ -184,7 +193,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                 completedParts.add(part.toString());
             } while (i < receivedData.length);
             logger.info("found: " + completedParts.size() + " parts");
-            message += " ResponseAskForResources with fileId: " + fileId + " parts: " + completedParts.size();
+            message += " ResponseAskForResources with fileId: " + fileId + " Port: " + port + " parts: " + completedParts.size();
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }
