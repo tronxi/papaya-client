@@ -143,23 +143,24 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
 
     private void responseAskForResources(Peer peer, String fileId) {
         logger.info("response ask for resources: " + fileId + " to " + peer);
-        try (Socket socket = new Socket(peer.address(), peer.port());
-             OutputStream outputStream = socket.getOutputStream()) {
-            ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
-            dataStream.write(PeerMessageType.RESPONSE_ASK_FOR_RESOURCES.getValue());
-            dataStream.write(fileId.getBytes());
-            dataStream.write("#".getBytes());
-            List<String> completedParts = fileManager.getCompletedParts(fileId);
-            logger.info("found: " + completedParts.size() + " parts");
-            if (!completedParts.isEmpty()) {
+        List<String> completedParts = fileManager.getCompletedParts(fileId);
+        logger.info("found: " + completedParts.size() + " parts");
+        if (!completedParts.isEmpty()) {
+            try (Socket socket = new Socket(peer.address(), peer.port());
+                 OutputStream outputStream = socket.getOutputStream()) {
+                ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
+                dataStream.write(PeerMessageType.RESPONSE_ASK_FOR_RESOURCES.getValue());
+                dataStream.write(fileId.getBytes());
+                dataStream.write("#".getBytes());
                 for (String completedPart : completedParts) {
                     dataStream.write(completedPart.getBytes());
                     dataStream.write("#".getBytes());
                 }
                 outputStream.write(dataStream.toByteArray());
+
+            } catch (IOException e) {
+                logger.severe(e.getMessage());
             }
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
         }
     }
 
