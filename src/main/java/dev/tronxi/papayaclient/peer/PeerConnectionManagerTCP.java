@@ -2,6 +2,9 @@ package dev.tronxi.papayaclient.peer;
 
 import dev.tronxi.papayaclient.files.FileManager;
 import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
+import dev.tronxi.papayaclient.peer.handlers.AskForResourcesHandler;
+import dev.tronxi.papayaclient.peer.handlers.PartFileHandler;
+import dev.tronxi.papayaclient.peer.handlers.ResponseAskForResourcesHandler;
 import jakarta.annotation.PostConstruct;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -16,7 +19,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -27,24 +29,31 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
 
     private static final Logger logger = Logger.getLogger(PeerConnectionManagerTCP.class.getName());
 
-
-    private final FileManager fileManager;
     @Value("${papaya.port}")
     private int port;
 
     @Value("${papaya.workspace}")
     private String workspace;
+
     private Path storePath;
 
     private ServerSocket serverSocket;
+
+    private final FileManager fileManager;
     private final GatewayDevice gatewayDevice;
     private final PeerSignalingService peerSignalingService;
+    private final AskForResourcesHandler askForResourcesHandler;
+    private final ResponseAskForResourcesHandler responseAskForResourcesHandler;
+    private final PartFileHandler partFileHandler;
 
-    public PeerConnectionManagerTCP(GatewayDevice gatewayDevice, FileManager fileManager, PeerSignalingService peerSignalingService) {
-        logger.setLevel(Level.INFO);
+    public PeerConnectionManagerTCP(GatewayDevice gatewayDevice, FileManager fileManager, PeerSignalingService peerSignalingService, AskForResourcesHandler askForResourcesHandler, ResponseAskForResourcesHandler responseAskForResourcesHandler, PartFileHandler partFileHandler) {
+        this.askForResourcesHandler = askForResourcesHandler;
+        this.responseAskForResourcesHandler = responseAskForResourcesHandler;
+        this.partFileHandler = partFileHandler;
         this.gatewayDevice = gatewayDevice;
         this.fileManager = fileManager;
         this.peerSignalingService = peerSignalingService;
+        logger.setLevel(Level.INFO);
     }
 
     @PostConstruct
@@ -78,18 +87,12 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                 PeerMessageType peerMessageType = PeerMessageType.fromValue(typeByte);
                                 logger.info("Receiving: " + peerMessageType);
                                 switch (peerMessageType) {
-                                    case PART_FILE -> {
-                                        message = receivePartFile(clientSocket, receivedData);
-                                    }
-                                    case ASK_FOR_RESOURCES -> {
-                                        message = receiveAskForResources(clientSocket, receivedData);
-                                    }
-                                    case RESPONSE_ASK_FOR_RESOURCES -> {
-                                        message = receiveResponseAskForResources(clientSocket, receivedData);
-                                    }
-                                    case INVALID -> {
-                                        message = "Invalid";
-                                    }
+                                    case PART_FILE -> message = partFileHandler.handle(clientSocket, receivedData);
+                                    case ASK_FOR_RESOURCES ->
+                                            message = askForResourcesHandler.handle(clientSocket, receivedData);
+                                    case RESPONSE_ASK_FOR_RESOURCES ->
+                                            message = responseAskForResourcesHandler.handle(clientSocket, receivedData);
+                                    case INVALID -> message = "Invalid";
                                 }
                                 String finalMessage = message;
                                 Platform.runLater(() -> {
@@ -114,117 +117,6 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
             new Thread(task).start();
         } catch (IOException e) {
             logger.severe(e.getMessage());
-        }
-    }
-
-    private String receiveAskForResources(Socket clientSocket, byte[] receivedData) {
-        String message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort();
-        try {
-            ByteArrayOutputStream fileId = new ByteArrayOutputStream();
-            fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
-            ByteArrayOutputStream port = new ByteArrayOutputStream();
-            int i = 33;
-            int charAtIndex;
-            do {
-                charAtIndex = (char) receivedData[i];
-                if (charAtIndex != '#') {
-                    port.write(receivedData[i]);
-                }
-                i++;
-            } while (charAtIndex != '#');
-            Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), 3390);
-            message += " AskForResources with fileId: " + fileId + " Port: " + port;
-            responseAskForResources(peer, fileId.toString());
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-        }
-        return message;
-    }
-
-    private void responseAskForResources(Peer peer, String fileId) {
-        logger.info("response ask for resources: " + fileId + " to " + peer);
-        List<String> completedParts = fileManager.getCompletedParts(fileId);
-        logger.info("found: " + completedParts.size() + " parts");
-        if (!completedParts.isEmpty()) {
-            try (Socket socket = new Socket(peer.address(), peer.port());
-                 OutputStream outputStream = socket.getOutputStream()) {
-                ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
-                dataStream.write(PeerMessageType.RESPONSE_ASK_FOR_RESOURCES.getValue());
-                dataStream.write(fileId.getBytes());
-                dataStream.write(String.valueOf(port).getBytes());
-                dataStream.write("#".getBytes());
-                for (String completedPart : completedParts) {
-                    dataStream.write(completedPart.getBytes());
-                    dataStream.write("#".getBytes());
-                }
-                outputStream.write(dataStream.toByteArray());
-
-            } catch (IOException e) {
-                logger.severe(e.getMessage());
-            }
-        }
-    }
-
-    private String receiveResponseAskForResources(Socket clientSocket, byte[] receivedData) {
-        String message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort();
-        ByteArrayOutputStream fileId = new ByteArrayOutputStream();
-        try {
-            fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
-            int i = 34;
-            List<String> completedParts = new ArrayList<>();
-            ByteArrayOutputStream port = new ByteArrayOutputStream();
-            int charAtIndex;
-            do {
-                charAtIndex = (char) receivedData[i];
-                if (charAtIndex != '#') {
-                    port.write(receivedData[i]);
-                }
-                i++;
-            } while (charAtIndex != '#');
-            do {
-                ByteArrayOutputStream part = new ByteArrayOutputStream();
-                do {
-                    charAtIndex = (char) receivedData[i];
-                    if (charAtIndex != '#') {
-                        part.write(receivedData[i]);
-                    }
-                    i++;
-                } while (charAtIndex != '#');
-                completedParts.add(part.toString());
-            } while (i < receivedData.length);
-            logger.info("found: " + completedParts.size() + " parts");
-            message += " ResponseAskForResources with fileId: " + fileId + " Port: " + port + " parts: " + completedParts.size();
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-        }
-        return message;
-    }
-
-    private String receivePartFile(Socket clientSocket, byte[] receivedData) {
-        String message;
-        ByteArrayOutputStream fileId = new ByteArrayOutputStream();
-        try {
-            logger.info("Receiving part file...");
-            fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
-            ByteArrayOutputStream partFileName = new ByteArrayOutputStream();
-            int i = 33;
-            char charAtIndex;
-            do {
-                charAtIndex = (char) receivedData[i];
-                if (charAtIndex != '#') {
-                    partFileName.write(receivedData[i]);
-                }
-                i++;
-            } while (charAtIndex != '#');
-            ByteArrayOutputStream outputStreamWithoutHeaders = new ByteArrayOutputStream();
-            outputStreamWithoutHeaders.write(Arrays.copyOfRange(receivedData, i, receivedData.length));
-            fileManager.writePart(fileId.toString(), partFileName.toString(), outputStreamWithoutHeaders);
-            message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() +
-                    " FileId: " + fileId + " : PartHash: " + partFileName + " Content: " + outputStreamWithoutHeaders.size();
-            return message;
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-            throw new RuntimeException(e);
         }
     }
 
