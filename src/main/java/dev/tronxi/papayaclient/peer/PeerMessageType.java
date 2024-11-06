@@ -5,7 +5,8 @@ public enum PeerMessageType {
     INVALID(-1),
     PART_FILE(0),
     ASK_FOR_RESOURCES(1),
-    RESPONSE_ASK_FOR_RESOURCES(2);
+    RESPONSE_ASK_FOR_RESOURCES(2),
+    ASK_FOR_PART_FILE(3);
 
 
     private final int value;

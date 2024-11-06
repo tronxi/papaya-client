@@ -2,6 +2,7 @@ package dev.tronxi.papayaclient.peer;
 
 import dev.tronxi.papayaclient.files.FileManager;
 import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
+import dev.tronxi.papayaclient.peer.handlers.AskForPartFileHandler;
 import dev.tronxi.papayaclient.peer.handlers.AskForResourcesHandler;
 import dev.tronxi.papayaclient.peer.handlers.PartFileHandler;
 import dev.tronxi.papayaclient.peer.handlers.ResponseAskForResourcesHandler;
@@ -44,11 +45,13 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
     private final PeerSignalingService peerSignalingService;
     private final AskForResourcesHandler askForResourcesHandler;
     private final ResponseAskForResourcesHandler responseAskForResourcesHandler;
+    private final AskForPartFileHandler askForPartFileHandler;
     private final PartFileHandler partFileHandler;
 
-    public PeerConnectionManagerTCP(GatewayDevice gatewayDevice, FileManager fileManager, PeerSignalingService peerSignalingService, AskForResourcesHandler askForResourcesHandler, ResponseAskForResourcesHandler responseAskForResourcesHandler, PartFileHandler partFileHandler) {
+    public PeerConnectionManagerTCP(GatewayDevice gatewayDevice, FileManager fileManager, PeerSignalingService peerSignalingService, AskForResourcesHandler askForResourcesHandler, ResponseAskForResourcesHandler responseAskForResourcesHandler, AskForPartFileHandler askForPartFileHandler, PartFileHandler partFileHandler) {
         this.askForResourcesHandler = askForResourcesHandler;
         this.responseAskForResourcesHandler = responseAskForResourcesHandler;
+        this.askForPartFileHandler = askForPartFileHandler;
         this.partFileHandler = partFileHandler;
         this.gatewayDevice = gatewayDevice;
         this.fileManager = fileManager;
@@ -92,6 +95,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                             message = askForResourcesHandler.handle(clientSocket, receivedData);
                                     case RESPONSE_ASK_FOR_RESOURCES ->
                                             message = responseAskForResourcesHandler.handle(clientSocket, receivedData);
+                                    case ASK_FOR_PART_FILE -> askForPartFileHandler.handle(clientSocket, receivedData);
                                     case INVALID -> message = "Invalid";
                                 }
                                 String finalMessage = message;

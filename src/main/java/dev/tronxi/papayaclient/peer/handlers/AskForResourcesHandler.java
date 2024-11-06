@@ -18,6 +18,7 @@ public class AskForResourcesHandler extends Handler {
 
     private static final Logger logger = Logger.getLogger(AskForResourcesHandler.class.getName());
 
+
     protected AskForResourcesHandler(FileManager fileManager) {
         super(fileManager);
     }
@@ -38,7 +39,7 @@ public class AskForResourcesHandler extends Handler {
                 }
                 i++;
             } while (charAtIndex != '#');
-            Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), 3390);
+            Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), Integer.parseInt(port.toString()));
             message += " AskForResources with fileId: " + fileId + " Port: " + port;
             responseAskForResources(peer, fileId.toString());
         } catch (IOException e) {
