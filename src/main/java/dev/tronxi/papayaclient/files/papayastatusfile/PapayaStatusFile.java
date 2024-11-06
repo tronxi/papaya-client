@@ -60,4 +60,13 @@ public class PapayaStatusFile {
     public void addPartStatusFile(PartStatusFile partStatusFile) {
         this.partStatusFiles.add(partStatusFile);
     }
+
+    @Override
+    public String toString() {
+        return "PapayaStatusFile{" +
+                "fileName='" + fileName + '\'' +
+                ", fileId='" + fileId + '\'' +
+                ", partStatusFiles=" + partStatusFiles +
+                '}';
+    }
 }

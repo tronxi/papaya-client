@@ -43,4 +43,13 @@ public class PartPeerStatusFile {
         this.latestUpdateTime = latestUpdateTime;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "PartPeerStatusFile{" +
+                "peer=" + peer +
+                ", partPeerStatus=" + partPeerStatus +
+                ", latestUpdateTime=" + latestUpdateTime +
+                '}';
+    }
 }

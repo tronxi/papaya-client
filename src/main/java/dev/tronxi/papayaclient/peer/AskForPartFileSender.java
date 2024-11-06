@@ -79,6 +79,7 @@ public class AskForPartFileSender {
     }
 
     private void sendMessage(String fileId, String partFileName, PartPeerStatusFile partPeerStatusFile) {
+        logger.info("Sending message: ask for part file: " + fileId + " partFileName: " + partFileName + " Peer: " + partPeerStatusFile);
         try (Socket socket = new Socket(partPeerStatusFile.getPeer().address(), partPeerStatusFile.getPeer().port());
              OutputStream outputStream = socket.getOutputStream()) {
             ByteArrayOutputStream dataStream = new ByteArrayOutputStream();

@@ -74,7 +74,7 @@ public class ResponseAskForResourcesHandler extends Handler {
             PapayaStatusFile papayaStatusFile = maybePapayaStatusFile.get();
             boolean statusChanged = false;
             for (PartStatusFile partStatusFile : papayaStatusFile.getPartStatusFiles()) {
-                if (completedParts.contains(partStatusFile.getFileHash())) {
+                if (completedParts.contains(partStatusFile.getFileName())) {
                     if(partStatusFile.getStatus().equals(PapayaStatus.INCOMPLETE)) {
                         PartPeerStatusFile partPeerStatusFile = new PartPeerStatusFile(peer, PartPeerStatus.NO_ASKED, System.currentTimeMillis());
                         partStatusFile.addPeer(partPeerStatusFile);

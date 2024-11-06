@@ -59,4 +59,14 @@ public class PartStatusFile {
     public void addPeer(PartPeerStatusFile partPeerStatusFile) {
         this.partPeerStatusFiles.add(partPeerStatusFile);
     }
+
+    @Override
+    public String toString() {
+        return "PartStatusFile{" +
+                "fileName='" + fileName + '\'' +
+                ", fileHash='" + fileHash + '\'' +
+                ", status=" + status +
+                ", partPeerStatusFiles=" + partPeerStatusFiles +
+                '}';
+    }
 }
