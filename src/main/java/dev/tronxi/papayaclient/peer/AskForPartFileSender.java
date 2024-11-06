@@ -88,6 +88,7 @@ public class AskForPartFileSender {
             dataStream.write(partFileName.getBytes());
             dataStream.write("#".getBytes());
             dataStream.write(String.valueOf(port).getBytes());
+            dataStream.write("#".getBytes());
             outputStream.write(dataStream.toByteArray());
             partPeerStatusFile.setPartPeerStatus(PartPeerStatus.ASKED);
             partPeerStatusFile.setLatestUpdateTime(System.currentTimeMillis());
