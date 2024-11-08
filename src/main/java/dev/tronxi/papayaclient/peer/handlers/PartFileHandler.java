@@ -1,20 +1,27 @@
 package dev.tronxi.papayaclient.peer.handlers;
 
 import dev.tronxi.papayaclient.files.FileManager;
+import dev.tronxi.papayaclient.files.HashGenerator;
+import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatus;
+import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatusFile;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @Service
 public class PartFileHandler extends Handler {
     private static final Logger logger = Logger.getLogger(PartFileHandler.class.getName());
+    private final HashGenerator hashGenerator;
 
-    protected PartFileHandler(FileManager fileManager) {
+    protected PartFileHandler(FileManager fileManager, HashGenerator hashGenerator) {
         super(fileManager);
+        this.hashGenerator = hashGenerator;
     }
 
     @Override
@@ -36,7 +43,32 @@ public class PartFileHandler extends Handler {
             } while (charAtIndex != '#');
             ByteArrayOutputStream outputStreamWithoutHeaders = new ByteArrayOutputStream();
             outputStreamWithoutHeaders.write(Arrays.copyOfRange(receivedData, i, receivedData.length));
-            fileManager.writePart(fileId.toString(), partFileName.toString(), outputStreamWithoutHeaders);
+            Optional<PapayaStatusFile> maybePapayaStatusFile = fileManager.retrievePapayaStatusFileFromFile(fileId.toString());
+            if (maybePapayaStatusFile.isPresent()) {
+                PapayaStatusFile statusFile = maybePapayaStatusFile.get();
+                statusFile.getPartStatusFiles().stream()
+                        .filter(partStatusFile -> partStatusFile.getFileName().equals(partFileName.toString()))
+                        .findFirst()
+                        .ifPresent(partStatusFile -> {
+                            String hash = hashGenerator.generateHash(outputStreamWithoutHeaders.toByteArray());
+                            if (hash.equals(partStatusFile.getFileHash())) {
+                                fileManager.writePart(fileId.toString(), partFileName.toString(), outputStreamWithoutHeaders);
+                                partStatusFile.setStatus(PapayaStatus.COMPLETE);
+                                if (partStatusFile.getStatus() == PapayaStatus.COMPLETE) {
+                                    Optional<Path> maybePath = fileManager.joinStore(storePath.resolve(fileId.toString()).toFile());
+                                    maybePath.ifPresentOrElse((path -> logger.info("File downloaded: " + path)),
+                                            () -> {
+                                                logger.severe("Error ");
+                                            });
+                                }
+                                fileManager.savePapayaStatusFile(fileId.toString(), statusFile);
+                            } else {
+                                logger.severe("Invalid hash");
+                            }
+                        });
+            } else {
+                logger.severe("Could not find PapayaStatusFile for " + fileId);
+            }
             message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() +
                     " FileId: " + fileId + " : PartHash: " + partFileName + " Content: " + outputStreamWithoutHeaders.size();
             return message;

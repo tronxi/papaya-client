@@ -52,7 +52,7 @@ public class FileManager {
             store.toFile().mkdirs();
         }
 
-        int partSize = 1000000000;
+        int partSize = 100000000;
         int numPart = 0;
 
         try (InputStream inputStream = Files.newInputStream(inputFilePatch)) {
@@ -262,8 +262,7 @@ public class FileManager {
     }
 
     public void writePart(String fileId, String partFileName, ByteArrayOutputStream content) {
-        Path output = Path.of(workspace).resolve("output");
-        Path file = output.resolve(fileId);
+        Path file = storePath.resolve(fileId);
         Path partFile = file.resolve(partFileName);
         if (!file.toFile().exists()) {
             file.toFile().mkdirs();
