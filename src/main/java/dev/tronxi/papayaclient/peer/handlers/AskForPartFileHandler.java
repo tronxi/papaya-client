@@ -56,6 +56,7 @@ public class AskForPartFileHandler extends Handler {
     }
 
     private void sendPartFile(Socket clientSocket, ByteArrayOutputStream fileId, ByteArrayOutputStream part, ByteArrayOutputStream port) {
+        logger.info("Sending part: " + part.toString() + " fileId: " + fileId.toString());
         Path partFilePath = storePath.resolve(fileId.toString()).resolve(part.toString());
         if (partFilePath.toFile().exists()) {
             Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), Integer.parseInt(port.toString()));

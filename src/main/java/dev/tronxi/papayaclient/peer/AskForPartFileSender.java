@@ -30,7 +30,8 @@ public class AskForPartFileSender {
         logger.info("Ask for part file started: " + papayaStatusFile.getFileId());
         papayaStatusFile.getPartStatusFiles().stream()
                 .filter(partStatusFile -> partStatusFile.getStatus().equals(PapayaStatus.INCOMPLETE))
-                .forEach(status -> {
+                .findFirst()
+                .ifPresent(status -> {
                     Set<PartPeerStatusFile> partPeerStatusFiles = status.getPartPeerStatusFiles();
                     boolean partDownloaded = checkIfPartisDownloaded(partPeerStatusFiles);
                     if (partDownloaded) {
