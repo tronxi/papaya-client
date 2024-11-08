@@ -22,6 +22,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,27 +88,31 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                             if (outputStream.size() > 0) {
                                 byte[] receivedData = outputStream.toByteArray();
                                 int typeByte = receivedData[0];
-                                String message = "";
+                                CompletableFuture<String> message = null;
                                 PeerMessageType peerMessageType = PeerMessageType.fromValue(typeByte);
                                 logger.info("Receiving: " + peerMessageType);
                                 switch (peerMessageType) {
-                                    case PART_FILE -> message = partFileHandler.handle(clientSocket, receivedData);
+                                    case PART_FILE ->
+                                            message = partFileHandler.handleInNewThread(clientSocket, receivedData);
                                     case ASK_FOR_RESOURCES ->
-                                            message = askForResourcesHandler.handle(clientSocket, receivedData);
+                                            message = askForResourcesHandler.handleInNewThread(clientSocket, receivedData);
                                     case RESPONSE_ASK_FOR_RESOURCES ->
-                                            message = responseAskForResourcesHandler.handle(clientSocket, receivedData);
-                                    case ASK_FOR_PART_FILE -> askForPartFileHandler.handle(clientSocket, receivedData);
-                                    case INVALID -> message = "Invalid";
+                                            message = responseAskForResourcesHandler.handleInNewThread(clientSocket, receivedData);
+                                    case ASK_FOR_PART_FILE ->
+                                            askForPartFileHandler.handleInNewThread(clientSocket, receivedData);
+                                    default -> message = CompletableFuture.completedFuture("Invalid");
                                 }
-                                String finalMessage = message;
-                                Platform.runLater(() -> {
-                                    textArea.appendText("\n" + finalMessage);
-                                    String[] lines = textArea.getText().split("\n");
-                                    if (lines.length > 100) {
-                                        String newText = String.join("\n", Arrays.copyOfRange(lines, lines.length - 100, lines.length));
-                                        textArea.setText(newText);
-                                        textArea.appendText("");
-                                    }
+                                CompletableFuture<String> finalMessage = message;
+                                finalMessage.thenAcceptAsync(string -> {
+                                    Platform.runLater(() -> {
+                                        textArea.appendText("\n" + string);
+                                        String[] lines = textArea.getText().split("\n");
+                                        if (lines.length > 100) {
+                                            String newText = String.join("\n", Arrays.copyOfRange(lines, lines.length - 100, lines.length));
+                                            textArea.setText(newText);
+                                            textArea.appendText("");
+                                        }
+                                    });
                                 });
                             } else {
                                 logger.info("Received empty message");

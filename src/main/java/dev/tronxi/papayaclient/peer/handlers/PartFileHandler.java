@@ -4,6 +4,7 @@ import dev.tronxi.papayaclient.files.FileManager;
 import dev.tronxi.papayaclient.files.HashGenerator;
 import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatus;
 import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatusFile;
+import dev.tronxi.papayaclient.peer.AskForPartFileSender;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -18,10 +19,12 @@ import java.util.logging.Logger;
 public class PartFileHandler extends Handler {
     private static final Logger logger = Logger.getLogger(PartFileHandler.class.getName());
     private final HashGenerator hashGenerator;
+    private final AskForPartFileSender askForPartFileSender;
 
-    protected PartFileHandler(FileManager fileManager, HashGenerator hashGenerator) {
+    protected PartFileHandler(FileManager fileManager, HashGenerator hashGenerator, AskForPartFileSender askForPartFileSender) {
         super(fileManager);
         this.hashGenerator = hashGenerator;
+        this.askForPartFileSender = askForPartFileSender;
     }
 
     @Override
@@ -54,7 +57,7 @@ public class PartFileHandler extends Handler {
                             if (hash.equals(partStatusFile.getFileHash())) {
                                 fileManager.writePart(fileId.toString(), partFileName.toString(), outputStreamWithoutHeaders);
                                 partStatusFile.setStatus(PapayaStatus.COMPLETE);
-                                if (partStatusFile.getStatus() == PapayaStatus.COMPLETE) {
+                                if (statusFile.getStatus() == PapayaStatus.COMPLETE) {
                                     Optional<Path> maybePath = fileManager.joinStore(storePath.resolve(fileId.toString()).toFile());
                                     maybePath.ifPresentOrElse((path -> logger.info("File downloaded: " + path)),
                                             () -> {
@@ -62,6 +65,7 @@ public class PartFileHandler extends Handler {
                                             });
                                 }
                                 fileManager.savePapayaStatusFile(fileId.toString(), statusFile);
+                                askForPartFileSender.send(statusFile);
                             } else {
                                 logger.severe("Invalid hash");
                             }

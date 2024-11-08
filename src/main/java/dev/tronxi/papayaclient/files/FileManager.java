@@ -251,7 +251,6 @@ public class FileManager {
 
     public void savePapayaStatusFile(String fileId, PapayaStatusFile papayaStatusFile) {
         logger.info("Start save papaya status file");
-        logger.info(papayaStatusFile.toString());
         File file = storePath.resolve(fileId).resolve(fileId + ".papayastatus").toFile();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
