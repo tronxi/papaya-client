@@ -64,7 +64,7 @@ public class PartFileHandler extends Handler {
                                                 logger.severe("Error ");
                                             });
                                 }
-                                fileManager.savePapayaStatusFile(fileId.toString(), statusFile);
+                                fileManager.savePapayaStatusFile(statusFile);
                                 askForPartFileSender.send(statusFile);
                             } else {
                                 logger.severe("Invalid hash");

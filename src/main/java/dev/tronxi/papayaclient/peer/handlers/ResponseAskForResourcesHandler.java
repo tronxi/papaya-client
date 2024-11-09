@@ -75,7 +75,7 @@ public class ResponseAskForResourcesHandler extends Handler {
             boolean statusChanged = false;
             for (PartStatusFile partStatusFile : papayaStatusFile.getPartStatusFiles()) {
                 if (completedParts.contains(partStatusFile.getFileName())) {
-                    if(partStatusFile.getStatus().equals(PapayaStatus.INCOMPLETE)) {
+                    if (partStatusFile.getStatus().equals(PapayaStatus.INCOMPLETE)) {
                         PartPeerStatusFile partPeerStatusFile = new PartPeerStatusFile(peer, PartPeerStatus.NO_ASKED, System.currentTimeMillis());
                         partStatusFile.addPeer(partPeerStatusFile);
                     }
@@ -83,7 +83,7 @@ public class ResponseAskForResourcesHandler extends Handler {
                 }
             }
             if (statusChanged) {
-                fileManager.savePapayaStatusFile(fileId, papayaStatusFile);
+                fileManager.savePapayaStatusFile(papayaStatusFile);
             }
             return Optional.of(papayaStatusFile);
         }

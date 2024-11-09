@@ -83,7 +83,6 @@ public class FileManager {
             objectMapper.writeValue(store.resolve(papayaFile.getFileId() + ".papaya").toFile(), papayaFile);
             papayaStatusFileService.save(papayaStatusFile);
             logger.info("PapayaStatusFile saved");
-            //objectMapper.writeValue(store.resolve(papayaFile.getFileId() + ".papayastatus").toFile(), papayaStatusFile);
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }
@@ -178,7 +177,6 @@ public class FileManager {
                 }
 
                 Path papayaStatusFilePath = storeFile.toPath().resolve(papayaFile.getFileId() + ".papayastatus");
-//                objectMapper.writeValue(papayaStatusFilePath.toFile(), papayaStatusFile);
                 papayaStatusFileService.save(papayaStatusFile);
                 return Optional.of(papayaStatusFilePath);
             } catch (IOException e) {
@@ -239,33 +237,11 @@ public class FileManager {
 
     public Optional<PapayaStatusFile> retrievePapayaStatusFileFromFile(String fileId) {
         return papayaStatusFileService.findById(fileId);
-//        File papayaStatusFile = storePath.resolve(fileId).resolve(fileId + ".papayastatus").toFile();
-//        logger.info("Start retrieve papaya status file from file");
-//        if (papayaStatusFile.exists()) {
-//            try {
-//                ObjectMapper objectMapper = new ObjectMapper();
-//                PapayaStatusFile pf = objectMapper.readValue(papayaStatusFile, PapayaStatusFile.class);
-//                return Optional.of(pf);
-//            } catch (IOException e) {
-//                logger.severe(e.getMessage());
-//                return Optional.empty();
-//            }
-//        } else {
-//            logger.severe("PapayaStatus file not found");
-//            return Optional.empty();
-//        }
     }
 
-    public void savePapayaStatusFile(String fileId, PapayaStatusFile papayaStatusFile) {
+    public void savePapayaStatusFile(PapayaStatusFile papayaStatusFile) {
         logger.info("Start save papaya status file");
         papayaStatusFileService.save(papayaStatusFile);
-//        File file = storePath.resolve(fileId).resolve(fileId + ".papayastatus").toFile();
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        try {
-//            objectMapper.writeValue(file, papayaStatusFile);
-//        } catch (IOException e) {
-//            logger.severe(e.getMessage());
-//        }
     }
 
     public void writePart(String fileId, String partFileName, ByteArrayOutputStream content) {

@@ -36,16 +36,15 @@ public class AskForPartFileSender {
                     boolean partDownloaded = checkIfPartisDownloaded(partPeerStatusFiles);
                     if (partDownloaded) {
                         status.setStatus(PapayaStatus.COMPLETE);
+                        fileManager.savePapayaStatusFile(papayaStatusFile);
                     } else {
                         updateAskedToTimeout(partPeerStatusFiles);
                         boolean partAsked = checkIfPartIdAsked(partPeerStatusFiles);
                         if (!partAsked) {
-                            askToRandomNoAsked(papayaStatusFile.getFileId(),status.getFileName(), partPeerStatusFiles);
+                            askToRandomNoAsked(papayaStatusFile.getFileId(), status.getFileName(), partPeerStatusFiles);
                         }
                     }
                 });
-
-        fileManager.savePapayaStatusFile(papayaStatusFile.getFileId(), papayaStatusFile);
     }
 
     private boolean checkIfPartisDownloaded(Set<PartPeerStatusFile> partPeerStatusFiles) {
