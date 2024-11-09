@@ -5,7 +5,7 @@ spring:
     url: jdbc:sqlite:papaya.db
     driver-class-name: org.sqlite.JDBC
   jpa:
-    show-sql: true
+    show-sql: false
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate.ddl-auto: update
 papaya:
