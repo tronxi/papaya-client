@@ -1,11 +1,12 @@
-package dev.tronxi.papayaclient.files;
+package dev.tronxi.papayaclient.persistence;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
-import dev.tronxi.papayaclient.files.papayafile.PartFile;
-import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatus;
-import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatusFile;
-import dev.tronxi.papayaclient.files.papayastatusfile.PartStatusFile;
+import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
+import dev.tronxi.papayaclient.persistence.papayafile.PartFile;
+import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatus;
+import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatusFile;
+import dev.tronxi.papayaclient.persistence.papayastatusfile.PartStatusFile;
+import dev.tronxi.papayaclient.persistence.services.PapayaStatusFileService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,11 +28,13 @@ public class FileManager {
     private Path storePath;
 
     private final HashGenerator hashGenerator;
+    private final PapayaStatusFileService papayaStatusFileService;
 
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
 
-    public FileManager(HashGenerator hashGenerator) {
+    public FileManager(HashGenerator hashGenerator, PapayaStatusFileService papayaStatusFileService) {
+        this.papayaStatusFileService = papayaStatusFileService;
         logger.setLevel(Level.INFO);
         this.hashGenerator = hashGenerator;
     }
@@ -78,7 +81,9 @@ public class FileManager {
             }
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(store.resolve(papayaFile.getFileId() + ".papaya").toFile(), papayaFile);
-            objectMapper.writeValue(store.resolve(papayaFile.getFileId() + ".papayastatus").toFile(), papayaStatusFile);
+            papayaStatusFileService.save(papayaStatusFile);
+            logger.info("PapayaStatusFile saved");
+            //objectMapper.writeValue(store.resolve(papayaFile.getFileId() + ".papayastatus").toFile(), papayaStatusFile);
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }
@@ -173,7 +178,8 @@ public class FileManager {
                 }
 
                 Path papayaStatusFilePath = storeFile.toPath().resolve(papayaFile.getFileId() + ".papayastatus");
-                objectMapper.writeValue(papayaStatusFilePath.toFile(), papayaStatusFile);
+//                objectMapper.writeValue(papayaStatusFilePath.toFile(), papayaStatusFile);
+                papayaStatusFileService.save(papayaStatusFile);
                 return Optional.of(papayaStatusFilePath);
             } catch (IOException e) {
                 logger.severe(e.getMessage());
@@ -232,32 +238,34 @@ public class FileManager {
     }
 
     public Optional<PapayaStatusFile> retrievePapayaStatusFileFromFile(String fileId) {
-        File papayaStatusFile = storePath.resolve(fileId).resolve(fileId + ".papayastatus").toFile();
-        logger.info("Start retrieve papaya status file from file");
-        if (papayaStatusFile.exists()) {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                PapayaStatusFile pf = objectMapper.readValue(papayaStatusFile, PapayaStatusFile.class);
-                return Optional.of(pf);
-            } catch (IOException e) {
-                logger.severe(e.getMessage());
-                return Optional.empty();
-            }
-        } else {
-            logger.severe("PapayaStatus file not found");
-            return Optional.empty();
-        }
+        return papayaStatusFileService.findById(fileId);
+//        File papayaStatusFile = storePath.resolve(fileId).resolve(fileId + ".papayastatus").toFile();
+//        logger.info("Start retrieve papaya status file from file");
+//        if (papayaStatusFile.exists()) {
+//            try {
+//                ObjectMapper objectMapper = new ObjectMapper();
+//                PapayaStatusFile pf = objectMapper.readValue(papayaStatusFile, PapayaStatusFile.class);
+//                return Optional.of(pf);
+//            } catch (IOException e) {
+//                logger.severe(e.getMessage());
+//                return Optional.empty();
+//            }
+//        } else {
+//            logger.severe("PapayaStatus file not found");
+//            return Optional.empty();
+//        }
     }
 
     public void savePapayaStatusFile(String fileId, PapayaStatusFile papayaStatusFile) {
         logger.info("Start save papaya status file");
-        File file = storePath.resolve(fileId).resolve(fileId + ".papayastatus").toFile();
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            objectMapper.writeValue(file, papayaStatusFile);
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-        }
+        papayaStatusFileService.save(papayaStatusFile);
+//        File file = storePath.resolve(fileId).resolve(fileId + ".papayastatus").toFile();
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        try {
+//            objectMapper.writeValue(file, papayaStatusFile);
+//        } catch (IOException e) {
+//            logger.severe(e.getMessage());
+//        }
     }
 
     public void writePart(String fileId, String partFileName, ByteArrayOutputStream content) {
@@ -296,21 +304,16 @@ public class FileManager {
     }
 
     public List<String> getCompletedParts(String fileId) {
-        Path papayaStatusPath = storePath.resolve(fileId).resolve(fileId + ".papayastatus");
-        if (!papayaStatusPath.toFile().exists()) {
+        Optional<PapayaStatusFile> maybePapayaStatusFile = papayaStatusFileService.findById(fileId);
+        if (maybePapayaStatusFile.isEmpty()) {
             return Collections.emptyList();
         }
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            PapayaStatusFile papayaStatus = objectMapper.readValue(papayaStatusPath.toFile(), PapayaStatusFile.class);
-            return papayaStatus.getPartStatusFiles()
-                    .stream()
-                    .filter(partStatusFile -> partStatusFile.getStatus() == PapayaStatus.COMPLETE)
-                    .map(PartStatusFile::getFileName)
-                    .toList();
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-            return Collections.emptyList();
-        }
+        PapayaStatusFile papayaStatusFile = maybePapayaStatusFile.get();
+        return Collections.emptyList();
+//        return papayaStatusFile.getPartStatusFiles()
+//                .stream()
+//                .filter(partStatusFile -> partStatusFile.getStatus() == PapayaStatus.COMPLETE)
+//                .map(PartStatusFile::getFileName)
+//                .toList();
     }
 }

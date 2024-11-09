@@ -1,6 +1,6 @@
 package dev.tronxi.papayaclient.peer;
 
-import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
+import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
 import javafx.scene.control.TextArea;
 
 

@@ -1,7 +1,7 @@
 package dev.tronxi.papayaclient.peer;
 
-import dev.tronxi.papayaclient.files.FileManager;
-import dev.tronxi.papayaclient.files.papayastatusfile.*;
+import dev.tronxi.papayaclient.persistence.FileManager;
+import dev.tronxi.papayaclient.persistence.papayastatusfile.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

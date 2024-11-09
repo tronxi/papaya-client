@@ -1,9 +1,9 @@
 package dev.tronxi.papayaclient.peer.handlers;
 
-import dev.tronxi.papayaclient.files.FileManager;
-import dev.tronxi.papayaclient.files.HashGenerator;
-import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatus;
-import dev.tronxi.papayaclient.files.papayastatusfile.PapayaStatusFile;
+import dev.tronxi.papayaclient.persistence.FileManager;
+import dev.tronxi.papayaclient.persistence.HashGenerator;
+import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatus;
+import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatusFile;
 import dev.tronxi.papayaclient.peer.AskForPartFileSender;
 import org.springframework.stereotype.Service;
 

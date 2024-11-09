@@ -1,7 +1,7 @@
 package dev.tronxi.papayaclient.peer;
 
-import dev.tronxi.papayaclient.files.FileManager;
-import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
+import dev.tronxi.papayaclient.persistence.FileManager;
+import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.peer.handlers.AskForPartFileHandler;
 import dev.tronxi.papayaclient.peer.handlers.AskForResourcesHandler;
 import dev.tronxi.papayaclient.peer.handlers.PartFileHandler;
@@ -99,7 +99,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                     case RESPONSE_ASK_FOR_RESOURCES ->
                                             message = responseAskForResourcesHandler.handleInNewThread(clientSocket, receivedData);
                                     case ASK_FOR_PART_FILE ->
-                                            askForPartFileHandler.handleInNewThread(clientSocket, receivedData);
+                                            message = askForPartFileHandler.handleInNewThread(clientSocket, receivedData);
                                     default -> message = CompletableFuture.completedFuture("Invalid");
                                 }
                                 CompletableFuture<String> finalMessage = message;

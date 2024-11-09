@@ -1,7 +1,13 @@
 spring:
   application:
     name: papaya-client
-
+  datasource:
+    url: jdbc:sqlite:papaya.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate.ddl-auto: update
 papaya:
   port: 3390
   workspace: /home/tronxi/papaya

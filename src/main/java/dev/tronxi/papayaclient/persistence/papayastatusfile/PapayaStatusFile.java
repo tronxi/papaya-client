@@ -1,14 +1,21 @@
-package dev.tronxi.papayaclient.files.papayastatusfile;
+package dev.tronxi.papayaclient.persistence.papayastatusfile;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Entity
 public class PapayaStatusFile {
-    private String fileName;
+
+    @Id
     private String fileId;
+
+    private String fileName;
+
+    @OneToMany
     private List<PartStatusFile> partStatusFiles;
 
     public PapayaStatusFile(String fileName, String fileId) {

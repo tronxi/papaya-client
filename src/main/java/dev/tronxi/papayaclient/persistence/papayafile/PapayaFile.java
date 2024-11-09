@@ -1,4 +1,4 @@
-package dev.tronxi.papayaclient.files.papayafile;
+package dev.tronxi.papayaclient.persistence.papayafile;
 
 import java.util.ArrayList;
 import java.util.List;

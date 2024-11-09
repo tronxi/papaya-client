@@ -1,4 +1,4 @@
-package dev.tronxi.papayaclient.files.papayastatusfile;
+package dev.tronxi.papayaclient.persistence.papayastatusfile;
 
 public enum PartPeerStatus {
     NO_ASKED,

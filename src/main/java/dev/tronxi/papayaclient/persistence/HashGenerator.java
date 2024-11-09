@@ -1,4 +1,4 @@
-package dev.tronxi.papayaclient.files;
+package dev.tronxi.papayaclient.persistence;
 
 import org.springframework.stereotype.Component;
 

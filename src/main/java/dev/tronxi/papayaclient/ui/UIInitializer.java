@@ -1,8 +1,8 @@
 package dev.tronxi.papayaclient.ui;
 
 import dev.tronxi.papayaclient.PapayaClientApplication;
-import dev.tronxi.papayaclient.files.FileManager;
-import dev.tronxi.papayaclient.files.papayafile.PapayaFile;
+import dev.tronxi.papayaclient.persistence.FileManager;
+import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.peer.PeerConnectionManager;
 import dev.tronxi.papayaclient.peer.PeerConnectionManagerTCP;
 import dev.tronxi.papayaclient.ui.components.CreateDirectoryChooserButton;
