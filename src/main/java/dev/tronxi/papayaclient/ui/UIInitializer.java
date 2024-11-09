@@ -52,15 +52,10 @@ public class UIInitializer extends Application {
         statusRunning.setVisible(false);
         Button statusButton = generateStatusButton(stage, statusRunning);
 
-        Label sendingRunning = new Label("SendingRunning...");
-        sendingRunning.managedProperty().bind(sendingRunning.visibleProperty());
-        sendingRunning.setVisible(false);
-        Button sendButton = generateSendButton(stage, sendingRunning);
-
         Button downloadButton = generateDownloadButton(stage);
 
-        HBox hBox = new HBox(createPapayaFileButton, joinButton, statusButton, sendButton, downloadButton,
-                createPapayaFileRunning, joinRunning, statusRunning, sendingRunning);
+        HBox hBox = new HBox(createPapayaFileButton, joinButton, statusButton, downloadButton,
+                createPapayaFileRunning, joinRunning, statusRunning);
         hBox.setSpacing(10);
 
         TextArea logs = new TextArea();
@@ -69,6 +64,7 @@ public class UIInitializer extends Application {
         logs.setMaxHeight(400);
         logs.setMinHeight(400);
         peerConnectionManager.start(logs);
+        peerConnectionManager.startAllIncompleteDownloads();
 
         VBox vBox = new VBox(hBox, logs);
         vBox.setSpacing(10);
@@ -184,28 +180,6 @@ public class UIInitializer extends Application {
                         new Thread(task).start();
                     }
                 });
-    }
-
-    private Button generateSendButton(Stage stage, Label label) {
-        return new CreateDirectoryChooserButton().create("Send", stage, file -> {
-            Optional<PapayaFile> maybePapayaFile = fileManager.retrievePapayaFileFromStore(file);
-            maybePapayaFile.ifPresent(papayaFile -> {
-                Task<Void> task = new Task<>() {
-                    @Override
-                    protected Void call() {
-                        peerConnectionManager.send(papayaFile);
-                        return null;
-                    }
-                };
-                task.setOnRunning(workerStateEvent -> {
-                    label.setVisible(true);
-                });
-                task.setOnSucceeded(workerStateEvent -> {
-                    label.setVisible(false);
-                });
-                new Thread(task).start();
-            });
-        });
     }
 
     @Override

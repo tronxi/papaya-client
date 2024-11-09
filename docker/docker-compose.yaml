@@ -1,0 +1,14 @@
+services:
+  papaya-mysql:
+    container_name: papaya-mysql
+    image: mysql:8.4.3-oraclelinux9
+    env_file: .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+    networks:
+      - papaya-net
+
+networks:
+  papaya-net:

@@ -2,12 +2,16 @@ spring:
   application:
     name: papaya-client
   datasource:
-    url: jdbc:sqlite:papaya.db
-    driver-class-name: org.sqlite.JDBC
+    url: jdbc:mysql://localhost:3306/papaya?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: papaya
+    password: papayapass
   jpa:
-    show-sql: false
-    database-platform: org.hibernate.community.dialect.SQLiteDialect
-    hibernate.ddl-auto: update
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
 papaya:
   port: 3390
   workspace: /home/tronxi/papaya

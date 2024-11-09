@@ -6,8 +6,7 @@ import javafx.scene.control.TextArea;
 
 public interface PeerConnectionManager {
     void start(TextArea textArea);
-    void send(PapayaFile papayaFile);
     void stop();
     void download(PapayaFile papayaFile);
-
+    void startAllIncompleteDownloads();
 }

@@ -189,33 +189,9 @@ public class FileManager {
         }
     }
 
-    public Optional<PapayaFile> retrievePapayaFileFromStore(File storeFile) {
-        logger.info("Start retrieve papaya file from store");
-        List<Path> papayaFiles = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(storeFile.toPath(), "*.papaya")) {
-            stream.forEach(papayaFiles::add);
-            if (papayaFiles.size() != 1) {
-                logger.severe("Papaya file not found");
-                return Optional.empty();
-            }
-            Path papayaPath = papayaFiles.getFirst();
-            if (papayaPath.toFile().exists()) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                try {
-                    PapayaFile papayaFile = objectMapper.readValue(papayaPath.toFile(), PapayaFile.class);
-                    return Optional.of(papayaFile);
-                } catch (IOException e) {
-                    logger.severe(e.getMessage());
-                    return Optional.empty();
-                }
-            } else {
-                logger.severe("Papaya file not found");
-                return Optional.empty();
-            }
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-            return Optional.empty();
-        }
+    public Optional<PapayaFile> retrievePapayaFileFromFileId(String fileId) {
+        File papayaFile = storePath.resolve(fileId).resolve(fileId + ".papaya").toFile();
+        return retrievePapayaFileFromFile(papayaFile);
     }
 
     public Optional<PapayaFile> retrievePapayaFileFromFile(File papayaFile) {

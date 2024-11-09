@@ -1,12 +1,10 @@
 package dev.tronxi.papayaclient.peer;
 
-import dev.tronxi.papayaclient.persistence.FileManager;
 import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.peer.handlers.AskForPartFileHandler;
 import dev.tronxi.papayaclient.peer.handlers.AskForResourcesHandler;
 import dev.tronxi.papayaclient.peer.handlers.PartFileHandler;
 import dev.tronxi.papayaclient.peer.handlers.ResponseAskForResourcesHandler;
-import jakarta.annotation.PostConstruct;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.TextArea;
@@ -18,10 +16,7 @@ import org.xml.sax.SAXException;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import java.util.logging.Level;
@@ -35,35 +30,23 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
     @Value("${papaya.port}")
     private int port;
 
-    @Value("${papaya.workspace}")
-    private String workspace;
-
-    private Path storePath;
-
     private ServerSocket serverSocket;
 
-    private final FileManager fileManager;
+    private final DownloadManager downloadManager;
     private final GatewayDevice gatewayDevice;
-    private final PeerSignalingService peerSignalingService;
     private final AskForResourcesHandler askForResourcesHandler;
     private final ResponseAskForResourcesHandler responseAskForResourcesHandler;
     private final AskForPartFileHandler askForPartFileHandler;
     private final PartFileHandler partFileHandler;
 
-    public PeerConnectionManagerTCP(GatewayDevice gatewayDevice, FileManager fileManager, PeerSignalingService peerSignalingService, AskForResourcesHandler askForResourcesHandler, ResponseAskForResourcesHandler responseAskForResourcesHandler, AskForPartFileHandler askForPartFileHandler, PartFileHandler partFileHandler) {
+    public PeerConnectionManagerTCP(GatewayDevice gatewayDevice, DownloadManager downloadManager, AskForResourcesHandler askForResourcesHandler, ResponseAskForResourcesHandler responseAskForResourcesHandler, AskForPartFileHandler askForPartFileHandler, PartFileHandler partFileHandler) {
+        this.downloadManager = downloadManager;
         this.askForResourcesHandler = askForResourcesHandler;
         this.responseAskForResourcesHandler = responseAskForResourcesHandler;
         this.askForPartFileHandler = askForPartFileHandler;
         this.partFileHandler = partFileHandler;
         this.gatewayDevice = gatewayDevice;
-        this.fileManager = fileManager;
-        this.peerSignalingService = peerSignalingService;
         logger.setLevel(Level.INFO);
-    }
-
-    @PostConstruct
-    public void init() {
-        storePath = Path.of(workspace + "/store/");
     }
 
     @Override
@@ -131,32 +114,6 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
     }
 
     @Override
-    public void send(PapayaFile papayaFile) {
-        logger.info("Sending file...");
-        papayaFile.getPartFiles().forEach(partFile -> {
-            Path partFilePath = storePath.resolve(papayaFile.getFileId())
-                    .resolve(partFile.getFileName());
-            if (partFilePath.toFile().exists()) {
-                try (Socket socket = new Socket("localhost", port);
-                     OutputStream outputStream = socket.getOutputStream()) {
-
-                    ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
-                    dataStream.write(PeerMessageType.PART_FILE.getValue());
-                    dataStream.write(papayaFile.getFileId().getBytes());
-                    dataStream.write(partFile.getFileName().getBytes());
-                    dataStream.write("#".getBytes());
-                    dataStream.write(Files.readAllBytes(partFilePath));
-                    outputStream.write(dataStream.toByteArray());
-                } catch (IOException e) {
-                    logger.severe(e.getMessage());
-                }
-            } else {
-                logger.severe("File not found: " + partFilePath);
-            }
-        });
-    }
-
-    @Override
     public void stop() {
         logger.info("Stop...");
         try {
@@ -177,27 +134,11 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
 
     @Override
     public void download(PapayaFile papayaFile) {
-        logger.info("Downloading file... " + papayaFile.getFileName());
-        fileManager.createStoreFromPapayaFile(papayaFile);
-        List<Peer> peers = peerSignalingService.retrievePeers();
-        logger.info("Peers retrieved: " + peers.size());
-        peers.forEach(peer -> {
-            askForResources(papayaFile, peer);
-        });
+        downloadManager.download(papayaFile);
     }
 
-    private void askForResources(PapayaFile papayaFile, Peer peer) {
-        logger.info("Asking for resources: " + papayaFile.getFileName() + " for " + peer);
-        try (Socket socket = new Socket(peer.address(), peer.port());
-             OutputStream outputStream = socket.getOutputStream()) {
-            ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
-            dataStream.write(PeerMessageType.ASK_FOR_RESOURCES.getValue());
-            dataStream.write(papayaFile.getFileId().getBytes());
-            dataStream.write(String.valueOf(port).getBytes());
-            dataStream.write("#".getBytes());
-            outputStream.write(dataStream.toByteArray());
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-        }
+    @Override
+    public void startAllIncompleteDownloads() {
+        downloadManager.startAllIncompleteDownloads();
     }
 }
