@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -33,6 +34,10 @@ public class DownloadManager {
 
     public void startAllIncompleteDownloads() {
         papayaStatusFileService.findAllIncomplete().forEach(status -> {
+            status.getPartStatusFiles().forEach(partStatusFile -> {
+                partStatusFile.setPartPeerStatusFiles(Collections.emptySet());
+            });
+            fileManager.savePapayaStatusFile(status);
             fileManager.retrievePapayaFileFromFileId(status.getFileId()).ifPresent(this::download);
         });
     }

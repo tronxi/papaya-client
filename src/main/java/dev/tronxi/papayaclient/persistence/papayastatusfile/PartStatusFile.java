@@ -16,7 +16,7 @@ public class PartStatusFile {
     private String fileHash;
     private PapayaStatus status;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     Set<PartPeerStatusFile> partPeerStatusFiles;
 
 
