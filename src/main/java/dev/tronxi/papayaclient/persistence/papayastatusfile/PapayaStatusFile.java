@@ -15,7 +15,7 @@ public class PapayaStatusFile {
 
     private String fileName;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<PartStatusFile> partStatusFiles;
 
     public PapayaStatusFile(String fileName, String fileId) {

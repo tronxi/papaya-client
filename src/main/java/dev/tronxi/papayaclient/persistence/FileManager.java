@@ -309,11 +309,10 @@ public class FileManager {
             return Collections.emptyList();
         }
         PapayaStatusFile papayaStatusFile = maybePapayaStatusFile.get();
-        return Collections.emptyList();
-//        return papayaStatusFile.getPartStatusFiles()
-//                .stream()
-//                .filter(partStatusFile -> partStatusFile.getStatus() == PapayaStatus.COMPLETE)
-//                .map(PartStatusFile::getFileName)
-//                .toList();
+        return papayaStatusFile.getPartStatusFiles()
+                .stream()
+                .filter(partStatusFile -> partStatusFile.getStatus() == PapayaStatus.COMPLETE)
+                .map(PartStatusFile::getFileName)
+                .toList();
     }
 }
