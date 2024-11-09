@@ -23,6 +23,7 @@ public class PeerSignalingService {
 //        peers.add(new Peer("localhost", 3390));
 //        peers.add(new Peer("192.168.1.134", 3390));
         peers.add(new Peer("192.168.1.133", 3390));
+        peers.add(new Peer("192.168.1.133", 3391));
     }
 
     private Peer peer;

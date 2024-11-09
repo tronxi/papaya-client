@@ -1,6 +1,5 @@
 package dev.tronxi.papayaclient.peer;
 
-import dev.tronxi.papayaclient.persistence.FileManager;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -9,6 +8,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -20,65 +22,42 @@ public class AskForPartFileSender {
     @Value("${papaya.port}")
     protected int port;
 
-    private final FileManager fileManager;
-
-    public AskForPartFileSender(FileManager fileManager) {
-        this.fileManager = fileManager;
-    }
+    private static final Map<Peer, Long> peerAskedFiles = new HashMap<>();
+    private static final Map<Long, PapayaStatus> partStatus = new HashMap<>();
 
     public void send(PapayaStatusFile papayaStatusFile) {
         logger.info("Ask for part file started: " + papayaStatusFile.getFileId());
+
         papayaStatusFile.getPartStatusFiles().stream()
                 .filter(partStatusFile -> partStatusFile.getStatus().equals(PapayaStatus.INCOMPLETE))
                 .findFirst()
                 .ifPresent(status -> {
+                     PapayaStatus currentStatus = partStatus.getOrDefault(status.getId(), PapayaStatus.INCOMPLETE);
+                     logger.info("Part status before: " + partStatus);
+                     if(currentStatus != PapayaStatus.INCOMPLETE) {
+                         logger.info("Part status asked: " + status.getId());
+                         return;
+                     }
+                    logger.info("Asking process for: " + status.getFileName() + " with status: " + status.getStatus() + " id: " + status.getId());
                     Set<PartPeerStatusFile> partPeerStatusFiles = status.getPartPeerStatusFiles();
-                    boolean partDownloaded = checkIfPartisDownloaded(partPeerStatusFiles);
-                    if (partDownloaded) {
-                        status.setStatus(PapayaStatus.COMPLETE);
-                        fileManager.savePapayaStatusFile(papayaStatusFile);
-                    } else {
-                        updateAskedToTimeout(partPeerStatusFiles);
-                        boolean partAsked = checkIfPartIdAsked(partPeerStatusFiles);
-                        if (!partAsked) {
-                            askToRandomNoAsked(papayaStatusFile.getFileId(), status.getFileName(), partPeerStatusFiles);
+                    partPeerStatusFiles.forEach(partPeerStatusFile -> {
+                        if (!peerAskedFiles.containsKey(partPeerStatusFile.getPeer())) {
+                            peerAskedFiles.put(partPeerStatusFile.getPeer(), 0L);
                         }
-                    }
+                    });
+                    logger.info("PeerAskedFiles before: " + peerAskedFiles);
+                    partPeerStatusFiles.stream()
+                            .min(Comparator.comparingLong(partPeerStatusFile -> peerAskedFiles.getOrDefault(partPeerStatusFile.getPeer(), 0L)))
+                            .ifPresent(partPeerStatusFile -> {
+                                partStatus.put(status.getId(), PapayaStatus.ASKED);
+                                peerAskedFiles.put(partPeerStatusFile.getPeer(), peerAskedFiles.get(partPeerStatusFile.getPeer()) + 1);
+                                sendMessage(papayaStatusFile.getFileId(), status.getFileName(), status.getId(), partPeerStatusFile);
+                                logger.info("PeerAskedFiles after: " + peerAskedFiles);
+                            });
                 });
     }
 
-    private boolean checkIfPartisDownloaded(Set<PartPeerStatusFile> partPeerStatusFiles) {
-        return partPeerStatusFiles.stream()
-                .anyMatch(partPeerStatusFile -> partPeerStatusFile.getPartPeerStatus().equals(PartPeerStatus.DOWNLOADED));
-    }
-
-    private void updateAskedToTimeout(Set<PartPeerStatusFile> partPeerStatusFiles) {
-        partPeerStatusFiles.stream()
-                .filter(partPeerStatusFile -> partPeerStatusFile.getPartPeerStatus().equals(PartPeerStatus.ASKED))
-                .forEach(partPeerStatusFile -> {
-                    long differenceInMinutes = calculateDifferenceInMinutes(partPeerStatusFile.getLatestUpdateTime(), System.currentTimeMillis());
-                    if (differenceInMinutes > 10) {
-                        partPeerStatusFile.setPartPeerStatus(PartPeerStatus.TIMEOUT);
-                        partPeerStatusFile.setLatestUpdateTime(System.currentTimeMillis());
-                    }
-                });
-    }
-
-    private boolean checkIfPartIdAsked(Set<PartPeerStatusFile> partPeerStatusFiles) {
-        return partPeerStatusFiles.stream()
-                .anyMatch(partPeerStatusFile -> partPeerStatusFile.getPartPeerStatus().equals(PartPeerStatus.ASKED));
-    }
-
-    private void askToRandomNoAsked(String fileId, String partFileName, Set<PartPeerStatusFile> partPeerStatusFiles) {
-        partPeerStatusFiles.stream()
-                .filter(partPeerStatusFile -> partPeerStatusFile.getPartPeerStatus().equals(PartPeerStatus.NO_ASKED))
-                .findAny()
-                .ifPresent(partPeerStatusFile -> {
-                    sendMessage(fileId, partFileName, partPeerStatusFile);
-                });
-    }
-
-    private void sendMessage(String fileId, String partFileName, PartPeerStatusFile partPeerStatusFile) {
+    private void sendMessage(String fileId, String partFileName, Long partId, PartPeerStatusFile partPeerStatusFile) {
         logger.info("Sending message: ask for part file: " + fileId + " partFileName: " + partFileName + " Peer: " + partPeerStatusFile);
         try (Socket socket = new Socket(partPeerStatusFile.getPeer().address(), partPeerStatusFile.getPeer().port());
              OutputStream outputStream = socket.getOutputStream()) {
@@ -96,10 +75,5 @@ public class AskForPartFileSender {
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }
-    }
-
-    private long calculateDifferenceInMinutes(long startTimeMillis, long endTimeMillis) {
-        long differenceInMillis = endTimeMillis - startTimeMillis;
-        return differenceInMillis / (1000 * 60);
     }
 }
