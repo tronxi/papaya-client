@@ -42,8 +42,10 @@ public class UpnpConfiguration {
             String externalIPAddress = gatewayDevice.getExternalIPAddress();
             logger.info("Found external IP address: " + externalIPAddress);
 
-            Peer peer = new Peer(gatewayDevice.getExternalIPAddress(), port);
+//            Peer peer = new Peer(gatewayDevice.getExternalIPAddress(), port);
+            Peer peer = new Peer(gatewayDevice.getLocalAddress().getHostAddress(), port);
             peerSignalingService.initialSend(peer);
+            peerSignalingService.retrievePeers();
 
             PortMappingEntry portMapping = new PortMappingEntry();
             if (gatewayDevice.getSpecificPortMappingEntry(port, "TCP", portMapping)) {
