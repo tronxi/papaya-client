@@ -30,7 +30,6 @@ public class AskForPartFileSender {
                 .findFirst()
                 .ifPresent(status -> {
                     PapayaStatus currentStatus = partStatus.getOrDefault(status.getId(), PapayaStatus.INCOMPLETE);
-                    logger.info("Part status before: " + partStatus);
                     if (currentStatus != PapayaStatus.INCOMPLETE) {
                         logger.info("Part status asked: " + status.getId());
                         return;

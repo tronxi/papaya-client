@@ -23,15 +23,32 @@ public class PeerTrackerService {
     @Value("${papaya.tracker}")
     private String trackerAddress;
     private Peer peer;
-
-
-    List<Peer> peers = new ArrayList<>();
+    private List<Peer> peers = new ArrayList<>();
 
     public PeerTrackerService() {
         logger.setLevel(Level.INFO);
     }
 
     public List<Peer> retrievePeers() {
+        List<Peer> currentPeers = retrieveCurrentPeers();
+        return currentPeers.stream()
+                .filter(p -> !p.equals(peer))
+                .toList();
+    }
+
+    public List<Peer> retrieveNewPeers() {
+        //TODO
+        List<Peer> currentPeers = retrieveCurrentPeers();
+        List<Peer> newPeers = new ArrayList<>();
+        for (Peer peer : currentPeers) {
+            if(!peers.contains(peer)) {
+                newPeers.add(peer);
+            }
+        }
+        return newPeers;
+    }
+
+    private List<Peer> retrieveCurrentPeers() {
         try {
             List<Peer> response = new RestTemplate().exchange(
                     trackerAddress + "/peer",
@@ -42,8 +59,7 @@ public class PeerTrackerService {
             ).getBody();
             logger.info("Peers: " + response);
             if (response != null) {
-                return response.stream().filter(p -> !p.equals(peer))
-                        .toList();
+                return response;
             }
             return List.of();
         } catch (Exception e) {
