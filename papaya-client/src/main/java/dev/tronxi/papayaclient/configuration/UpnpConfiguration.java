@@ -1,7 +1,7 @@
 package dev.tronxi.papayaclient.configuration;
 
 import dev.tronxi.papayaclient.peer.Peer;
-import dev.tronxi.papayaclient.peer.PeerSignalingService;
+import dev.tronxi.papayaclient.peer.services.PeerTrackerService;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
 import org.bitlet.weupnp.PortMappingEntry;
@@ -23,10 +23,10 @@ public class UpnpConfiguration {
     @Value("${papaya.port}")
     private int port;
 
-    private final PeerSignalingService peerSignalingService;
+    private final PeerTrackerService peerTrackerService;
 
-    public UpnpConfiguration(PeerSignalingService peerSignalingService) {
-        this.peerSignalingService = peerSignalingService;
+    public UpnpConfiguration(PeerTrackerService peerTrackerService) {
+        this.peerTrackerService = peerTrackerService;
     }
 
 
@@ -44,8 +44,7 @@ public class UpnpConfiguration {
 
 //            Peer peer = new Peer(gatewayDevice.getExternalIPAddress(), port);
             Peer peer = new Peer(gatewayDevice.getLocalAddress().getHostAddress(), port);
-            peerSignalingService.initialSend(peer);
-            peerSignalingService.retrievePeers();
+            peerTrackerService.initialSend(peer);
 
             PortMappingEntry portMapping = new PortMappingEntry();
             if (gatewayDevice.getSpecificPortMappingEntry(port, "TCP", portMapping)) {

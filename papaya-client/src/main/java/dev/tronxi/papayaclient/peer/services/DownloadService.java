@@ -1,5 +1,7 @@
-package dev.tronxi.papayaclient.peer;
+package dev.tronxi.papayaclient.peer.services;
 
+import dev.tronxi.papayaclient.peer.Peer;
+import dev.tronxi.papayaclient.peer.PeerMessageType;
 import dev.tronxi.papayaclient.persistence.FileManager;
 import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.persistence.services.PapayaStatusFileService;
@@ -15,20 +17,20 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @Service
-public class DownloadManager {
+public class DownloadService {
 
     @Value("${papaya.port}")
     private int port;
 
-    private static final Logger logger = Logger.getLogger(DownloadManager.class.getName());
+    private static final Logger logger = Logger.getLogger(DownloadService.class.getName());
 
     private final FileManager fileManager;
-    private final PeerSignalingService peerSignalingService;
+    private final PeerTrackerService peerTrackerService;
     private final PapayaStatusFileService papayaStatusFileService;
 
-    public DownloadManager(FileManager fileManager, PeerSignalingService peerSignalingService, PapayaStatusFileService papayaStatusFileService) {
+    public DownloadService(FileManager fileManager, PeerTrackerService peerTrackerService, PapayaStatusFileService papayaStatusFileService) {
         this.fileManager = fileManager;
-        this.peerSignalingService = peerSignalingService;
+        this.peerTrackerService = peerTrackerService;
         this.papayaStatusFileService = papayaStatusFileService;
     }
 
@@ -46,7 +48,7 @@ public class DownloadManager {
     public void download(PapayaFile papayaFile) {
         logger.info("Downloading file... " + papayaFile.getFileName());
         fileManager.createStoreFromPapayaFile(papayaFile);
-        List<Peer> peers = peerSignalingService.retrievePeers();
+        List<Peer> peers = peerTrackerService.retrievePeers();
         logger.info("Peers retrieved: " + peers.size());
         peers.forEach(peer -> {
             askForResources(papayaFile, peer);
