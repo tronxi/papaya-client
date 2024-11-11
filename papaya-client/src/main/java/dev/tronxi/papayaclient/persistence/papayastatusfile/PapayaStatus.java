@@ -4,4 +4,5 @@ public enum PapayaStatus {
     COMPLETE,
     ASKED,
     INCOMPLETE,
+    JOINED
 }

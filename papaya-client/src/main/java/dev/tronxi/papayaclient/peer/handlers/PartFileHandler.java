@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -21,6 +23,7 @@ public class PartFileHandler extends Handler {
     private static final Logger logger = Logger.getLogger(PartFileHandler.class.getName());
     private final HashGenerator hashGenerator;
     private final AskForPartFileSender askForPartFileSender;
+    private static final Map<String, PapayaStatus> filesJoined = new HashMap<>();
 
     protected PartFileHandler(FileManager fileManager, HashGenerator hashGenerator, AskForPartFileSender askForPartFileSender) {
         super(fileManager);
@@ -61,12 +64,14 @@ public class PartFileHandler extends Handler {
                                 partStatusFile.setStatus(PapayaStatus.COMPLETE);
                                 fileManager.savePartStatusFile(partStatusFile);
                                 if (statusFile.getStatus() == PapayaStatus.COMPLETE) {
-                                    //TODO
-                                    Optional<Path> maybePath = fileManager.joinStore(storePath.resolve(fileId.toString()).toFile());
-                                    maybePath.ifPresentOrElse((path -> logger.info("File downloaded: " + path)),
-                                            () -> {
-                                                logger.severe("Error ");
-                                            });
+                                    if (!filesJoined.containsKey(statusFile.getFileId())) {
+                                        filesJoined.put(statusFile.getFileId(), PapayaStatus.JOINED);
+                                        Optional<Path> maybePath = fileManager.joinStore(storePath.resolve(fileId.toString()).toFile());
+                                        maybePath.ifPresentOrElse((path -> logger.info("File downloaded: " + path)),
+                                                () -> {
+                                                    logger.severe("Error ");
+                                                });
+                                    }
                                 }
                                 askForPartFileSender.send(statusFile);
                             } else {
