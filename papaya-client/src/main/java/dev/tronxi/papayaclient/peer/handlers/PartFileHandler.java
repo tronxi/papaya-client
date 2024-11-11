@@ -5,6 +5,7 @@ import dev.tronxi.papayaclient.persistence.HashGenerator;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatus;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatusFile;
 import dev.tronxi.papayaclient.peer.AskForPartFileSender;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -28,6 +29,7 @@ public class PartFileHandler extends Handler {
     }
 
     @Override
+    @Transactional
     public String handle(Socket clientSocket, byte[] receivedData) {
         String message;
         ByteArrayOutputStream fileId = new ByteArrayOutputStream();
@@ -57,14 +59,15 @@ public class PartFileHandler extends Handler {
                             if (hash.equals(partStatusFile.getFileHash())) {
                                 fileManager.writePart(fileId.toString(), partFileName.toString(), outputStreamWithoutHeaders);
                                 partStatusFile.setStatus(PapayaStatus.COMPLETE);
+                                fileManager.savePartStatusFile(partStatusFile);
                                 if (statusFile.getStatus() == PapayaStatus.COMPLETE) {
+                                    //TODO
                                     Optional<Path> maybePath = fileManager.joinStore(storePath.resolve(fileId.toString()).toFile());
                                     maybePath.ifPresentOrElse((path -> logger.info("File downloaded: " + path)),
                                             () -> {
                                                 logger.severe("Error ");
                                             });
                                 }
-                                fileManager.savePapayaStatusFile(statusFile);
                                 askForPartFileSender.send(statusFile);
                             } else {
                                 logger.severe("Invalid hash");

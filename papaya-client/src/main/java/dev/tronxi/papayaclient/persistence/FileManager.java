@@ -6,6 +6,7 @@ import dev.tronxi.papayaclient.persistence.papayafile.PartFile;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatus;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatusFile;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PartStatusFile;
+import dev.tronxi.papayaclient.persistence.repositories.PartStatusFileRepository;
 import dev.tronxi.papayaclient.persistence.services.PapayaStatusFileService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,12 +30,14 @@ public class FileManager {
 
     private final HashGenerator hashGenerator;
     private final PapayaStatusFileService papayaStatusFileService;
+    private final PartStatusFileRepository partStatusFileRepository;
 
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
 
-    public FileManager(HashGenerator hashGenerator, PapayaStatusFileService papayaStatusFileService) {
+    public FileManager(HashGenerator hashGenerator, PapayaStatusFileService papayaStatusFileService, PartStatusFileRepository partStatusFileRepository) {
         this.papayaStatusFileService = papayaStatusFileService;
+        this.partStatusFileRepository = partStatusFileRepository;
         logger.setLevel(Level.INFO);
         this.hashGenerator = hashGenerator;
     }
@@ -218,6 +221,10 @@ public class FileManager {
     public void savePapayaStatusFile(PapayaStatusFile papayaStatusFile) {
         logger.info("Start save papaya status file");
         papayaStatusFileService.save(papayaStatusFile);
+    }
+
+    public void savePartStatusFile(PartStatusFile partStatusFile) {
+        partStatusFileRepository.save(partStatusFile);
     }
 
     public void writePart(String fileId, String partFileName, ByteArrayOutputStream content) {

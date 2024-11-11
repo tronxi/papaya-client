@@ -6,6 +6,7 @@ import dev.tronxi.papayaclient.persistence.FileManager;
 import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.persistence.services.PapayaStatusFileService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +36,7 @@ public class DownloadService {
     }
 
     public void startAllIncompleteDownloads() {
+        logger.info("Start all incomplete downloads");
         papayaStatusFileService.findAllIncomplete().forEach(status -> {
             status.getPartStatusFiles().forEach(partStatusFile -> {
                 partStatusFile.setPartPeerStatusFiles(Collections.emptySet());
@@ -67,6 +69,22 @@ public class DownloadService {
             outputStream.write(dataStream.toByteArray());
         } catch (IOException e) {
             logger.severe(e.getMessage());
+        }
+    }
+
+    @Scheduled(initialDelay = 100000, fixedRate = 100000)
+    public void askForResourcesNewPeers() {
+        logger.info("Ask for resources new peers...");
+        List<Peer> newPeers = peerTrackerService.retrieveNewPeers();
+        logger.info("new Peers: " + newPeers.size());
+        if(!newPeers.isEmpty()) {
+            papayaStatusFileService.findAllIncomplete().forEach(status -> {
+                fileManager.retrievePapayaFileFromFileId(status.getFileId()).ifPresent(papayaFile -> {
+                    newPeers.forEach(newPeer -> {
+                        askForResources(papayaFile, newPeer);
+                    });
+                });
+            });
         }
     }
 }

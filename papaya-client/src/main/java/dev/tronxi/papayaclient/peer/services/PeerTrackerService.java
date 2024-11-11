@@ -23,7 +23,7 @@ public class PeerTrackerService {
     @Value("${papaya.tracker}")
     private String trackerAddress;
     private Peer peer;
-    private List<Peer> peers = new ArrayList<>();
+    private List<Peer> lastPeers = new ArrayList<>();
 
     public PeerTrackerService() {
         logger.setLevel(Level.INFO);
@@ -37,14 +37,14 @@ public class PeerTrackerService {
     }
 
     public List<Peer> retrieveNewPeers() {
-        //TODO
-        List<Peer> currentPeers = retrieveCurrentPeers();
+        List<Peer> currentPeers = retrievePeers();
         List<Peer> newPeers = new ArrayList<>();
         for (Peer peer : currentPeers) {
-            if(!peers.contains(peer)) {
+            if(!lastPeers.contains(peer)) {
                 newPeers.add(peer);
             }
         }
+        lastPeers = currentPeers;
         return newPeers;
     }
 

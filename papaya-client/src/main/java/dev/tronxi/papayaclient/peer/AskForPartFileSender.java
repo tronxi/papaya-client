@@ -27,21 +27,18 @@ public class AskForPartFileSender {
 
         papayaStatusFile.getPartStatusFiles().stream()
                 .filter(partStatusFile -> partStatusFile.getStatus().equals(PapayaStatus.INCOMPLETE))
+                .filter(status -> partStatus.getOrDefault(status.getId(), PapayaStatus.INCOMPLETE) == PapayaStatus.INCOMPLETE)
                 .findFirst()
-                .ifPresent(status -> {
-                    PapayaStatus currentStatus = partStatus.getOrDefault(status.getId(), PapayaStatus.INCOMPLETE);
-                    if (currentStatus != PapayaStatus.INCOMPLETE) {
-                        logger.info("Part status asked: " + status.getId());
-                        return;
-                    }
+                .ifPresentOrElse(status -> {
                     logger.info("Asking process for: " + status.getFileName() + " with status: " + status.getStatus() + " id: " + status.getId());
+
                     Set<PartPeerStatusFile> partPeerStatusFiles = status.getPartPeerStatusFiles();
                     partPeerStatusFiles.forEach(partPeerStatusFile -> {
-                        if (!peerAskedFiles.containsKey(partPeerStatusFile.getPeer())) {
-                            peerAskedFiles.put(partPeerStatusFile.getPeer(), 0L);
-                        }
+                        peerAskedFiles.putIfAbsent(partPeerStatusFile.getPeer(), 0L);
                     });
+
                     logger.info("PeerAskedFiles before: " + peerAskedFiles);
+
                     partPeerStatusFiles.stream()
                             .min(Comparator.comparingLong(partPeerStatusFile -> peerAskedFiles.getOrDefault(partPeerStatusFile.getPeer(), 0L)))
                             .ifPresent(partPeerStatusFile -> {
@@ -50,8 +47,18 @@ public class AskForPartFileSender {
                                 sendMessage(papayaStatusFile.getFileId(), status.getFileName(), partPeerStatusFiles, partPeerStatusFile);
                                 logger.info("PeerAskedFiles after: " + peerAskedFiles);
                             });
+                }, () -> {
+                    logger.info("Removing part status");
+                    papayaStatusFile.getPartStatusFiles().forEach(status -> {
+                        partStatus.remove(status.getId());
+                    });
+                    if(papayaStatusFile.getStatus() != PapayaStatus.COMPLETE) {
+                        logger.info("Retry send");
+                        send(papayaStatusFile);
+                    }
                 });
     }
+
 
     private void sendMessage(String fileId, String partFileName, Set<PartPeerStatusFile> partPeerStatusFileList, PartPeerStatusFile partPeerStatusFile) {
         logger.info("Sending message: ask for part file: " + fileId + " partFileName: " + partFileName + " Peer: " + partPeerStatusFile);
