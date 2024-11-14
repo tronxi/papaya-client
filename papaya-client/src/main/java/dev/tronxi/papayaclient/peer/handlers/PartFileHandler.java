@@ -62,7 +62,7 @@ public class PartFileHandler extends Handler {
                             if (hash.equals(partStatusFile.getFileHash())) {
                                 fileManager.writePart(fileId.toString(), partFileName.toString(), outputStreamWithoutHeaders);
                                 partStatusFile.setStatus(PapayaStatus.COMPLETE);
-                                fileManager.savePartStatusFile(partStatusFile);
+                                fileManager.savePartStatusFile(statusFile, partStatusFile);
                                 if (statusFile.getStatus() == PapayaStatus.COMPLETE) {
                                     if (!filesJoined.containsKey(statusFile.getFileId())) {
                                         filesJoined.put(statusFile.getFileId(), PapayaStatus.JOINED);

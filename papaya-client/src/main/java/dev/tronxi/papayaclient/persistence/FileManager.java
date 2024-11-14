@@ -17,6 +17,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +32,8 @@ public class FileManager {
     private final HashGenerator hashGenerator;
     private final PapayaStatusFileService papayaStatusFileService;
     private final PartStatusFileRepository partStatusFileRepository;
+    private final Map<String, Function<PapayaStatusFile, Void>> updateFunctions = new HashMap<>();
+    private Function<PapayaStatusFile, Void> newPapayaStatusFileFunction;
 
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
@@ -85,6 +88,9 @@ public class FileManager {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(store.resolve(papayaFile.getFileId() + ".papaya").toFile(), papayaFile);
             papayaStatusFileService.save(papayaStatusFile);
+            if(newPapayaStatusFileFunction!=null) {
+                newPapayaStatusFileFunction.apply(papayaStatusFile);
+            }
             logger.info("PapayaStatusFile saved");
         } catch (IOException e) {
             logger.severe(e.getMessage());
@@ -221,10 +227,24 @@ public class FileManager {
     public void savePapayaStatusFile(PapayaStatusFile papayaStatusFile) {
         logger.info("Start save papaya status file");
         papayaStatusFileService.save(papayaStatusFile);
+        if (updateFunctions.containsKey(papayaStatusFile.getFileId())) {
+            updateFunctions.get(papayaStatusFile.getFileId()).apply(papayaStatusFile);
+        } else {
+            if (newPapayaStatusFileFunction != null) {
+                newPapayaStatusFileFunction.apply(papayaStatusFile);
+            }
+        }
     }
 
-    public void savePartStatusFile(PartStatusFile partStatusFile) {
+    public void savePartStatusFile(PapayaStatusFile papayaStatusFile, PartStatusFile partStatusFile) {
         partStatusFileRepository.save(partStatusFile);
+        if (updateFunctions.containsKey(papayaStatusFile.getFileId())) {
+            updateFunctions.get(papayaStatusFile.getFileId()).apply(papayaStatusFile);
+        } else {
+            if (newPapayaStatusFileFunction != null) {
+                newPapayaStatusFileFunction.apply(papayaStatusFile);
+            }
+        }
     }
 
     public void writePart(String fileId, String partFileName, ByteArrayOutputStream content) {
@@ -273,5 +293,17 @@ public class FileManager {
                 .filter(partStatusFile -> partStatusFile.getStatus() == PapayaStatus.COMPLETE)
                 .map(PartStatusFile::getFileName)
                 .toList();
+    }
+
+    public void setNewPapayaStatusFileFunction(Function<PapayaStatusFile, Void> function) {
+        newPapayaStatusFileFunction = function;
+    }
+
+    public void addUpdateFunction(String fileId, Function<PapayaStatusFile, Void> updateFunction) {
+        updateFunctions.put(fileId, updateFunction);
+    }
+
+    public List<PapayaStatusFile> findAll() {
+        return papayaStatusFileService.findAll();
     }
 }

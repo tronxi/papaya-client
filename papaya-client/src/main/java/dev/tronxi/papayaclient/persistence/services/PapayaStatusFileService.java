@@ -38,4 +38,8 @@ public class PapayaStatusFileService {
                 .filter(papayaStatusFile -> papayaStatusFile.getStatus().equals(PapayaStatus.INCOMPLETE))
                 .toList();
     }
+
+    public List<PapayaStatusFile> findAll() {
+        return papayaStatusFileRepository.findAll();
+    }
 }
