@@ -70,7 +70,7 @@ public class UIInitializer extends Application {
 
         VBox vBox = new VBox(hBox, new Separator(), papayaProgressVBox, logs);
         vBox.setSpacing(10);
-        Scene scene = new Scene(vBox, 800, 480);
+        Scene scene = new Scene(vBox, 900, 650);
         stage.setTitle("Papaya");
         stage.setScene(scene);
         stage.show();

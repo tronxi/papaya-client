@@ -30,7 +30,7 @@ public class PapayaProgress {
         progressBar.setMaxWidth(150);
         refresh(papayaStatusFile);
         String percentCalculated = calculatePercent(progress);
-        percentLabel = new Label(percentCalculated + "%");
+        percentLabel = new Label(percentCalculated);
 
 
         hbox.getChildren().addAll(fileNameLabel, progressBar, percentLabel);
@@ -41,7 +41,7 @@ public class PapayaProgress {
         progress = calculateProgress(papayaStatusFile);
         Platform.runLater(() -> {
             progressBar.setProgress(progress);
-            percentLabel.setText(calculatePercent(progress) + "%");
+            percentLabel.setText(calculatePercent(progress));
             if (papayaStatusFile.getStatus().equals(PapayaStatus.COMPLETE)) {
                 progressBar.setStyle("-fx-accent: #5ac456;");
             } else {
