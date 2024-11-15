@@ -88,7 +88,7 @@ public class FileManager {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(store.resolve(papayaFile.getFileId() + ".papaya").toFile(), papayaFile);
             papayaStatusFileService.save(papayaStatusFile);
-            if(newPapayaStatusFileFunction!=null) {
+            if (newPapayaStatusFileFunction != null) {
                 newPapayaStatusFileFunction.apply(papayaStatusFile);
             }
             logger.info("PapayaStatusFile saved");
@@ -305,5 +305,9 @@ public class FileManager {
 
     public List<PapayaStatusFile> findAll() {
         return papayaStatusFileService.findAll();
+    }
+
+    public File getPapayaFolder(PapayaStatusFile papayaStatusFile) {
+        return storePath.resolve(papayaStatusFile.getFileId()).toFile();
     }
 }

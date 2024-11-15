@@ -2,23 +2,33 @@ package dev.tronxi.papayaclient.ui.components;
 
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatus;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatusFile;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
+import java.io.File;
+import java.util.logging.Logger;
+
 public class PapayaProgress {
+
+    private static final Logger logger = Logger.getLogger(PapayaProgress.class.getName());
 
     private ProgressBar progressBar;
     private double progress;
     private Label percentLabel;
 
-    public HBox create(PapayaStatusFile papayaStatusFile) {
+
+    public HBox create(HostServices hostServices, File papayaFolder, PapayaStatusFile papayaStatusFile) {
         HBox hbox = new HBox();
-        hbox.setPadding(new Insets(5));
+        hbox.setPadding(new Insets(10));
         hbox.setSpacing(10.0);
+        hbox.setAlignment(Pos.CENTER_LEFT);
 
         Label fileNameLabel = new Label(papayaStatusFile.getFileName());
         Tooltip tooltip = new Tooltip(papayaStatusFile.getFileName());
@@ -32,9 +42,31 @@ public class PapayaProgress {
         String percentCalculated = calculatePercent(progress);
         percentLabel = new Label(percentCalculated);
 
-
-        hbox.getChildren().addAll(fileNameLabel, progressBar, percentLabel);
+        Button openFolderButton = getOpenFolderButton(hostServices, papayaFolder);
+        hbox.getChildren().addAll(fileNameLabel, progressBar, percentLabel, openFolderButton);
         return hbox;
+    }
+
+    private Button getOpenFolderButton(HostServices hostServices, File papayaFolder) {
+        Button openFolderButton = new Button("\uD83D\uDCC1");
+        openFolderButton.setStyle("""
+                    -fx-font-size: 16px;
+                    -fx-font-weight: bold;
+                    -fx-padding: 5 10 5 10; 
+                    -fx-background-color: #0078D7; 
+                    -fx-text-fill: white;
+                    -fx-background-radius: 5; 
+                    -fx-border-radius: 5; 
+                    -fx-border-color: #005A9E;
+                    -fx-border-width: 1;
+                    -fx-cursor: hand;
+                """);
+        openFolderButton.setOnMouseClicked(mouseEvent -> {
+            if (papayaFolder.exists()) {
+                hostServices.showDocument(papayaFolder.toURI().toString());
+            }
+        });
+        return openFolderButton;
     }
 
     public Void refresh(PapayaStatusFile papayaStatusFile) {

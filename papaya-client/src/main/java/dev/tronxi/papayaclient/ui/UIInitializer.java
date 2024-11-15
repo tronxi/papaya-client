@@ -8,6 +8,7 @@ import dev.tronxi.papayaclient.peer.PeerConnectionManagerTCP;
 import dev.tronxi.papayaclient.ui.components.CreateFileChooserButton;
 import dev.tronxi.papayaclient.ui.components.PapayaProgress;
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
@@ -59,16 +60,15 @@ public class UIInitializer extends Application {
             Platform.runLater(() -> {
                 PapayaProgress papayaProgress = new PapayaProgress();
                 fileManager.addUpdateFunction(papayaStatusFile.getFileId(), papayaProgress::refresh);
-                papayaProgressVBox.getChildren().add(papayaProgress.create(papayaStatusFile));
+                papayaProgressVBox.getChildren().add(papayaProgress.create(getHostServices(), fileManager.getPapayaFolder(papayaStatusFile), papayaStatusFile));
             });
             return null;
         }));
         fileManager.findAll().forEach(papayaStatusFile -> {
             PapayaProgress papayaProgress = new PapayaProgress();
             fileManager.addUpdateFunction(papayaStatusFile.getFileId(), papayaProgress::refresh);
-            papayaProgressVBox.getChildren().add(papayaProgress.create(papayaStatusFile));
+            papayaProgressVBox.getChildren().add(papayaProgress.create(getHostServices(), fileManager.getPapayaFolder(papayaStatusFile), papayaStatusFile));
         });
-
         ScrollPane progressScrollPane = new ScrollPane(papayaProgressVBox);
         progressScrollPane.setFitToWidth(true);
 
