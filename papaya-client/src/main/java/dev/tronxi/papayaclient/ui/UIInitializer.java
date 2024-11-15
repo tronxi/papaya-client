@@ -10,10 +10,10 @@ import dev.tronxi.papayaclient.ui.components.PapayaProgress;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
@@ -42,14 +42,15 @@ public class UIInitializer extends Application {
 
         Button downloadButton = generateDownloadButton(stage);
 
-        HBox hBox = new HBox(createPapayaFileButton, downloadButton, createPapayaFileRunning);
-        hBox.setSpacing(10);
+        HBox buttonsBox = new HBox(createPapayaFileButton, downloadButton, createPapayaFileRunning);
+        buttonsBox.setPadding(new Insets(10));
+        buttonsBox.setSpacing(10);
 
         TextArea logs = new TextArea();
+        logs.setMaxHeight(500);
         logs.setEditable(false);
         logs.setText("");
-        logs.setMaxHeight(400);
-        logs.setMinHeight(400);
+
         peerConnectionManager.start(logs);
         peerConnectionManager.startAllIncompleteDownloads();
 
@@ -68,13 +69,27 @@ public class UIInitializer extends Application {
             papayaProgressVBox.getChildren().add(papayaProgress.create(papayaStatusFile));
         });
 
-        VBox vBox = new VBox(hBox, new Separator(), papayaProgressVBox, logs);
-        vBox.setSpacing(10);
-        Scene scene = new Scene(vBox, 900, 650);
+        ScrollPane progressScrollPane = new ScrollPane(papayaProgressVBox);
+        progressScrollPane.setFitToWidth(true);
+
+        ScrollPane logsScrollPane = new ScrollPane(logs);
+        logsScrollPane.setFitToWidth(true);
+
+        SplitPane splitPane = new SplitPane();
+        splitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
+        splitPane.getItems().addAll(progressScrollPane, logs);
+        splitPane.setDividerPositions(0.8);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(buttonsBox);
+        borderPane.setCenter(splitPane);
+
+        Scene scene = new Scene(borderPane, 900, 580);
         stage.setTitle("Papaya");
         stage.setScene(scene);
         stage.show();
     }
+
 
     private Button generateDownloadButton(Stage stage) {
         return new CreateFileChooserButton().create("Download", stage, file -> {
