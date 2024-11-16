@@ -63,7 +63,10 @@ public class UIInitializer extends Application {
             });
             return null;
         }));
-        fileManager.setDeletedPapayaStatusFileFunction(() -> retrieveAllPapayaStatus(papayaProgressVBox));
+        fileManager.addDeletedPapayaStatusFileFunction((papayaStatusFile) -> {
+            retrieveAllPapayaStatus(papayaProgressVBox);
+            return null;
+        });
         retrieveAllPapayaStatus(papayaProgressVBox);
         ScrollPane progressScrollPane = new ScrollPane(papayaProgressVBox);
         progressScrollPane.setFitToWidth(true);

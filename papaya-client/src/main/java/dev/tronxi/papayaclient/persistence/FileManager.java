@@ -36,7 +36,7 @@ public class FileManager {
     private final PartStatusFileRepository partStatusFileRepository;
     private final Map<String, Function<PapayaStatusFile, Void>> updateFunctions = new HashMap<>();
     private Function<PapayaStatusFile, Void> newPapayaStatusFileFunction;
-    private Runnable deletedPapayaStatusFileFunction;
+    private List<Function<PapayaStatusFile, Void>> deletedPapayaStatusFileFunctions = new ArrayList<>();
 
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
@@ -308,8 +308,8 @@ public class FileManager {
         updateFunctions.put(fileId, updateFunction);
     }
 
-    public void setDeletedPapayaStatusFileFunction(Runnable deletedFunction) {
-        deletedPapayaStatusFileFunction = deletedFunction;
+    public void addDeletedPapayaStatusFileFunction(Function<PapayaStatusFile, Void> deletedFunction) {
+        deletedPapayaStatusFileFunctions.add(deletedFunction);
     }
 
     public List<PapayaStatusFile> findAll() {
@@ -333,9 +333,7 @@ public class FileManager {
             }
         }).thenRun(() -> {
             updateFunctions.remove(papayaStatusFile.getFileId());
-            if (deletedPapayaStatusFileFunction != null) {
-                deletedPapayaStatusFileFunction.run();
-            }
+            deletedPapayaStatusFileFunctions.forEach(f -> f.apply(papayaStatusFile));
         });
     }
 

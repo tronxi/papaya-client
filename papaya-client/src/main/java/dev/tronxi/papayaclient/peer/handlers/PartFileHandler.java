@@ -27,6 +27,10 @@ public class PartFileHandler extends Handler {
 
     protected PartFileHandler(FileManager fileManager, HashGenerator hashGenerator, AskForPartFileSender askForPartFileSender) {
         super(fileManager);
+        this.fileManager.addDeletedPapayaStatusFileFunction((papayaStatusFile -> {
+            filesJoined.remove(papayaStatusFile.getFileId());
+            return null;
+        }));
         this.hashGenerator = hashGenerator;
         this.askForPartFileSender = askForPartFileSender;
     }
