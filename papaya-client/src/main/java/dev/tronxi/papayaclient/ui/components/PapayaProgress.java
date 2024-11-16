@@ -1,15 +1,13 @@
 package dev.tronxi.papayaclient.ui.components;
 
+import dev.tronxi.papayaclient.persistence.FileManager;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatus;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatusFile;
 import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
 import java.io.File;
@@ -22,9 +20,10 @@ public class PapayaProgress {
     private ProgressBar progressBar;
     private double progress;
     private Label percentLabel;
+    private Button removeFolderButton;
+    private Button openFolderButton;
 
-
-    public HBox create(HostServices hostServices, File papayaFolder, PapayaStatusFile papayaStatusFile) {
+    public HBox create(HostServices hostServices, FileManager fileManager, PapayaStatusFile papayaStatusFile) {
         HBox hbox = new HBox();
         hbox.setPadding(new Insets(10));
         hbox.setSpacing(10.0);
@@ -42,24 +41,56 @@ public class PapayaProgress {
         String percentCalculated = calculatePercent(progress);
         percentLabel = new Label(percentCalculated);
 
-        Button openFolderButton = getOpenFolderButton(hostServices, papayaFolder);
-        hbox.getChildren().addAll(fileNameLabel, progressBar, percentLabel, openFolderButton);
+        openFolderButton = getOpenFolderButton(hostServices, fileManager.getPapayaFolder(papayaStatusFile));
+        removeFolderButton = getRemoveFolderButton(fileManager, papayaStatusFile);
+        hbox.getChildren().addAll(fileNameLabel, progressBar, percentLabel, openFolderButton, removeFolderButton);
         return hbox;
+    }
+
+    private Button getRemoveFolderButton(FileManager fileManager, PapayaStatusFile papayaStatusFile) {
+        Button removeFolderButton = new Button("\uD83D\uDDD1");
+        removeFolderButton.managedProperty().bind(removeFolderButton.visibleProperty());
+        removeFolderButton.setStyle("""
+                -fx-font-size: 16px;
+                -fx-font-weight: bold;
+                -fx-padding: 4 8;\s
+                -fx-background-color: white;\s
+                -fx-text-fill: #f61313;\s
+                -fx-border-color: #cccccc;\s
+                -fx-border-width: 1;\s
+                -fx-border-radius: 3;
+                -fx-cursor: hand;
+                """);
+        removeFolderButton.setOnMouseClicked(mouseEvent -> {
+            showConfirmationDialog(fileManager, papayaStatusFile);
+        });
+        return removeFolderButton;
+    }
+
+    private void showConfirmationDialog(FileManager fileManager, PapayaStatusFile papayaStatusFile) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation");
+        alert.setHeaderText("Are you sure you want to delete?");
+        alert.setContentText("This will delete the folder and all its associated files.");
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                fileManager.removePapayaFolder(papayaStatusFile);
+            }
+        });
     }
 
     private Button getOpenFolderButton(HostServices hostServices, File papayaFolder) {
         Button openFolderButton = new Button("\uD83D\uDCC1");
+        openFolderButton.managedProperty().bind(openFolderButton.visibleProperty());
         openFolderButton.setStyle("""
-                    -fx-font-size: 16px;
-                    -fx-font-weight: bold;
-                    -fx-padding: 5 10 5 10; 
-                    -fx-background-color: #0078D7; 
-                    -fx-text-fill: white;
-                    -fx-background-radius: 5; 
-                    -fx-border-radius: 5; 
-                    -fx-border-color: #005A9E;
-                    -fx-border-width: 1;
-                    -fx-cursor: hand;
+                -fx-font-size: 16px;
+                -fx-padding: 4 8;\s
+                -fx-background-color: white;\s
+                -fx-text-fill: #333333;\s
+                -fx-border-color: #cccccc;\s
+                -fx-border-width: 1;\s
+                -fx-border-radius: 3;
+                -fx-cursor: hand;
                 """);
         openFolderButton.setOnMouseClicked(mouseEvent -> {
             if (papayaFolder.exists()) {
@@ -76,8 +107,12 @@ public class PapayaProgress {
             percentLabel.setText(calculatePercent(progress));
             if (papayaStatusFile.getStatus().equals(PapayaStatus.COMPLETE)) {
                 progressBar.setStyle("-fx-accent: #5ac456;");
+                openFolderButton.setVisible(true);
+                removeFolderButton.setVisible(true);
             } else {
                 progressBar.setStyle("-fx-accent: #0ca3ff;");
+                openFolderButton.setVisible(false);
+                removeFolderButton.setVisible(false);
             }
         });
         return null;

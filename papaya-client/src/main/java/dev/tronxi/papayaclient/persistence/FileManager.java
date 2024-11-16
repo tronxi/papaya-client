@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 @Service
 public class FileManager {
@@ -34,6 +35,7 @@ public class FileManager {
     private final PartStatusFileRepository partStatusFileRepository;
     private final Map<String, Function<PapayaStatusFile, Void>> updateFunctions = new HashMap<>();
     private Function<PapayaStatusFile, Void> newPapayaStatusFileFunction;
+    private Runnable deletedPapayaStatusFileFunction;
 
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
@@ -184,7 +186,13 @@ public class FileManager {
                         papayaStatusFile.addPartStatusFile(partStatusFile);
                     }
                 }
-
+                if (updateFunctions.containsKey(papayaStatusFile.getFileId())) {
+                    updateFunctions.get(papayaStatusFile.getFileId()).apply(papayaStatusFile);
+                } else {
+                    if (newPapayaStatusFileFunction != null) {
+                        newPapayaStatusFileFunction.apply(papayaStatusFile);
+                    }
+                }
                 Path papayaStatusFilePath = storeFile.toPath().resolve(papayaFile.getFileId() + ".papayastatus");
                 papayaStatusFileService.save(papayaStatusFile);
                 return Optional.of(papayaStatusFilePath);
@@ -303,11 +311,45 @@ public class FileManager {
         updateFunctions.put(fileId, updateFunction);
     }
 
+    public void setDeletedPapayaStatusFileFunction(Runnable deletedFunction) {
+        deletedPapayaStatusFileFunction = deletedFunction;
+    }
+
     public List<PapayaStatusFile> findAll() {
         return papayaStatusFileService.findAll();
     }
 
     public File getPapayaFolder(PapayaStatusFile papayaStatusFile) {
         return storePath.resolve(papayaStatusFile.getFileId()).toFile();
+    }
+
+    public void removePapayaFolder(PapayaStatusFile papayaStatusFile) {
+        File papayaFolder = getPapayaFolder(papayaStatusFile);
+        if (papayaFolder != null && papayaFolder.exists() && papayaFolder.isDirectory()) {
+            try {
+                papayaStatusFileService.remove(papayaStatusFile);
+                deleteDirectory(papayaFolder.toPath());
+                updateFunctions.remove(papayaStatusFile.getFileId());
+                if (deletedPapayaStatusFileFunction != null) {
+                    deletedPapayaStatusFileFunction.run();
+                }
+
+            } catch (Exception e) {
+                logger.severe(e.getMessage());
+            }
+        }
+    }
+
+    private void deleteDirectory(Path path) throws IOException {
+        try (Stream<Path> paths = Files.walk(path)) {
+            paths.sorted((path1, path2) -> path2.compareTo(path1))
+                    .forEach(p -> {
+                        try {
+                            Files.deleteIfExists(p);
+                        } catch (IOException e) {
+                            logger.severe(e.getMessage());
+                        }
+                    });
+        }
     }
 }

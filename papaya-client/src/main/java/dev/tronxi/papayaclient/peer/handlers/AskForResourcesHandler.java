@@ -25,7 +25,7 @@ public class AskForResourcesHandler extends Handler {
 
     @Override
     public String handle(Socket clientSocket, byte[] receivedData) {
-        String message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort();
+        String message = "From: " + clientSocket.getInetAddress();
         try {
             ByteArrayOutputStream fileId = new ByteArrayOutputStream();
             fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
@@ -40,7 +40,7 @@ public class AskForResourcesHandler extends Handler {
                 i++;
             } while (charAtIndex != '#');
             Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), Integer.parseInt(port.toString()));
-            message += " AskForResources with fileId: " + fileId + " Port: " + port;
+            message += ":" + port + " AskForResources with fileId: " + fileId;
             responseAskForResources(peer, fileId.toString());
         } catch (IOException e) {
             logger.severe(e.getMessage());

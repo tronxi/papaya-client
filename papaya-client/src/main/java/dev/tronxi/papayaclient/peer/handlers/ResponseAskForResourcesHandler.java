@@ -30,7 +30,7 @@ public class ResponseAskForResourcesHandler extends Handler {
 
     @Override
     public String handle(Socket clientSocket, byte[] receivedData) {
-        String message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort();
+        String message = "From: " + clientSocket.getInetAddress();
         ByteArrayOutputStream fileId = new ByteArrayOutputStream();
         try {
             fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
@@ -60,7 +60,7 @@ public class ResponseAskForResourcesHandler extends Handler {
             Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), Integer.parseInt(port.toString()));
             Optional<PapayaStatusFile> maybePapayaStatusFileUpdated = updateStatus(fileId.toString(), peer, completedParts);
             maybePapayaStatusFileUpdated.ifPresent(askForPartFileSender::send);
-            message += " ResponseAskForResources with fileId: " + fileId + " Port: " + port + " parts: " + completedParts.size();
+            message += ":" + port + " ResponseAskForResources with fileId: " + fileId + " parts: " + completedParts.size();
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }

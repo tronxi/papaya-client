@@ -73,16 +73,18 @@ public class PartFileHandler extends Handler {
                                                 });
                                     }
                                 }
-                                askForPartFileSender.send(statusFile);
                             } else {
                                 logger.severe("Invalid hash");
                             }
                         });
+                if (statusFile.getStatus() != PapayaStatus.COMPLETE && !filesJoined.containsKey(statusFile.getFileId())) {
+                    askForPartFileSender.send(statusFile);
+                }
             } else {
                 logger.severe("Could not find PapayaStatusFile for " + fileId);
             }
-            message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() +
-                    " FileId: " + fileId + " : PartHash: " + partFileName + " Content: " + outputStreamWithoutHeaders.size();
+            message = "From: " + clientSocket.getInetAddress() +
+                    " FileId: " + fileId + " : Part: " + partFileName + " Content: " + outputStreamWithoutHeaders.size();
             return message;
         } catch (IOException e) {
             logger.severe(e.getMessage());

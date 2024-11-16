@@ -25,7 +25,7 @@ public class AskForPartFileHandler extends Handler {
 
     @Override
     public String handle(Socket clientSocket, byte[] receivedData) {
-        String message = "From: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort();
+        String message = "From: " + clientSocket.getInetAddress();
         try {
             ByteArrayOutputStream fileId = new ByteArrayOutputStream();
             fileId.write(Arrays.copyOfRange(receivedData, 1, 33));
@@ -47,7 +47,7 @@ public class AskForPartFileHandler extends Handler {
                 }
                 i++;
             } while (charAtIndex != '#');
-            message += " AskForPartFile with fileId: " + fileId + " Part: " + part + " Port: " + port;
+            message += ":" + port + " AskForPartFile with fileId: " + fileId + " Part: " + part;
             sendPartFile(clientSocket, fileId, part, port);
         } catch (IOException e) {
             logger.severe(e.getMessage());

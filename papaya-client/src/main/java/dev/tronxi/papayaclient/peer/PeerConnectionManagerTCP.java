@@ -68,7 +68,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                         String[] lines = textArea.getText().split("\n");
                                         if (lines.length > 100) {
                                             String newText = String.join("\n", Arrays.copyOfRange(lines, lines.length - 100, lines.length));
-                                            textArea.setText(newText);
+                                            textArea.appendText(newText);
                                             textArea.appendText("");
                                         }
                                     });
