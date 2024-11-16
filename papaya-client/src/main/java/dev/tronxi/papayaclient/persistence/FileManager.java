@@ -3,6 +3,7 @@ package dev.tronxi.papayaclient.persistence;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.persistence.papayafile.PartFile;
+import dev.tronxi.papayaclient.persistence.papayastatusfile.JoinStatus;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatus;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatusFile;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PartStatusFile;
@@ -36,7 +37,7 @@ public class FileManager {
     private final PartStatusFileRepository partStatusFileRepository;
     private final Map<String, Function<PapayaStatusFile, Void>> updateFunctions = new HashMap<>();
     private Function<PapayaStatusFile, Void> newPapayaStatusFileFunction;
-    private List<Function<PapayaStatusFile, Void>> deletedPapayaStatusFileFunctions = new ArrayList<>();
+    private final List<Function<PapayaStatusFile, Void>> deletedPapayaStatusFileFunctions = new ArrayList<>();
 
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
@@ -102,8 +103,25 @@ public class FileManager {
         return Optional.of(store);
     }
 
-    public Optional<Path> joinStore(File storeFile) {
+    public void startJoinStarted() {
+        List<PapayaStatusFile> toJoin = papayaStatusFileService.findAllCompleteAndNotJoined();
+        toJoin.forEach(papayaStatusFile -> {
+            File file = storePath.resolve(papayaStatusFile.getFileId()).resolve(papayaStatusFile.getFileName()).toFile();
+            if (file.exists()) {
+                file.delete();
+            }
+            joinStore(papayaStatusFile);
+        });
+    }
+
+    public Optional<Path> joinStore(PapayaStatusFile papayaStatusFile) {
         logger.info("Start join");
+        File storeFile = storePath.resolve(papayaStatusFile.getFileId()).toFile();
+        papayaStatusFile.setJoinStatus(JoinStatus.STARTED);
+        papayaStatusFileService.save(papayaStatusFile);
+        if (updateFunctions.containsKey(papayaStatusFile.getFileId())) {
+            updateFunctions.get(papayaStatusFile.getFileId()).apply(papayaStatusFile);
+        }
         List<Path> papayaFiles = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(storeFile.toPath(), "*.papaya")) {
             stream.forEach(papayaFiles::add);
@@ -136,6 +154,12 @@ public class FileManager {
                             return Optional.empty();
                         }
                     }
+                    papayaStatusFile.setJoinStatus(JoinStatus.COMPLETED);
+                    papayaStatusFileService.save(papayaStatusFile);
+                    if (updateFunctions.containsKey(papayaStatusFile.getFileId())) {
+                        updateFunctions.get(papayaStatusFile.getFileId()).apply(papayaStatusFile);
+                    }
+
                 } catch (IOException e) {
                     logger.severe(e.getMessage());
                 }

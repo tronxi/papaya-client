@@ -15,17 +15,20 @@ public class PapayaStatusFile {
 
     private String fileName;
 
+    private JoinStatus joinStatus;
+
     @OneToMany(fetch = FetchType.EAGER)
     private List<PartStatusFile> partStatusFiles;
 
     public PapayaStatusFile(String fileName, String fileId) {
         this.fileName = fileName;
         this.fileId = fileId;
+        this.joinStatus = JoinStatus.NONE;
         this.partStatusFiles = new ArrayList<>();
     }
 
     public PapayaStatusFile() {
-
+        this.joinStatus = JoinStatus.NONE;
     }
 
     public PapayaStatus getStatus() {
@@ -75,5 +78,14 @@ public class PapayaStatusFile {
                 ", fileId='" + fileId + '\'' +
                 ", partStatusFiles=" + partStatusFiles +
                 '}';
+    }
+
+    public JoinStatus getJoinStatus() {
+        return joinStatus;
+    }
+
+    public PapayaStatusFile setJoinStatus(JoinStatus joinStatus) {
+        this.joinStatus = joinStatus;
+        return this;
     }
 }

@@ -70,7 +70,7 @@ public class PartFileHandler extends Handler {
                                 if (statusFile.getStatus() == PapayaStatus.COMPLETE) {
                                     if (!filesJoined.containsKey(statusFile.getFileId())) {
                                         filesJoined.put(statusFile.getFileId(), PapayaStatus.JOINED);
-                                        Optional<Path> maybePath = fileManager.joinStore(storePath.resolve(fileId.toString()).toFile());
+                                        Optional<Path> maybePath = fileManager.joinStore(statusFile);
                                         maybePath.ifPresentOrElse((path -> logger.info("File downloaded: " + path)),
                                                 () -> {
                                                     logger.severe("Error ");

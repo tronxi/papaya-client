@@ -1,6 +1,7 @@
 package dev.tronxi.papayaclient.ui.components;
 
 import dev.tronxi.papayaclient.persistence.FileManager;
+import dev.tronxi.papayaclient.persistence.papayastatusfile.JoinStatus;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatus;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatusFile;
 import javafx.application.HostServices;
@@ -106,7 +107,11 @@ public class PapayaProgress {
             progressBar.setProgress(progress);
             percentLabel.setText(calculatePercent(progress));
             if (papayaStatusFile.getStatus().equals(PapayaStatus.COMPLETE)) {
-                progressBar.setStyle("-fx-accent: #5ac456;");
+                if (papayaStatusFile.getJoinStatus().equals(JoinStatus.STARTED)) {
+                    progressBar.setStyle("-fx-accent: #f5dc3c;");
+                } else if (papayaStatusFile.getJoinStatus().equals(JoinStatus.COMPLETED)) {
+                    progressBar.setStyle("-fx-accent: #5ac456;");
+                }
                 openFolderButton.setVisible(true);
                 removeFolderButton.setVisible(true);
             } else {
