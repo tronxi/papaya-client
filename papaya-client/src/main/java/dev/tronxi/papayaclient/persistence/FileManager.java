@@ -17,6 +17,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -237,10 +238,6 @@ public class FileManager {
         papayaStatusFileService.save(papayaStatusFile);
         if (updateFunctions.containsKey(papayaStatusFile.getFileId())) {
             updateFunctions.get(papayaStatusFile.getFileId()).apply(papayaStatusFile);
-        } else {
-            if (newPapayaStatusFileFunction != null) {
-                newPapayaStatusFileFunction.apply(papayaStatusFile);
-            }
         }
     }
 
@@ -324,20 +321,22 @@ public class FileManager {
     }
 
     public void removePapayaFolder(PapayaStatusFile papayaStatusFile) {
-        File papayaFolder = getPapayaFolder(papayaStatusFile);
-        if (papayaFolder != null && papayaFolder.exists() && papayaFolder.isDirectory()) {
-            try {
-                papayaStatusFileService.remove(papayaStatusFile);
-                deleteDirectory(papayaFolder.toPath());
-                updateFunctions.remove(papayaStatusFile.getFileId());
-                if (deletedPapayaStatusFileFunction != null) {
-                    deletedPapayaStatusFileFunction.run();
+        CompletableFuture.runAsync(() -> {
+            File papayaFolder = getPapayaFolder(papayaStatusFile);
+            if (papayaFolder != null && papayaFolder.exists() && papayaFolder.isDirectory()) {
+                try {
+                    papayaStatusFileService.remove(papayaStatusFile);
+                    deleteDirectory(papayaFolder.toPath());
+                } catch (Exception e) {
+                    logger.severe(e.getMessage());
                 }
-
-            } catch (Exception e) {
-                logger.severe(e.getMessage());
             }
-        }
+        }).thenRun(() -> {
+            updateFunctions.remove(papayaStatusFile.getFileId());
+            if (deletedPapayaStatusFileFunction != null) {
+                deletedPapayaStatusFileFunction.run();
+            }
+        });
     }
 
     private void deleteDirectory(Path path) throws IOException {

@@ -87,11 +87,13 @@ public class UIInitializer extends Application {
     }
 
     private void retrieveAllPapayaStatus(VBox papayaProgressVBox) {
-        papayaProgressVBox.getChildren().clear();
-        fileManager.findAll().forEach(papayaStatusFile -> {
-            PapayaProgress papayaProgress = new PapayaProgress();
-            fileManager.addUpdateFunction(papayaStatusFile.getFileId(), papayaProgress::refresh);
-            papayaProgressVBox.getChildren().add(papayaProgress.create(getHostServices(), fileManager, papayaStatusFile));
+        Platform.runLater(() -> {
+            papayaProgressVBox.getChildren().clear();
+            fileManager.findAll().forEach(papayaStatusFile -> {
+                PapayaProgress papayaProgress = new PapayaProgress();
+                fileManager.addUpdateFunction(papayaStatusFile.getFileId(), papayaProgress::refresh);
+                papayaProgressVBox.getChildren().add(papayaProgress.create(getHostServices(), fileManager, papayaStatusFile));
+            });
         });
     }
 
