@@ -25,9 +25,6 @@ public class PeerTrackerService {
     private Peer peer;
     private List<Peer> lastPeers = new ArrayList<>();
 
-    public PeerTrackerService() {
-        logger.setLevel(Level.INFO);
-    }
 
     public List<Peer> retrievePeers() {
         List<Peer> currentPeers = retrieveCurrentPeers();

@@ -45,7 +45,6 @@ public class FileManager {
     public FileManager(HashGenerator hashGenerator, PapayaStatusFileService papayaStatusFileService, PartStatusFileRepository partStatusFileRepository) {
         this.papayaStatusFileService = papayaStatusFileService;
         this.partStatusFileRepository = partStatusFileRepository;
-        logger.setLevel(Level.INFO);
         this.hashGenerator = hashGenerator;
     }
 
@@ -307,7 +306,7 @@ public class FileManager {
                 logger.severe(e.getMessage());
             }
         } else {
-            logger.severe("Papaya store already exists");
+            logger.info("Papaya store already exists");
         }
     }
 

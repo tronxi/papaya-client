@@ -37,7 +37,6 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
         this.downloadService = downloadService;
         this.stopService = stopService;
         this.handlerService = handlerService;
-        logger.setLevel(Level.INFO);
     }
 
     @Override
