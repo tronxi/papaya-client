@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.TextArea;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -99,6 +100,7 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
     }
 
     @Override
+    @Scheduled(fixedRate = 300000)
     public void startAllIncompleteDownloads() {
         downloadService.startAllIncompleteDownloads();
     }

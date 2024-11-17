@@ -52,7 +52,6 @@ public class UIInitializer extends Application {
         logs.setText("");
 
         peerConnectionManager.start(logs);
-        peerConnectionManager.startAllIncompleteDownloads();
         new Thread(() -> fileManager.startJoinStarted()).start();
 
         VBox papayaProgressVBox = new VBox();
