@@ -8,9 +8,9 @@ import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatus;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PapayaStatusFile;
 import dev.tronxi.papayaclient.persistence.papayastatusfile.PartStatusFile;
 import dev.tronxi.papayaclient.persistence.repositories.PartStatusFileRepository;
+import dev.tronxi.papayaclient.persistence.services.ConfigService;
 import dev.tronxi.papayaclient.persistence.services.PapayaStatusFileService;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -20,15 +20,13 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 @Service
 public class FileManager {
 
-    @Value("${papaya.workspace}")
-    private String workspace;
+    private final String workspace;
 
     private Path storePath;
 
@@ -42,15 +40,20 @@ public class FileManager {
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
 
-    public FileManager(HashGenerator hashGenerator, PapayaStatusFileService papayaStatusFileService, PartStatusFileRepository partStatusFileRepository) {
+    public FileManager(ConfigService configService, HashGenerator hashGenerator, PapayaStatusFileService papayaStatusFileService, PartStatusFileRepository partStatusFileRepository) {
         this.papayaStatusFileService = papayaStatusFileService;
         this.partStatusFileRepository = partStatusFileRepository;
         this.hashGenerator = hashGenerator;
+        this.workspace = configService.retrieveWorkspace();
     }
 
     @PostConstruct
     public void init() {
         storePath = Path.of(workspace + "/store/");
+    }
+
+    public Path getStorePath() {
+        return storePath;
     }
 
 

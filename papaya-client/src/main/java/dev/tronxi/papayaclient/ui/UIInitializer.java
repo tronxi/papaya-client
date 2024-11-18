@@ -5,6 +5,8 @@ import dev.tronxi.papayaclient.persistence.FileManager;
 import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.peer.PeerConnectionManager;
 import dev.tronxi.papayaclient.peer.PeerConnectionManagerTCP;
+import dev.tronxi.papayaclient.persistence.services.ConfigService;
+import dev.tronxi.papayaclient.ui.components.ConfigView;
 import dev.tronxi.papayaclient.ui.components.CreateFileChooserButton;
 import dev.tronxi.papayaclient.ui.components.PapayaProgress;
 import javafx.application.Application;
@@ -26,11 +28,13 @@ public class UIInitializer extends Application {
 
     private FileManager fileManager;
     private PeerConnectionManager peerConnectionManager;
+    private ConfigService configService;
 
     @Override
     public void init() {
         fileManager = PapayaClientApplication.getContext().getBean(FileManager.class);
         peerConnectionManager = PapayaClientApplication.getContext().getBean(PeerConnectionManagerTCP.class);
+        configService = PapayaClientApplication.getContext().getBean(ConfigService.class);
     }
 
     @Override
@@ -42,7 +46,12 @@ public class UIInitializer extends Application {
 
         Button downloadButton = generateDownloadButton(stage);
 
-        HBox buttonsBox = new HBox(createPapayaFileButton, downloadButton, createPapayaFileRunning);
+        Button configButton = new Button("Config");
+        configButton.setOnMouseClicked(event -> {
+            new ConfigView().render(configService);
+        });
+
+        HBox buttonsBox = new HBox(configButton, createPapayaFileButton, downloadButton, createPapayaFileRunning);
         buttonsBox.setPadding(new Insets(10));
         buttonsBox.setSpacing(10);
 

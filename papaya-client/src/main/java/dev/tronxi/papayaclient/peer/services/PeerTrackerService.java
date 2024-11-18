@@ -1,7 +1,7 @@
 package dev.tronxi.papayaclient.peer.services;
 
 import dev.tronxi.papayaclient.peer.Peer;
-import org.springframework.beans.factory.annotation.Value;
+import dev.tronxi.papayaclient.persistence.services.ConfigService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,10 +20,13 @@ public class PeerTrackerService {
 
     Logger logger = Logger.getLogger(PeerTrackerService.class.getName());
 
-    @Value("${papaya.tracker}")
-    private String trackerAddress;
+    private final String trackerAddress;
     private Peer peer;
     private List<Peer> lastPeers = new ArrayList<>();
+
+    public PeerTrackerService(ConfigService configService) {
+        this.trackerAddress = configService.retrieveTracker();
+    }
 
 
     public List<Peer> retrievePeers() {
@@ -37,7 +40,7 @@ public class PeerTrackerService {
         List<Peer> currentPeers = retrievePeers();
         List<Peer> newPeers = new ArrayList<>();
         for (Peer peer : currentPeers) {
-            if(!lastPeers.contains(peer)) {
+            if (!lastPeers.contains(peer)) {
                 newPeers.add(peer);
             }
         }
