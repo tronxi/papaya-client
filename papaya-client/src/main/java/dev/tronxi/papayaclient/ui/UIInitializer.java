@@ -1,5 +1,6 @@
 package dev.tronxi.papayaclient.ui;
 
+import atlantafx.base.theme.PrimerLight;
 import dev.tronxi.papayaclient.PapayaClientApplication;
 import dev.tronxi.papayaclient.persistence.FileManager;
 import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
@@ -39,6 +40,7 @@ public class UIInitializer extends Application {
 
     @Override
     public void start(Stage stage) {
+        Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
         Label createPapayaFileRunning = new Label("CreatePapayaFileRunning...");
         createPapayaFileRunning.managedProperty().bind(createPapayaFileRunning.visibleProperty());
         createPapayaFileRunning.setVisible(false);
@@ -46,10 +48,7 @@ public class UIInitializer extends Application {
 
         Button downloadButton = generateDownloadButton(stage);
 
-        Button configButton = new Button("Config");
-        configButton.setOnMouseClicked(event -> {
-            new ConfigView().render(configService);
-        });
+        Button configButton = generateConfigbutton();
 
         HBox buttonsBox = new HBox(configButton, createPapayaFileButton, downloadButton, createPapayaFileRunning);
         buttonsBox.setPadding(new Insets(10));
@@ -98,6 +97,14 @@ public class UIInitializer extends Application {
         stage.show();
     }
 
+    private Button generateConfigbutton() {
+        Button configButton = new Button("⚙ Config");
+        configButton.setOnMouseClicked(event -> {
+            new ConfigView().render(configService);
+        });
+        return configButton;
+    }
+
     private void retrieveAllPapayaStatus(VBox papayaProgressVBox) {
         Platform.runLater(() -> {
             papayaProgressVBox.getChildren().clear();
@@ -111,7 +118,7 @@ public class UIInitializer extends Application {
 
 
     private Button generateDownloadButton(Stage stage) {
-        return new CreateFileChooserButton().create("Download", stage, file -> {
+        return new CreateFileChooserButton().create("⬇ Download", stage, file -> {
             Optional<PapayaFile> maybePapayaFile = fileManager.retrievePapayaFileFromFile(file);
             maybePapayaFile.ifPresent(papayaFile -> {
                 Task<Void> task = new Task<>() {
@@ -128,7 +135,7 @@ public class UIInitializer extends Application {
 
     private Button generateCreatePapayaFileButton(Stage stage, Label label) {
         return new CreateFileChooserButton().
-                create("Create", stage, selectedFile -> {
+                create("➕ Create", stage, selectedFile -> {
                     if (selectedFile != null) {
                         Task<Optional<Path>> task = new Task<>() {
                             @Override

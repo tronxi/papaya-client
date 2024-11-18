@@ -12,11 +12,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 public class PapayaProgress {
-
-    private static final Logger logger = Logger.getLogger(PapayaProgress.class.getName());
 
     private ProgressBar progressBar;
     private double progress;
@@ -108,14 +105,14 @@ public class PapayaProgress {
             percentLabel.setText(calculatePercent(progress));
             if (papayaStatusFile.getStatus().equals(PapayaStatus.COMPLETE)) {
                 if (papayaStatusFile.getJoinStatus().equals(JoinStatus.STARTED)) {
-                    progressBar.setStyle("-fx-accent: #f5dc3c;");
+                    progressBar.setStyle("-color-progress-bar-fill: #f5dc3c");
                 } else if (papayaStatusFile.getJoinStatus().equals(JoinStatus.COMPLETED)) {
-                    progressBar.setStyle("-fx-accent: #5ac456;");
+                    progressBar.setStyle("-color-progress-bar-fill: #5ac456");
                 }
                 openFolderButton.setVisible(true);
                 removeFolderButton.setVisible(true);
             } else {
-                progressBar.setStyle("-fx-accent: #0ca3ff;");
+                progressBar.setStyle("-color-progress-bar-fill: #0ca3ff");
                 openFolderButton.setVisible(false);
                 removeFolderButton.setVisible(false);
             }

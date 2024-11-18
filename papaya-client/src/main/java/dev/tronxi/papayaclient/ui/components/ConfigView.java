@@ -27,7 +27,6 @@ public class ConfigView {
         mainLayout.setSpacing(20);
         mainLayout.setPadding(new Insets(20));
         mainLayout.setAlignment(Pos.TOP_CENTER);
-        mainLayout.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #ccc; -fx-border-width: 1px;");
 
         Scene scene = new Scene(mainLayout, 400, 250);
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -37,8 +36,8 @@ public class ConfigView {
     }
 
     private Button createSaveButton(Stage stage, ConfigService configService, TextField workspaceTextField, TextField trackerTextField) {
-        Button saveButton = new Button("Save");
-        saveButton.setStyle("-fx-cursor: hand; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 10;");
+        Button saveButton = new Button("\uD83D\uDCBE Save");
+        saveButton.getStyleClass().add("success");
         saveButton.setOnAction(event -> {
             boolean userConfirmed = showConfirmationDialog(stage);
             if (userConfirmed) {
