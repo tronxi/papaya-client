@@ -1,10 +1,16 @@
 package dev.tronxi.papayatracker.models;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+
 import java.util.Objects;
 
-public record Peer(String address, int port, long millis) {
+@RedisHash("Peer")
+public record Peer(@Id String id, String address, int port, long millis) {
+
     public static Peer of(PeerDTO peerDTO) {
-        return new Peer(peerDTO.address(), peerDTO.port(), System.currentTimeMillis());
+        String id = peerDTO.address() + ":" + peerDTO.port();
+        return new Peer(id, peerDTO.address(), peerDTO.port(), System.currentTimeMillis());
     }
 
     @Override
