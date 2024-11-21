@@ -30,6 +30,7 @@ public class FileManager {
 
     private Path storePath;
 
+    private final PartSizeCalculator partSizeCalculator;
     private final HashGenerator hashGenerator;
     private final PapayaStatusFileService papayaStatusFileService;
     private final PartStatusFileRepository partStatusFileRepository;
@@ -40,7 +41,8 @@ public class FileManager {
     private static final Logger logger = Logger.getLogger(FileManager.class.getName());
 
 
-    public FileManager(ConfigService configService, HashGenerator hashGenerator, PapayaStatusFileService papayaStatusFileService, PartStatusFileRepository partStatusFileRepository) {
+    public FileManager(ConfigService configService, PartSizeCalculator partSizeCalculator, HashGenerator hashGenerator, PapayaStatusFileService papayaStatusFileService, PartStatusFileRepository partStatusFileRepository) {
+        this.partSizeCalculator = partSizeCalculator;
         this.papayaStatusFileService = papayaStatusFileService;
         this.partStatusFileRepository = partStatusFileRepository;
         this.hashGenerator = hashGenerator;
@@ -66,21 +68,21 @@ public class FileManager {
         if (!store.toFile().exists()) {
             store.toFile().mkdirs();
         }
-
-        int partSize = 100000000;
+        long partSize = partSizeCalculator.calculate(inputFile.length());
+        logger.info("PartSize: " + partSize);
         int numPart = 0;
 
         try (InputStream inputStream = Files.newInputStream(inputFilePatch)) {
-            byte[] buffer = new byte[2000000000];
+            byte[] buffer = new byte[384000000];
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 logger.info("Reading bytes: " + bytesRead);
                 byte[] bytes = new byte[bytesRead];
                 System.arraycopy(buffer, 0, bytes, 0, bytesRead);
-                for (int i = 0; i < bytes.length; i += partSize) {
+                for (int i = 0; i < bytes.length; i += (int) partSize) {
                     logger.info("Reading part: " + i);
-                    int end = Math.min(bytes.length, i + partSize);
-                    byte[] part = Arrays.copyOfRange(bytes, i, end);
+                    long end = Math.min(bytes.length, i + partSize);
+                    byte[] part = Arrays.copyOfRange(bytes, i, (int) end);
                     String partName = String.valueOf(numPart);
                     String partHash = hashGenerator.generateHash(part);
                     PartFile partFile = new PartFile(partName, partHash);
