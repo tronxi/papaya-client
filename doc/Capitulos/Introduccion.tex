@@ -1,39 +1,40 @@
+\setlength{\parskip}{\baselineskip}
+
+
 \chapter{Introducción}
 \label{cap:introduccion}
 
-\chapterquote{Frase célebre dicha por alguien inteligente}{Autor}
+
+\section{Contexto}
+
+Las redes Peer-to-Peer (P2P) representan un modelo de comunicación descentralizado en el que todos los nodos participan de forma equitativa, actuando tanto como clientes como servidores. Este paradigma, alternativo al modelo cliente-servidor tradicional, ha transformado la forma en que compartimos información y utilizamos los recursos en línea. Su impacto ha sido especialmente notable en el ámbito del intercambio de archivos, donde su capacidad para distribuir grandes volúmenes de datos sin depender de servidores centralizados ha supuesto una revolución tecnológica \cite{schollmeier2001}.
 
 
-El estudiante elaborará una memoria descriptiva del trabajo realizado, con una \textbf{extensión mínima recomendada de 50 páginas} incluyendo al menos una introducción, objetivos y plan de trabajo, resultados con una discusión crítica y razonada de los mismos, conclusiones y bibliografía empleada en la elaboración de la memoria.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width = 0.5\textwidth]{Imagenes/Vectorial/client-server-vs-p2p}
+    \caption{Comparaci\'on entre arquitectura cliente-servidor y arquitectura P2P}
+    \label{fig:clientVsp2p}
+\end{figure}
 
-La memoria se puede redactar en castellano o en inglés, pero en el primer caso la introducción y las conclusiones de la memoria tienen que traducirse también al inglés y aparecerán como capítulos \textbf{al final de la memoria}. En ambos casos, el título de la memoria aparecerá en castellano y en inglés.
 
-Además del cuerpo principal describiendo el trabajo realizado, la memoria contendrá los siguientes elementos, que no computarán para el cálculo de la extensión mínima del trabajo:
+El inicio de las redes P2P modernas se remonta a finales de la década de 1990, con la aparición de Napster en 1999. Napster introdujo un modelo centralizado en el que los usuarios podían buscar y descargar archivos, principalmente música, a través de un servidor que indexaba todos los contenidos disponibles. Esta plataforma, aunque técnicamente no era completamente P2P debido a su dependencia de un servidor central, fue pionera en popularizar el intercambio de archivos entre pares.
 
-\begin{itemize}
-\item un resumen en inglés de media página, incluyendo el título en inglés,
-\item ese mismo resumen en castellano, incluyendo el título en castellano,
-\item una lista de no más de 10 palabras clave en inglés,
-\item esa misma lista en castellano,
-\item un índice de contenidos, y
-\item una bibliografía.
-\end{itemize}
 
-La portada de la memoria deberá contener la siguiente información:
+Sin embargo, Napster enfrentó múltiples desafíos legales, principalmente por el intercambio no autorizado de material protegido por derechos de autor. Estos problemas llevaron a su cierre en 2001, pero también impulsaron el desarrollo de alternativas más descentralizadas que no dependían de un punto único de control.
 
-\begin{itemize}
-\item "Máster en NOMBRE DEL MÁSTER, Facultad de Informática, Universidad Complutense de Madrid"
-\item Título
-\item Autor
-\item Director(es)
-\item Colaborador externo de dirección, si lo hay
-\item Curso académico
-\item Solo en la versión final: convocatoria y calificación obtenida
-\end{itemize}
 
-Para facilitar la escritura de la memoria siguiendo esta estructura, el estudiante podrá usar las plantillas en LaTeX o Word preparadas al efecto y publicadas en la página web del máster correspondiente.
+La caída de Napster marcó el comienzo de una segunda generación de redes P2P, más resilientes y descentralizadas. Plataformas como Gnutella y eDonkey surgieron como respuesta a la vulnerabilidad inherente de los sistemas centralizados. Gnutella, por ejemplo, permitió que cada nodo en la red actuara de forma completamente independiente, eliminando la necesidad de un servidor central.
 
-Todo el material no original, ya sea texto o figuras, deberá ser convenientemente citado y referenciado. En el caso de material complementario se deben respetar las licencias y copyrights asociados al software y hardware que se emplee. En caso contrario no se autorizará la defensa, sin menoscabo de otras acciones que correspondan.
+
+Estas redes introdujeron nuevos retos técnicos, como la búsqueda eficiente de archivos en una red distribuida y el manejo de grandes volúmenes de tráfico. Para abordar estos problemas, se desarrollaron algoritmos más avanzados para la localización de recursos y técnicas de segmentación de archivos para optimizar la transferencia de datos.
+
+
+La llegada de BitTorrent en 2001 marcó un nuevo hito en la evolución de las redes P2P. Este protocolo introdujo un enfoque innovador para el intercambio de archivos al dividirlos en fragmentos más pequeños. Los usuarios podían descargar estos fragmentos desde múltiples fuentes simultáneamente, lo que mejoraba significativamente la velocidad y la eficiencia de las transferencias. Además, BitTorrent redujo la carga sobre los nodos individuales al permitir que los usuarios que habían descargado partes de un archivo las compartieran inmediatamente con otros \cite{cohen2003}.
+
+
+A lo largo de los años, las redes P2P han evolucionado para abarcar aplicaciones más allá del intercambio de archivos. En la actualidad, estas tecnologías son fundamentales en áreas como el streaming de vídeo, los juegos en línea y, más recientemente, las plataformas basadas en blockchain como Bitcoin. Este último caso destaca por su capacidad para descentralizar no solo la transferencia de datos, sino también el control financiero, mediante un registro distribuido y seguro.
+
 
 
 \section{Motivación}
@@ -46,7 +47,6 @@ Descripción de los objetivos del trabajo.
 
 \section{Plan de trabajo}
 Aquí se describe el plan de trabajo a seguir para la consecución de los objetivos descritos en el apartado anterior.
-
 
 
 \section{Explicaciones adicionales sobre el uso de esta plantilla}
