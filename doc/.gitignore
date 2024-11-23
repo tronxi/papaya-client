@@ -1,0 +1,44 @@
+# Archivos de salida y temporales generados por LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.nav
+*.snm
+*.vrb
+*.synctex.gz
+
+# Archivos de diseño
+*.dvi
+*.ps
+
+# Archivos de imágenes generadas
+*.eps
+*.pdf_tex
+
+# Archivos de compilación intermedia
+*.ilg
+*.ind
+*.idx
+*.bak
+*.rel
+
+# Carpetas comunes de compilación
+_build/
+out/
+tmp/
+
+# Archivos de bibliografía generados (mantenemos .bib)
+*.bbl
+*.blg
+
+# Archivos de editores y entornos comunes
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
