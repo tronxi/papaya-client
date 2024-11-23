@@ -1,13 +1,13 @@
-\setlength{\parskip}{\baselineskip}
-
-
 \chapter{Introducción}
 \label{cap:introduccion}
 
 
 \section{Contexto}
 
-Las redes Peer-to-Peer (P2P) representan un modelo de comunicación descentralizado en el que todos los nodos participan de forma equitativa, actuando tanto como clientes como servidores. Este paradigma, alternativo al modelo cliente-servidor tradicional, ha transformado la forma en que compartimos información y utilizamos los recursos en línea. Su impacto ha sido especialmente notable en el ámbito del intercambio de archivos, donde su capacidad para distribuir grandes volúmenes de datos sin depender de servidores centralizados ha supuesto una revolución tecnológica \cite{schollmeier2001}.
+Las redes Peer-to-Peer (P2P) representan un modelo de comunicación descentralizado en el que todos los nodos participan de forma equitativa, actuando tanto como clientes como servidores.
+Este paradigma, alternativo al modelo cliente-servidor tradicional, ha transformado la forma en que compartimos información y utilizamos los recursos en línea.
+Su impacto ha sido especialmente notable en el ámbito del intercambio de archivos,
+donde su capacidad para distribuir grandes volúmenes de datos sin depender de servidores centralizados ha supuesto una revolución tecnológica \cite{schollmeier2001}.
 
 
 \begin{figure}[h]
@@ -18,47 +18,114 @@ Las redes Peer-to-Peer (P2P) representan un modelo de comunicación descentraliz
 \end{figure}
 
 
-El inicio de las redes P2P modernas se remonta a finales de la década de 1990, con la aparición de Napster en 1999. Napster introdujo un modelo centralizado en el que los usuarios podían buscar y descargar archivos, principalmente música, a través de un servidor que indexaba todos los contenidos disponibles. Esta plataforma, aunque técnicamente no era completamente P2P debido a su dependencia de un servidor central, fue pionera en popularizar el intercambio de archivos entre pares.
+El inicio de las redes P2P modernas se remonta a finales de la década de 1990, con la aparición de Napster en 1999.
+Napster introdujo un modelo centralizado en el que los usuarios podían buscar y descargar archivos, principalmente música, a través de un servidor que indexaba todos los contenidos disponibles.
+Esta plataforma, aunque técnicamente no era completamente P2P debido a su dependencia de un servidor central,
+fue pionera en popularizar el intercambio de archivos entre pares.
 
 
-Sin embargo, Napster enfrentó múltiples desafíos legales, principalmente por el intercambio no autorizado de material protegido por derechos de autor. Estos problemas llevaron a su cierre en 2001, pero también impulsaron el desarrollo de alternativas más descentralizadas que no dependían de un punto único de control.
+Sin embargo, Napster enfrentó múltiples desafíos legales, principalmente por el intercambio no autorizado de material protegido por derechos de autor.
+Estos problemas llevaron a su cierre en 2001, pero también impulsaron el desarrollo de alternativas más descentralizadas que no dependían de un punto único de control.
 
 
-La caída de Napster marcó el comienzo de una segunda generación de redes P2P, más resilientes y descentralizadas. Plataformas como Gnutella y eDonkey surgieron como respuesta a la vulnerabilidad inherente de los sistemas centralizados. Gnutella, por ejemplo, permitió que cada nodo en la red actuara de forma completamente independiente, eliminando la necesidad de un servidor central.
+La caída de Napster marcó el comienzo de una segunda generación de redes P2P, más resilientes y descentralizadas.
+Plataformas como Gnutella y eDonkey surgieron como respuesta a la vulnerabilidad inherente de los sistemas centralizados.
+Gnutella, por ejemplo, permitió que cada nodo en la red actuara de forma completamente independiente, eliminando la necesidad de un servidor central.
 
 
-Estas redes introdujeron nuevos retos técnicos, como la búsqueda eficiente de archivos en una red distribuida y el manejo de grandes volúmenes de tráfico. Para abordar estos problemas, se desarrollaron algoritmos más avanzados para la localización de recursos y técnicas de segmentación de archivos para optimizar la transferencia de datos.
+Estas redes introdujeron nuevos retos técnicos, como la búsqueda eficiente de archivos en una red distribuida y el manejo de grandes volúmenes de tráfico.
+Para abordar estos problemas, se desarrollaron algoritmos más avanzados para la localización de recursos y técnicas de segmentación de archivos para optimizar la transferencia de datos.
 
 
-La llegada de BitTorrent en 2001 marcó un nuevo hito en la evolución de las redes P2P. Este protocolo introdujo un enfoque innovador para el intercambio de archivos al dividirlos en fragmentos más pequeños. Los usuarios podían descargar estos fragmentos desde múltiples fuentes simultáneamente, lo que mejoraba significativamente la velocidad y la eficiencia de las transferencias. Además, BitTorrent redujo la carga sobre los nodos individuales al permitir que los usuarios que habían descargado partes de un archivo las compartieran inmediatamente con otros \cite{cohen2003}.
+La llegada de BitTorrent en 2001 marcó un nuevo hito en la evolución de las redes P2P.
+Este protocolo introdujo un enfoque innovador para el intercambio de archivos al dividirlos en fragmentos más pequeños. L
+os usuarios podían descargar estos fragmentos desde múltiples fuentes simultáneamente, lo que mejoraba significativamente la velocidad y la eficiencia de las transferencias.
+Además, BitTorrent redujo la carga sobre los nodos individuales al permitir que los usuarios que habían descargado partes de un archivo las compartieran inmediatamente con otros \cite{cohen2003}.
 
 
-A lo largo de los años, las redes P2P han evolucionado para abarcar aplicaciones más allá del intercambio de archivos. En la actualidad, estas tecnologías son fundamentales en áreas como el streaming de vídeo, los juegos en línea y, más recientemente, las plataformas basadas en blockchain como Bitcoin. Este último caso destaca por su capacidad para descentralizar no solo la transferencia de datos, sino también el control financiero, mediante un registro distribuido y seguro.
+A lo largo de los años, las redes P2P han evolucionado para abarcar aplicaciones más allá del intercambio de archivos.
+En la actualidad, estas tecnologías son fundamentales en áreas como el streaming de vídeo, los juegos en línea y, más recientemente, las plataformas basadas en blockchain como Bitcoin.
+Este último caso destaca por su capacidad para descentralizar no solo la transferencia de datos, sino también el control financiero, mediante un registro distribuido y seguro.
 
 
 
 \section{Motivación}
-Introducción al tema del TFM.
+
+Las redes Peer-to-Peer (P2P) han transformado la manera en que compartimos información y utilizamos recursos en línea,
+posicionándose como una alternativa eficiente y escalable al modelo cliente-servidor.
+A pesar de su relevancia y aplicaciones actuales en campos como el intercambio de archivos, el streaming de vídeo y las plataformas blockchain,
+el diseño e implementación de estas redes desde un nivel práctico sigue siendo un reto para muchos desarrolladores.
+
+Este trabajo no busca competir con las grandes plataformas que emplean arquitecturas P2P ni desarrollar una red masiva con millones de usuarios.
+En cambio, se enfoca en la creación de una red P2P funcional desde cero, con énfasis en los conceptos fundamentales y su implementación práctica.
+
+Con ello, se espera facilitar el entendimiento de este modelo descentralizado y motivar el desarrollo de nuevas aplicaciones basadas en redes P2P,
+adaptadas a los desafíos tecnológicos contemporáneos.
 
 
 \section{Objetivos}
-Descripción de los objetivos del trabajo.
+
+El objetivo principal de este trabajo es diseñar e implementar una red Peer-to-Peer (P2P) funcional para el intercambio de archivos de manera distribuida,
+integrando tecnologías actuales como UPnP para la gestión automática de puertos y un sistema centralizado para la localización y conexión de nodos.
+Este desarrollo se centrará en la creación de un cliente con interfaz gráfica que sirva como base para todas las funcionalidades de la red.
+
+Para alcanzar este objetivo general, se plantean los siguientes objetivos específicos:
+
+\begin{itemize}
+    \item \textbf{Desarrollar un cliente con interfaz gráfica:} Diseñar e implementar una aplicación gráfica que permita a los usuarios compartir y descargar archivos de manera sencilla e intuitiva. Este cliente será el núcleo sobre el cual se integrarán las funcionalidades de la red P2P.
+
+    \item \textbf{Desarrollar un sistema de registro y gestión de nodos:} Implementar un mecanismo centralizado que permita identificar y coordinar los peers conectados a la red, facilitando su interacción y comunicación.
+
+    \item \textbf{Diseñar e implementar la comunicación directa entre nodos:} Crear un protocolo basado en TCP que permita a los peers establecer conexiones fiables y seguras para el intercambio de archivos, asegurando una comunicación robusta y compatible con redes distribuidas.
+
+    \item \textbf{Integrar soporte para UPnP:} Automatizar la configuración de puertos en los routers mediante el uso de UPnP, garantizando una conectividad sencilla y accesible para los usuarios.
+
+    \item \textbf{Implementar un sistema de intercambio de archivos distribuido:} Diseñar un modelo que permita a los peers compartir y descargar archivos fragmentados desde múltiples fuentes, optimizando el uso de los recursos de la red.
+
+    \item \textbf{Documentar el diseño, implementación y evaluación del sistema:} Elaborar una descripción técnica detallada del desarrollo de la red P2P, incluyendo los algoritmos y tecnologías utilizadas, así como las
+
+\end{itemize}
 
 
 \section{Plan de trabajo}
-Aquí se describe el plan de trabajo a seguir para la consecución de los objetivos descritos en el apartado anterior.
 
+Durante el desarrollo del proyecto se ha seguido un plan de trabajo detallado con el objetivo de estructurar las tareas y garantizar el cumplimiento de los objetivos planteados. La planificación ha permitido organizar de forma eficiente las distintas fases del desarrollo, estableciendo prioridades y tiempos. El plan de trabajo se ha dividido en los siguientes puntos:
 
-\section{Explicaciones adicionales sobre el uso de esta plantilla}
-Si quieres cambiar el \textbf{estilo del título} de los capítulos, edita \verb|TeXiS\TeXiS_pream.tex| y comenta la línea \verb|\usepackage[Lenny]{fncychap}| para dejar el estilo básico de \LaTeX.
+\begin{enumerate}
 
-Si no te gusta que no haya \textbf{espacios entre párrafos} y quieres dejar un pequeño espacio en blanco, no metas saltos de línea (\verb|\\|) al final de los párrafos. En su lugar, busca el comando  \verb|\setlength{\parskip}{0.2ex}| en \verb|TeXiS\TeXiS_pream.tex| y aumenta el valor de $0.2ex$ a, por ejemplo, $1ex$.
+    \item \textbf{Estudio de las tecnologías a utilizar:}
+    Se llevó a cabo un análisis detallado de las tecnologías necesarias para el desarrollo del proyecto, incluyendo protocolos de comunicación como TCP,
+    sistemas de apertura de puertos con UPnP y arquitecturas P2P para el intercambio de archivos.
+    Este estudio incluyó la búsqueda de documentación técnica, recursos en línea y herramientas que facilitaran el desarrollo.
 
-TFMTeXiS se ha elaborado a partir de la plantilla de TeXiS\footnote{\url{http://gaia.fdi.ucm.es/research/texis/}}, creada por Marco Antonio y Pedro Pablo Gómez Martín para escribir su tesis doctoral. Para explicaciones más extensas y detalladas sobre cómo usar esta plantilla, recomendamos la lectura del documento \texttt{TeXiS-Manual-1.0.pdf} que acompaña a esta plantilla.
+    \item \textbf{Desarrollo del cliente con interfaz gráfica:}
+    Se inició el diseño e implementación en java del cliente gráfico como base del proyecto.
+    Este cliente incluye funcionalidades esenciales para compartir y descargar archivos, sirviendo como núcleo sobre el cual se desarrollaron las demás características de la red.
+    Durante esta fase, se probaron aspectos básicos de la interacción con el sistema de archivos local.
 
-El siguiente texto se genera con el comando \verb|\lipsum[2-20]| que viene a continuación en el fichero .tex. El único propósito es mostrar el aspecto de las páginas usando esta plantilla. Quita este comando y, si quieres, comenta o elimina el paquete \textit{lipsum} al final de \verb|TeXiS\TeXiS_pream.tex|
+    \item \textbf{Implementación del sistema de registro de nodos:}
+    Se diseñó e implementó un sistema centralizado para gestionar los nodos conectados a la red.
+    Este sistema permite registrar los peers activos y facilitar su descubrimiento entre ellos.
+    Además, se integró con el cliente para garantizar que los usuarios pudieran conectarse a otros peers de manera eficiente.
 
-\subsection{Texto de prueba}
+    \item \textbf{Diseño e implementación de la comunicación entre nodos:}
+    Se desarrolló un protocolo basado en TCP para la conexión directa entre peers.
+    Esta etapa incluyó pruebas para garantizar la fiabilidad y estabilidad de las conexiones, así como su integración con el cliente gráfico.
 
+    \item \textbf{Integración del soporte para UPnP:}
+    Se implementó soporte para la configuración automática de puertos mediante UPnP, lo que permitió facilitar la conexión entre nodos en redes con configuraciones complejas,
+    eliminando la necesidad de ajustes manuales por parte del usuario.
 
-\lipsum[2-20]
+    \item \textbf{Evaluación y pruebas del sistema:}
+    Se llevaron a cabo pruebas funcionales para verificar el correcto funcionamiento de cada componente de la red P2P, así como su integración global.
+    Estas pruebas incluyeron casos con múltiples nodos conectados para garantizar la robustez del sistema.
+
+    \item \textbf{Escritura y revisión de la memoria:}
+    Durante las fases de implementación y pruebas, se elaboró la memoria del proyecto, documentando las decisiones tomadas, los resultados obtenidos y los aprendizajes adquiridos.
+
+    \item \textbf{Cierre del proyecto:}
+    Una vez terminadas todas las fases, se realizó una revisión final del cliente y de la memoria, realizando las correcciones necesarias para su entrega final.
+    Se verificó que todos los objetivos se hubieran cumplido satisfactoriamente antes del cierre del proyecto.
+\end{enumerate}
+
+En definitiva, un plan de trabajo bien estructurado ha permitido avanzar de manera eficiente y cumplir con los hitos establecidos dentro del tiempo límite.

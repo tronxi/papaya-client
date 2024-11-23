@@ -27,6 +27,7 @@
 
 NOMBRE_LATEX = TFMTeXiS
 FICHEROS_GLOSARIO = acronimos.gdf
+NOMBRE_SALIDA = Sistema_de_intercambio_de_archivos_P2P_TFM_Sergio_Garcia_sanchez
 # NO deberia ser igual que NOMBRE_LATEX
 # (es decir, si NOMBRE_LATEX es
 # "documento" NO pongas "documento.gdf"
@@ -39,14 +40,15 @@ FICHEROS_GLOSARIO = acronimos.gdf
 #
 # Genera el documento utilizando pdflatex
 # 
+
 pdflatex:
-	pdflatex $(NOMBRE_LATEX)
-	-bibtex $(NOMBRE_LATEX)
+	pdflatex -jobname=$(NOMBRE_SALIDA) $(NOMBRE_LATEX)
+	-bibtex $(NOMBRE_SALIDA)
 	-glosstex $(NOMBRE_LATEX) $(FICHEROS_GLOSARIO)
-	-makeindex $(NOMBRE_LATEX).gxs -o $(NOMBRE_LATEX).glx -s glosstex.ist
-#	-makeindex $(NOMBRE_LATEX)   Si tuvieras ?ndice de palabras (mira preambulo.tex)
-	pdflatex $(NOMBRE_LATEX)
-	pdflatex $(NOMBRE_LATEX)
+	-makeindex $(NOMBRE_SALIDA).gxs -o $(NOMBRE_SALIDA).glx -s glosstex.ist
+#	-makeindex $(NOMBRE_LATEX)   Si tuvieras índice de palabras (mira preambulo.tex)
+	pdflatex -jobname=$(NOMBRE_SALIDA) $(NOMBRE_LATEX)
+	pdflatex -jobname=$(NOMBRE_SALIDA) $(NOMBRE_LATEX)
 # El gui?n en cualquier comando indica que si dicho comando falla
 # (termina con una salida diferente de 0) la construcci?n del Make no
 # debe detenerse. Eso podr?a ocurrir en el makeindex si se est?
