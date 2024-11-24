@@ -1,0 +1,71 @@
+\chapter{Fundamentos t\'eoricos}
+\label{cap:fundamentosTeoricos}
+
+Este capítulo aborda los fundamentos teóricos necesarios para comprender las redes Peer-to-Peer (P2P), comenzando con su definición y evolución histórica.
+A continuación, se analizan las arquitecturas más comunes y los protocolos clave que permiten su funcionamiento, como TCP y UPnP.
+Por último, se estudian los sistemas de descubrimiento de nodos, destacando los modelos centralizados y distribuidos, así como ejemplos prácticos que ilustran su aplicación en la actualidad.
+
+\section{Introducción a las redes P2P}
+\subsection{Definición y evolución}
+Las redes Peer-to-Peer (P2P) son sistemas de comunicación que se caracterizan por su arquitectura descentralizada, donde todos los nodos de la red desempeñan roles equivalentes.
+Esto significa que los nodos actúan tanto como clientes, solicitando recursos, como servidores, compartiendo datos con otros nodos.
+Según \cite{schollmeier2001}, una red P2P se define por su capacidad para que los nodos compartan recursos directamente entre ellos, sin depender de una entidad central que coordine o gestione las interacciones.
+Este enfoque fomenta la resiliencia y la escalabilidad, ya que la red no depende de un único punto de fallo.
+
+En contraste, el modelo cliente-servidor tradicional se basa en un servidor central que almacena los datos y responde a las solicitudes de los clientes.
+Este modelo introduce limitaciones importantes, como posibles cuellos de botella y la vulnerabilidad a fallos del servidor centralizado \cite{coulouris2011}.
+Por el contrario, las redes P2P distribuyen la carga de trabajo entre todos los nodos, aprovechando la capacidad colectiva de la red para manejar grandes volúmenes de datos de manera eficiente.
+
+\paragraph{Primera generación de redes P2P}
+
+El desarrollo moderno de las redes P2P comenzó en 1999 con la aparición de Napster, una plataforma diseñada para compartir música digital.
+Aunque Napster no era completamente descentralizada, ya que dependía de un servidor central para indexar los archivos compartidos,
+marcó un hito al permitir que los usuarios se conectaran directamente para intercambiar archivos entre ellos.
+Según \cite{oram2001}, Napster popularizó el concepto de intercambio de archivos entre pares y demostró el potencial de las redes P2P para transformar la distribución de contenido digital.
+
+Sin embargo, la dependencia de Napster de un servidor centralizado lo convirtió en un objetivo legal vulnerable.
+Su cierre en 2001 motivó el desarrollo de redes P2P más descentralizadas, que buscaban eliminar la dependencia de un único punto de control.
+
+\paragraph{Segunda generación de redes P2P}
+
+La segunda generación de redes P2P, representada por plataformas como Gnutella y eDonkey, eliminó los servidores centrales y adoptó modelos completamente distribuidos.
+En Gnutella, por ejemplo, cada nodo se conectaba directamente con otros nodos vecinos, formando una red en malla.
+Aunque esta descentralización mejoró la resiliencia de la red, también introdujo retos técnicos significativos.
+Entre los principales desafíos se encontraban la búsqueda eficiente de recursos en una red distribuida y la gestión del tráfico generado por múltiples nodos \cite{risson2006}.
+
+Por su parte, eDonkey introdujo mejoras en la forma de localizar archivos, empleando servidores auxiliares para agilizar las búsquedas, pero manteniendo la transferencia directa entre nodos.
+Estas plataformas demostraron que las redes P2P podían escalar y manejar grandes cantidades de datos, pero también evidenciaron la necesidad de optimizar su funcionamiento.
+
+\paragraph{BitTorrent y la fragmentación de archivos}
+
+En 2001, BitTorrent marcó un punto de inflexión en la evolución de las redes P2P al introducir un nuevo enfoque para el intercambio de archivos.
+En lugar de que un nodo descargara un archivo completo de otro, BitTorrent dividía los archivos en fragmentos más pequeños.
+Esto permitía que un usuario descargara diferentes fragmentos de un archivo desde múltiples nodos simultáneamente, maximizando la eficiencia del ancho de banda disponible \cite{cohen2003}.
+Además, los nodos comenzaban a compartir los fragmentos descargados con otros usuarios incluso antes de completar la descarga, fomentando la colaboración activa entre los peers.
+
+Esta innovación consolidó a BitTorrent como una tecnología líder en el intercambio de archivos y popularizó el uso de las redes P2P en aplicaciones masivas,
+demostrando su capacidad para manejar grandes volúmenes de datos de manera eficiente.
+
+\paragraph{Relevancia actual de las redes P2P}
+
+En la actualidad, las redes P2P han trascendido el ámbito del intercambio de archivos y se han adaptado a una amplia gama de aplicaciones.
+Por ejemplo, en el streaming de contenido, tecnologías como WebRTC aprovechan la conectividad directa entre nodos para mejorar la latencia y reducir la carga en servidores centrales.
+Además, plataformas basadas en blockchain, como Bitcoin, utilizan redes P2P para garantizar la descentralización no solo en la transferencia de datos, sino también en la gestión financiera.
+Según \cite{nakamoto2008}, la arquitectura P2P es fundamental para el funcionamiento de Bitcoin, ya que elimina la necesidad de intermediarios y permite un sistema financiero más transparente y seguro.
+
+\subsection{Arquitecturas de redes P2P}
+Se analizarán las principales arquitecturas utilizadas en las redes P2P, incluyendo las arquitecturas centralizadas, descentralizadas e híbridas, y se discutirán sus ventajas y desventajas.
+
+\section{Protocolos de comunicación en redes P2P}
+\subsection{Protocolo TCP en redes P2P}
+Este apartado se centrará en cómo las redes P2P utilizan el protocolo TCP para establecer conexiones fiables y garantizar la transferencia de datos entre nodos.
+
+\subsection{Configuración automática mediante UPnP}
+Se describirá cómo el protocolo Universal Plug and Play (UPnP) permite la configuración automática de puertos en redes P2P, facilitando la conectividad entre nodos sin intervención manual del usuario.
+
+\section{Mecanismos de descubrimiento de nodos}
+\subsection{Modelos centralizados y distribuidos}
+Se presentarán los diferentes modelos de descubrimiento de nodos, desde los sistemas centralizados hasta los distribuidos, destacando sus características y aplicaciones.
+
+\subsection{Casos de uso y ejemplos prácticos}
+Este apartado ofrecerá ejemplos relevantes de implementación de sistemas de descubrimiento de nodos y discutirá cómo se aplican en redes P2P para optimizar la conectividad y el rendimiento.
