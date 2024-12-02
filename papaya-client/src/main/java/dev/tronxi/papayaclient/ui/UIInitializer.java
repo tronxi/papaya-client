@@ -118,9 +118,7 @@ public class UIInitializer extends Application {
 
     private Button generateConfigbutton() {
         Button configButton = new Button("⚙ Config");
-        configButton.setOnMouseClicked(event -> {
-            new ConfigView().render(configService);
-        });
+        configButton.setOnMouseClicked(event -> new ConfigView().render(configService));
         return configButton;
     }
 
@@ -162,9 +160,7 @@ public class UIInitializer extends Application {
                                 return fileManager.split(selectedFile);
                             }
                         };
-                        task.setOnRunning(workerStateEvent -> {
-                            label.setVisible(true);
-                        });
+                        task.setOnRunning(workerStateEvent -> label.setVisible(true));
                         task.setOnSucceeded(workerStateEvent -> {
                             label.setVisible(false);
                             Optional<Path> maybePath = task.getValue();
