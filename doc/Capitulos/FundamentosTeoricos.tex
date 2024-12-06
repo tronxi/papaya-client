@@ -177,53 +177,53 @@ En las siguientes secciones, se analizarán las características de ambos protoc
 
 
 \subsubsection{Protocolo TCP}
-%El Transmission Control Protocol (TCP) es uno de los pilares fundamentales en las comunicaciones de redes Peer-to-Peer (P2P). Este protocolo de transporte confiable garantiza la entrega íntegra y ordenada de los datos entre dos nodos, lo que lo convierte en una herramienta clave para aplicaciones que priorizan la fiabilidad. TCP opera en un modelo orientado a la conexión, lo que implica que antes de transferir datos, se debe establecer una conexión entre los nodos implicados. Estas características hacen que TCP sea especialmente útil en redes P2P, incluso en entornos con condiciones de red variables.
-%
-%\subsubsection*{Establecimiento de conexión: Three-Way Handshake}
-%El proceso de inicialización en TCP, conocido como Three-Way Handshake, permite establecer una conexión confiable entre dos nodos. Este procedimiento consta de tres pasos principales:
-%
-%\begin{enumerate}
-%\item SYN: El nodo que inicia la conexión envía un paquete de sincronización (SYN) al nodo receptor, indicando su intención de establecer comunicación.
-%\item SYN-ACK: El receptor responde con un paquete de sincronización y acuse de recibo (SYN-ACK), confirmando la recepción del mensaje inicial y mostrando su disposición para continuar.
-%\item ACK: Finalmente, el nodo iniciador envía un paquete de acuse de recibo (ACK), completando el proceso y estableciendo la conexión.
-%\end{enumerate}
-%Este mecanismo permite a ambos nodos acordar parámetros fundamentales, como los números de secuencia iniciales y las ventanas de transmisión. Estos parámetros son esenciales para garantizar la sincronización durante la transmisión y la integridad de los datos \cite{stevens1994tcp}.
-%
-%\subsubsection*{Mecanismos de fiabilidad}
-%TCP incluye varios mecanismos diseñados para garantizar que los datos lleguen correctamente al destino, incluso en presencia de fallos en la red:
-%
-%\begin{itemize}
-%\item Números de secuencia: Cada byte transmitido está asociado a un número de secuencia único, que permite identificar el orden correcto de los datos y detectar duplicados.
-%\item Acuse de recibo (ACK): El receptor confirma la recepción de los datos enviando un mensaje ACK al emisor, indicando el próximo byte esperado. Este sistema asegura que los segmentos recibidos sean correctamente identificados.
-%\item Retransmisión de paquetes: Si el emisor no recibe un acuse de recibo dentro de un tiempo específico calculado dinámicamente (Retransmission Timeout, RTO), el paquete se retransmite \cite{jacobson1988congestion}.
-%\item Checksum: Cada segmento contiene un valor checksum que valida la integridad de los datos. Si el checksum recibido no coincide, el segmento se descarta \cite{kurose2016computer}.
-%\end{itemize}
-%Estos mecanismos garantizan la fiabilidad y precisión en la transmisión, una característica esencial para aplicaciones de intercambio de archivos en redes P2P.
-%
-%\subsubsection*{Control de flujo y congestión}
-%Para gestionar la transferencia de datos de manera eficiente, TCP utiliza algoritmos avanzados de control de flujo y congestión:
-%
-%\begin{itemize}
-%\item Ventana deslizante (Sliding Window Protocol): Este sistema permite al emisor transmitir múltiples segmentos sin esperar confirmación individual para cada uno, optimizando el uso del ancho de banda disponible.
-%\item Control de congestión: TCP adapta dinámicamente su tasa de transmisión según las condiciones de la red. Los principales algoritmos utilizados incluyen:\begin{itemize}
-%\item Slow Start: Inicia con un tamaño de ventana reducido, que aumenta exponencialmente hasta que se detectan signos de congestión.
-%\item Congestion Avoidance: Tras alcanzar la capacidad de la red, el crecimiento del tamaño de la ventana es lineal.
-%\item Fast Retransmit: Cuando se detectan tres ACK duplicados consecutivos, TCP asume que un paquete se perdió y lo retransmite inmediatamente, sin esperar al tiempo de retransmisión (RTO) \cite{jacobson1988congestion}.
-%\end{itemize}
-%
-%\end{itemize}
-%Estos mecanismos permiten que TCP maximice el rendimiento, evitando la saturación de la red y garantizando una transferencia fluida.
-%
-%\subsubsection*{Desafíos de TCP en redes P2P}
-%A pesar de sus ventajas, TCP enfrenta ciertos desafíos en el contexto de redes P2P:
-%
-%\begin{enumerate}
-%\item Overhead en la gestión de conexiones: Cada conexión TCP requiere recursos significativos, como memoria y capacidad de procesamiento. En redes P2P, donde los nodos deben establecer y mantener múltiples conexiones simultáneamente, este overhead puede limitar el rendimiento \cite{cohen2003}.
-%\item Latencia: Los mecanismos de retransmisión y control de flujo pueden introducir retrasos, especialmente en redes congestionadas o de alta latencia.
-%\item Escalabilidad: La necesidad de gestionar múltiples conexiones persistentes puede convertirse en un cuello de botella en sistemas con miles de nodos.
-%\end{enumerate}
-%\subsubsection*{Relevancia de TCP en redes P2P}
-%A pesar de estos desafíos, TCP sigue siendo el protocolo dominante para aplicaciones P2P que priorizan la fiabilidad y la integridad de los datos. Sistemas como BitTorrent utilizan TCP para transferir fragmentos de archivos entre nodos, asegurando que cada parte se reciba de manera correcta antes de ensamblar el archivo completo. Su capacidad para operar en redes heterogéneas y manejar errores lo convierte en una herramienta esencial en el diseño de redes P2P modernas \cite{cohen2003}.
+El Transmission Control Protocol (TCP) es uno de los pilares fundamentales en las comunicaciones de redes Peer-to-Peer (P2P). Este protocolo de transporte confiable garantiza la entrega íntegra y ordenada de los datos entre dos nodos, lo que lo convierte en una herramienta clave para aplicaciones que priorizan la fiabilidad. TCP opera en un modelo orientado a la conexión, lo que implica que antes de transferir datos, se debe establecer una conexión entre los nodos implicados. Estas características hacen que TCP sea especialmente útil en redes P2P, incluso en entornos con condiciones de red variables.
+
+\subsubsection*{Establecimiento de conexión: Three-Way Handshake}
+El proceso de inicialización en TCP, conocido como Three-Way Handshake, permite establecer una conexión confiable entre dos nodos. Este procedimiento consta de tres pasos principales:
+
+\begin{enumerate}
+\item SYN: El nodo que inicia la conexión envía un paquete de sincronización (SYN) al nodo receptor, indicando su intención de establecer comunicación.
+\item SYN-ACK: El receptor responde con un paquete de sincronización y acuse de recibo (SYN-ACK), confirmando la recepción del mensaje inicial y mostrando su disposición para continuar.
+\item ACK: Finalmente, el nodo iniciador envía un paquete de acuse de recibo (ACK), completando el proceso y estableciendo la conexión.
+\end{enumerate}
+Este mecanismo permite a ambos nodos acordar parámetros fundamentales, como los números de secuencia iniciales y las ventanas de transmisión. Estos parámetros son esenciales para garantizar la sincronización durante la transmisión y la integridad de los datos \cite{stevens1994tcp}.
+
+\subsubsection*{Mecanismos de fiabilidad}
+TCP incluye varios mecanismos diseñados para garantizar que los datos lleguen correctamente al destino, incluso en presencia de fallos en la red:
+
+\begin{itemize}
+\item Números de secuencia: Cada byte transmitido está asociado a un número de secuencia único, que permite identificar el orden correcto de los datos y detectar duplicados.
+\item Acuse de recibo (ACK): El receptor confirma la recepción de los datos enviando un mensaje ACK al emisor, indicando el próximo byte esperado. Este sistema asegura que los segmentos recibidos sean correctamente identificados.
+\item Retransmisión de paquetes: Si el emisor no recibe un acuse de recibo dentro de un tiempo específico calculado dinámicamente (Retransmission Timeout, RTO), el paquete se retransmite \cite{jacobson1988congestion}.
+\item Checksum: Cada segmento contiene un valor checksum que valida la integridad de los datos. Si el checksum recibido no coincide, el segmento se descarta \cite{kurose2016computer}.
+\end{itemize}
+Estos mecanismos garantizan la fiabilidad y precisión en la transmisión, una característica esencial para aplicaciones de intercambio de archivos en redes P2P.
+
+\subsubsection*{Control de flujo y congestión}
+Para gestionar la transferencia de datos de manera eficiente, TCP utiliza algoritmos avanzados de control de flujo y congestión:
+
+\begin{itemize}
+\item Ventana deslizante (Sliding Window Protocol): Este sistema permite al emisor transmitir múltiples segmentos sin esperar confirmación individual para cada uno, optimizando el uso del ancho de banda disponible.
+\item Control de congestión: TCP adapta dinámicamente su tasa de transmisión según las condiciones de la red. Los principales algoritmos utilizados incluyen:\begin{itemize}
+\item Slow Start: Inicia con un tamaño de ventana reducido, que aumenta exponencialmente hasta que se detectan signos de congestión.
+\item Congestion Avoidance: Tras alcanzar la capacidad de la red, el crecimiento del tamaño de la ventana es lineal.
+\item Fast Retransmit: Cuando se detectan tres ACK duplicados consecutivos, TCP asume que un paquete se perdió y lo retransmite inmediatamente, sin esperar al tiempo de retransmisión (RTO) \cite{jacobson1988congestion}.
+\end{itemize}
+
+\end{itemize}
+Estos mecanismos permiten que TCP maximice el rendimiento, evitando la saturación de la red y garantizando una transferencia fluida.
+
+\subsubsection*{Desafíos de TCP en redes P2P}
+A pesar de sus ventajas, TCP enfrenta ciertos desafíos en el contexto de redes P2P:
+
+\begin{enumerate}
+\item Overhead en la gestión de conexiones: Cada conexión TCP requiere recursos significativos, como memoria y capacidad de procesamiento. En redes P2P, donde los nodos deben establecer y mantener múltiples conexiones simultáneamente, este overhead puede limitar el rendimiento \cite{cohen2003}.
+\item Latencia: Los mecanismos de retransmisión y control de flujo pueden introducir retrasos, especialmente en redes congestionadas o de alta latencia.
+\item Escalabilidad: La necesidad de gestionar múltiples conexiones persistentes puede convertirse en un cuello de botella en sistemas con miles de nodos.
+\end{enumerate}
+\subsubsection*{Relevancia de TCP en redes P2P}
+A pesar de estos desafíos, TCP sigue siendo el protocolo dominante para aplicaciones P2P que priorizan la fiabilidad y la integridad de los datos. Sistemas como BitTorrent utilizan TCP para transferir fragmentos de archivos entre nodos, asegurando que cada parte se reciba de manera correcta antes de ensamblar el archivo completo. Su capacidad para operar en redes heterogéneas y manejar errores lo convierte en una herramienta esencial en el diseño de redes P2P modernas \cite{cohen2003}.
 
 
 \subsubsection{Protocolo UDP}
