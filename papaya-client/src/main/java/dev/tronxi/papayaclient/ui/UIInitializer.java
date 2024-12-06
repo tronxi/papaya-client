@@ -1,5 +1,6 @@
 package dev.tronxi.papayaclient.ui;
 
+import atlantafx.base.theme.PrimerDark;
 import atlantafx.base.theme.PrimerLight;
 import dev.tronxi.papayaclient.PapayaClientApplication;
 import dev.tronxi.papayaclient.persistence.FileManager;
@@ -11,6 +12,7 @@ import dev.tronxi.papayaclient.ui.components.ConfigView;
 import dev.tronxi.papayaclient.ui.components.CreateFileChooserButton;
 import dev.tronxi.papayaclient.ui.components.PapayaProgress;
 import javafx.application.Application;
+import javafx.application.ColorScheme;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
@@ -40,7 +42,7 @@ public class UIInitializer extends Application {
 
     @Override
     public void start(Stage stage) {
-        Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+        setColorScheme();
         Label createPapayaFileRunning = new Label("CreatePapayaFileRunning...");
         createPapayaFileRunning.managedProperty().bind(createPapayaFileRunning.visibleProperty());
         createPapayaFileRunning.setVisible(false);
@@ -97,11 +99,26 @@ public class UIInitializer extends Application {
         stage.show();
     }
 
+    private void setColorScheme() {
+        Platform.Preferences preferences = Platform.getPreferences();
+        ColorScheme colorScheme = preferences.getColorScheme();
+        if (ColorScheme.DARK.equals(colorScheme)) {
+            Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+        } else {
+            Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+        }
+        preferences.colorSchemeProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == ColorScheme.DARK) {
+                Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+            } else {
+                Application.setUserAgentStylesheet(new PrimerLight().getUserAgentStylesheet());
+            }
+        });
+    }
+
     private Button generateConfigbutton() {
         Button configButton = new Button("⚙ Config");
-        configButton.setOnMouseClicked(event -> {
-            new ConfigView().render(configService);
-        });
+        configButton.setOnMouseClicked(event -> new ConfigView().render(configService));
         return configButton;
     }
 
@@ -143,9 +160,7 @@ public class UIInitializer extends Application {
                                 return fileManager.split(selectedFile);
                             }
                         };
-                        task.setOnRunning(workerStateEvent -> {
-                            label.setVisible(true);
-                        });
+                        task.setOnRunning(workerStateEvent -> label.setVisible(true));
                         task.setOnSucceeded(workerStateEvent -> {
                             label.setVisible(false);
                             Optional<Path> maybePath = task.getValue();
