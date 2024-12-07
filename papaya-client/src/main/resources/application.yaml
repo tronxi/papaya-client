@@ -15,5 +15,5 @@ papaya:
   tracker: https://tronxi.ddns.net/tracker
 logging:
   level:
-    root: INFO
+    root: WARN
 
