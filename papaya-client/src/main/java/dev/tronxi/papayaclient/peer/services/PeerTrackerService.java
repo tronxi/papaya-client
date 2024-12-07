@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 @Service
 public class PeerTrackerService {
 
-    Logger logger = Logger.getLogger(PeerTrackerService.class.getName());
+    private final Logger logger = Logger.getLogger(PeerTrackerService.class.getName());
 
     private final String trackerAddress;
     private Peer peer;
@@ -31,9 +31,7 @@ public class PeerTrackerService {
 
     public List<Peer> retrievePeers() {
         List<Peer> currentPeers = retrieveCurrentPeers();
-        return currentPeers.stream()
-                .filter(p -> !p.equals(peer))
-                .toList();
+        return currentPeers.stream().filter(p -> !p.equals(peer)).toList();
     }
 
     public List<Peer> retrieveNewPeers() {
@@ -50,13 +48,8 @@ public class PeerTrackerService {
 
     private List<Peer> retrieveCurrentPeers() {
         try {
-            List<Peer> response = new RestTemplate().exchange(
-                    trackerAddress + "/peer",
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<List<Peer>>() {
-                    }
-            ).getBody();
+            List<Peer> response = new RestTemplate().exchange(trackerAddress + "/peer", HttpMethod.GET, null, new ParameterizedTypeReference<List<Peer>>() {
+            }).getBody();
             logger.info("Peers: " + response);
             if (response != null) {
                 return response;
@@ -89,12 +82,7 @@ public class PeerTrackerService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
             HttpEntity<Peer> entity = new HttpEntity<>(peer, headers);
-            new RestTemplate().exchange(
-                    trackerAddress + "/peer",
-                    HttpMethod.POST,
-                    entity,
-                    Void.class
-            );
+            new RestTemplate().exchange(trackerAddress + "/peer", HttpMethod.POST, entity, Void.class);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to send peer", e);
         }
@@ -105,12 +93,7 @@ public class PeerTrackerService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
             HttpEntity<Peer> entity = new HttpEntity<>(peer, headers);
-            new RestTemplate().exchange(
-                    trackerAddress + "/peer",
-                    HttpMethod.DELETE,
-                    entity,
-                    Void.class
-            );
+            new RestTemplate().exchange(trackerAddress + "/peer", HttpMethod.DELETE, entity, Void.class);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to remove peer", e);
         }

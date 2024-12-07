@@ -38,9 +38,7 @@ public class DownloadService {
     public void startAllIncompleteDownloads() {
         logger.info("Start all incomplete downloads");
         papayaStatusFileService.findAllIncomplete().forEach(status -> {
-            status.getPartStatusFiles().forEach(partStatusFile -> {
-                partStatusFile.setPartPeerStatusFiles(Collections.emptySet());
-            });
+            status.getPartStatusFiles().forEach(partStatusFile -> partStatusFile.setPartPeerStatusFiles(Collections.emptySet()));
             fileManager.savePapayaStatusFile(status);
             fileManager.retrievePapayaFileFromFileId(status.getFileId()).ifPresent(this::download);
         });
@@ -52,15 +50,12 @@ public class DownloadService {
         fileManager.createStoreFromPapayaFile(papayaFile);
         List<Peer> peers = peerTrackerService.retrievePeers();
         logger.info("Peers retrieved: " + peers.size());
-        peers.forEach(peer -> {
-            askForResources(papayaFile, peer);
-        });
+        peers.forEach(peer -> askForResources(papayaFile, peer));
     }
 
     private void askForResources(PapayaFile papayaFile, Peer peer) {
         logger.info("Asking for resources: " + papayaFile.getFileName() + " for " + peer);
-        try (Socket socket = new Socket(peer.address(), peer.port());
-             OutputStream outputStream = socket.getOutputStream()) {
+        try (Socket socket = new Socket(peer.address(), peer.port()); OutputStream outputStream = socket.getOutputStream()) {
             ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
             dataStream.write(PeerMessageType.ASK_FOR_RESOURCES.getValue());
             dataStream.write(papayaFile.getFileId().getBytes());
@@ -77,14 +72,8 @@ public class DownloadService {
         logger.info("Ask for resources new peers...");
         List<Peer> newPeers = peerTrackerService.retrieveNewPeers();
         logger.info("new Peers: " + newPeers.size());
-        if(!newPeers.isEmpty()) {
-            papayaStatusFileService.findAllIncomplete().forEach(status -> {
-                fileManager.retrievePapayaFileFromFileId(status.getFileId()).ifPresent(papayaFile -> {
-                    newPeers.forEach(newPeer -> {
-                        askForResources(papayaFile, newPeer);
-                    });
-                });
-            });
+        if (!newPeers.isEmpty()) {
+            papayaStatusFileService.findAllIncomplete().forEach(status -> fileManager.retrievePapayaFileFromFileId(status.getFileId()).ifPresent(papayaFile -> newPeers.forEach(newPeer -> askForResources(papayaFile, newPeer))));
         }
     }
 }

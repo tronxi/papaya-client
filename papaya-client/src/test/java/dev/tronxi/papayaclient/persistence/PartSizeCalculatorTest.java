@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PartSizeCalculatorTest {
 
-    PartSizeCalculator partSizeCalculator = new PartSizeCalculator();
+    private final PartSizeCalculator partSizeCalculator = new PartSizeCalculator();
 
     @Test
     public void calculatePartSize_File_8KB() {

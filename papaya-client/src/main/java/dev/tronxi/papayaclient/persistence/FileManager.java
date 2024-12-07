@@ -178,14 +178,13 @@ public class FileManager {
         }
     }
 
-    public Optional<Path> generateStatus(File storeFile) {
+    public void generateStatus(File storeFile) {
         logger.info("Start generate status");
         List<Path> papayaFiles = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(storeFile.toPath(), "*.papaya")) {
             stream.forEach(papayaFiles::add);
             if (papayaFiles.size() != 1) {
                 logger.severe("Papaya file not found");
-                return Optional.empty();
             }
             Path papayaPath = papayaFiles.getFirst();
             ObjectMapper objectMapper = new ObjectMapper();
@@ -222,16 +221,12 @@ public class FileManager {
                         newPapayaStatusFileFunction.apply(papayaStatusFile);
                     }
                 }
-                Path papayaStatusFilePath = storeFile.toPath().resolve(papayaFile.getFileId() + ".papayastatus");
                 papayaStatusFileService.save(papayaStatusFile);
-                return Optional.of(papayaStatusFilePath);
             } catch (IOException e) {
                 logger.severe(e.getMessage());
-                return Optional.empty();
             }
         } catch (IOException e) {
             logger.severe(e.getMessage());
-            return Optional.empty();
         }
     }
 
@@ -367,7 +362,7 @@ public class FileManager {
 
     private void deleteDirectory(Path path) throws IOException {
         try (Stream<Path> paths = Files.walk(path)) {
-            paths.sorted((path1, path2) -> path2.compareTo(path1))
+            paths.sorted(Comparator.reverseOrder())
                     .forEach(p -> {
                         try {
                             Files.deleteIfExists(p);

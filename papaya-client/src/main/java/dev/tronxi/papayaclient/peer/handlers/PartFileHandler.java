@@ -58,37 +58,30 @@ public class PartFileHandler extends Handler {
             Optional<PapayaStatusFile> maybePapayaStatusFile = fileManager.retrievePapayaStatusFileFromFile(fileId.toString());
             if (maybePapayaStatusFile.isPresent()) {
                 PapayaStatusFile statusFile = maybePapayaStatusFile.get();
-                statusFile.getPartStatusFiles().stream()
-                        .filter(partStatusFile -> partStatusFile.getFileName().equals(partFileName.toString()))
-                        .findFirst()
-                        .ifPresent(partStatusFile -> {
-                            String hash = hashGenerator.generateHash(outputStreamWithoutHeaders.toByteArray());
-                            if (hash.equals(partStatusFile.getFileHash())) {
-                                fileManager.writePart(fileId.toString(), partFileName.toString(), outputStreamWithoutHeaders);
-                                partStatusFile.setStatus(PapayaStatus.COMPLETE);
-                                fileManager.savePartStatusFile(statusFile, partStatusFile);
-                                if (statusFile.getStatus() == PapayaStatus.COMPLETE) {
-                                    if (!filesJoined.containsKey(statusFile.getFileId())) {
-                                        filesJoined.put(statusFile.getFileId(), PapayaStatus.JOINED);
-                                        Optional<Path> maybePath = fileManager.joinStore(statusFile);
-                                        maybePath.ifPresentOrElse((path -> logger.info("File downloaded: " + path)),
-                                                () -> {
-                                                    logger.severe("Error ");
-                                                });
-                                    }
-                                }
-                            } else {
-                                logger.severe("Invalid hash");
+                statusFile.getPartStatusFiles().stream().filter(partStatusFile -> partStatusFile.getFileName().equals(partFileName.toString())).findFirst().ifPresent(partStatusFile -> {
+                    String hash = hashGenerator.generateHash(outputStreamWithoutHeaders.toByteArray());
+                    if (hash.equals(partStatusFile.getFileHash())) {
+                        fileManager.writePart(fileId.toString(), partFileName.toString(), outputStreamWithoutHeaders);
+                        partStatusFile.setStatus(PapayaStatus.COMPLETE);
+                        fileManager.savePartStatusFile(statusFile, partStatusFile);
+                        if (statusFile.getStatus() == PapayaStatus.COMPLETE) {
+                            if (!filesJoined.containsKey(statusFile.getFileId())) {
+                                filesJoined.put(statusFile.getFileId(), PapayaStatus.JOINED);
+                                Optional<Path> maybePath = fileManager.joinStore(statusFile);
+                                maybePath.ifPresentOrElse((path -> logger.info("File downloaded: " + path)), () -> logger.severe("Error "));
                             }
-                        });
+                        }
+                    } else {
+                        logger.severe("Invalid hash");
+                    }
+                });
                 if (statusFile.getStatus() != PapayaStatus.COMPLETE && !filesJoined.containsKey(statusFile.getFileId())) {
                     askForPartFileSender.send(statusFile);
                 }
             } else {
                 logger.severe("Could not find PapayaStatusFile for " + fileId);
             }
-            message = "From: " + clientSocket.getInetAddress() +
-                    " FileId: " + fileId + " : Part: " + partFileName + " Content: " + outputStreamWithoutHeaders.size();
+            message = "From: " + clientSocket.getInetAddress() + " FileId: " + fileId + " : Part: " + partFileName + " Content: " + outputStreamWithoutHeaders.size();
             return message;
         } catch (IOException e) {
             logger.severe(e.getMessage());

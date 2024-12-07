@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 @Service
 public class AskForPartFileSender {
 
-    Logger logger = Logger.getLogger(AskForPartFileSender.class.getName());
+    private final Logger logger = Logger.getLogger(AskForPartFileSender.class.getName());
 
     @Value("${papaya.port}")
     protected int port;
@@ -33,9 +33,7 @@ public class AskForPartFileSender {
                     logger.info("Asking process for: " + status.getFileName() + " with status: " + status.getStatus() + " id: " + status.getId());
 
                     Set<PartPeerStatusFile> partPeerStatusFiles = status.getPartPeerStatusFiles();
-                    partPeerStatusFiles.forEach(partPeerStatusFile -> {
-                        peerAskedFiles.putIfAbsent(partPeerStatusFile.getPeer(), 0L);
-                    });
+                    partPeerStatusFiles.forEach(partPeerStatusFile -> peerAskedFiles.putIfAbsent(partPeerStatusFile.getPeer(), 0L));
 
                     logger.info("PeerAskedFiles before: " + peerAskedFiles);
 
@@ -52,9 +50,7 @@ public class AskForPartFileSender {
                             });
                 }, () -> {
                     logger.info("Removing part status");
-                    papayaStatusFile.getPartStatusFiles().forEach(status -> {
-                        partStatus.remove(status.getId());
-                    });
+                    papayaStatusFile.getPartStatusFiles().forEach(status -> partStatus.remove(status.getId()));
                     if (papayaStatusFile.getStatus() != PapayaStatus.COMPLETE) {
                         logger.info("Retry send");
                         send(papayaStatusFile);

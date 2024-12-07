@@ -59,9 +59,7 @@ public class PapayaProgress {
                 -fx-border-radius: 3;
                 -fx-cursor: hand;
                 """);
-        removeFolderButton.setOnMouseClicked(mouseEvent -> {
-            showConfirmationDialog(fileManager, papayaStatusFile);
-        });
+        removeFolderButton.setOnMouseClicked(mouseEvent -> showConfirmationDialog(fileManager, papayaStatusFile));
         return removeFolderButton;
     }
 

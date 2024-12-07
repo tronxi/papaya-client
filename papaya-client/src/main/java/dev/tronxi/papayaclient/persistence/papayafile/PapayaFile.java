@@ -11,7 +11,7 @@ public class PapayaFile {
 
     public PapayaFile(String fileName) {
         this.fileName = fileName;
-        this.fileId = UUID.randomUUID().toString().replace("-", "").substring(0, 32);;
+        this.fileId = UUID.randomUUID().toString().replace("-", "").substring(0, 32);
         partFiles = new ArrayList<>();
     }
 

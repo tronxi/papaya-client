@@ -61,17 +61,15 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                             if (outputStream.size() > 0) {
                                 byte[] receivedData = outputStream.toByteArray();
                                 CompletableFuture<String> message = handlerService.handle(clientSocket, receivedData);
-                                message.thenAcceptAsync(string -> {
-                                    Platform.runLater(() -> {
-                                        textArea.appendText("\n" + string);
-                                        String[] lines = textArea.getText().split("\n");
-                                        if (lines.length > 100) {
-                                            String newText = String.join("\n", Arrays.copyOfRange(lines, lines.length - 100, lines.length));
-                                            textArea.appendText(newText);
-                                            textArea.appendText("");
-                                        }
-                                    });
-                                });
+                                message.thenAcceptAsync(string -> Platform.runLater(() -> {
+                                    textArea.appendText("\n" + string);
+                                    String[] lines = textArea.getText().split("\n");
+                                    if (lines.length > 100) {
+                                        String newText = String.join("\n", Arrays.copyOfRange(lines, lines.length - 100, lines.length));
+                                        textArea.appendText(newText);
+                                        textArea.appendText("");
+                                    }
+                                }));
                             } else {
                                 logger.info("Received empty message");
                             }

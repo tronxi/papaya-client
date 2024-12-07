@@ -4,5 +4,5 @@ public enum PartPeerStatus {
     NO_ASKED,
     ASKED,
     TIMEOUT,
-    DOWNLOADED;
+    DOWNLOADED
 }

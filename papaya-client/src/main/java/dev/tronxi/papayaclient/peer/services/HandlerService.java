@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 @Service
 public class HandlerService {
-    Logger logger = Logger.getLogger(HandlerService.class.getName());
+    private final Logger logger = Logger.getLogger(HandlerService.class.getName());
 
     private final AskForResourcesHandler askForResourcesHandler;
     private final ResponseAskForResourcesHandler responseAskForResourcesHandler;

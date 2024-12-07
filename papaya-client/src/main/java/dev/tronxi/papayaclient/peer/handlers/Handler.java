@@ -11,8 +11,7 @@ public abstract class Handler {
     @Value("${papaya.port}")
     protected int port;
 
-
-    protected Path storePath;
+    protected final Path storePath;
 
     protected final FileManager fileManager;
 

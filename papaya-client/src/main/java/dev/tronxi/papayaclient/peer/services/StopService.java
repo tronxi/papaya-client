@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 @Service
 public class StopService {
 
-    Logger logger = Logger.getLogger(StopService.class.getName());
+    private final Logger logger = Logger.getLogger(StopService.class.getName());
 
     @Value("${papaya.port}")
     private int port;
