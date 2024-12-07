@@ -2,13 +2,13 @@ spring:
   application:
     name: papaya-client
   datasource:
-    url: jdbc:mysql://localhost:3306/papaya?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: papaya
-    password: papayapass
+    url: jdbc:derby:db;create=true
+    driver-class-name: org.apache.derby.jdbc.EmbeddedDriver
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate.jdbc.lob.non_contextual_creation: true
 papaya:
   port: 3390
   workspace: /home/tronxi/papaya

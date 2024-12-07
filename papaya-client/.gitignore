@@ -34,3 +34,5 @@ build/
 
 papaya.db
 docker/mysql
+db
+derby.log
