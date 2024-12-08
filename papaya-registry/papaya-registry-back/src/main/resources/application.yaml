@@ -1,11 +1,8 @@
 spring:
   application:
     name: papaya-registry-back
-  datasource:
-    url: jdbc:mysql://localhost:3306/papayaregistry?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: papayaregistry
-    password: papayaregistrypass
-  jpa:
-    hibernate:
-      ddl-auto: update
+registry:
+  solr:
+    host: http://localhost:8983/solr/
+    core: papayaregistry
+

@@ -1,14 +1,4 @@
 services:
-#  papaya-registry-mysql:
-#    container_name: papaya-registry-mysql
-#    image: mysql:8.4.3-oraclelinux9
-#    env_file: .env
-#    ports:
-#      - "3306:3306"
-#    volumes:
-#      - ./mysql:/var/lib/mysql
-#    networks:
-#      - papaya-registry-net
   solr:
     image: solr:9.7.0
     ports:
@@ -17,7 +7,7 @@ services:
       - ./solr:/var/solr
     command:
       - solr-precreate
-      - gettingstarted
+      - papayaregistry
     networks:
       - papaya-registry-net
 networks:
