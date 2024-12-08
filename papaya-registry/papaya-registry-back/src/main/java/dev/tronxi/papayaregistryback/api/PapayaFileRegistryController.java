@@ -1,13 +1,9 @@
 package dev.tronxi.papayaregistryback.api;
 
-import dev.tronxi.papayaregistryback.models.PapayaFileRegistry;
 import dev.tronxi.papayaregistryback.usecases.AddPapayaFileToRegistryUseCase;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.nio.file.Path;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("registry")
@@ -19,15 +15,9 @@ public class PapayaFileRegistryController {
         this.addPapayaFileToRegistryUseCase = addPapayaFileToRegistryUseCase;
     }
 
-    @GetMapping
-    ResponseEntity<Void> getAllPeers() {
-        PapayaFileRegistry papayaFileRegistry = new PapayaFileRegistry();
-        papayaFileRegistry.setFileId("aa");
-        papayaFileRegistry.setFileName("name");
-        papayaFileRegistry.setPath(Path.of("registry/files/aa"));
-        papayaFileRegistry.setDescription("description");
-        papayaFileRegistry.setDownloads(0L);
-        addPapayaFileToRegistryUseCase.add(papayaFileRegistry);
+    @PostMapping
+    ResponseEntity<Void> savePapayaFile(@RequestParam MultipartFile papayaFile, @RequestParam String description) {
+        addPapayaFileToRegistryUseCase.add(papayaFile, description);
         return ResponseEntity.ok().build();
     }
 }
