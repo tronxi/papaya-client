@@ -12,6 +12,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Optional;
 
 @Component
@@ -33,7 +34,7 @@ public class PapayaFileRegistryRepositorySolr implements PapayaFileRegistryRepos
         if (findByFileId(papayaFileRegistry.getFileId()).isPresent()) return;
 
         boolean saved = fileSystemRegistryManager.savePapayaFile(papayaFileRegistry);
-        if(!saved) return;
+        if (!saved) return;
 
         SolrInputDocument solrInputDocument = papayaFileRegistryMapper.toSolrInputDocument(papayaFileRegistry);
         try {
@@ -42,9 +43,7 @@ public class PapayaFileRegistryRepositorySolr implements PapayaFileRegistryRepos
         } catch (SolrServerException | IOException e) {
             throw new RuntimeException(e);
         }
-
     }
-
 
     public Optional<PapayaFileRegistry> findByFileId(String fileId) {
         try {
@@ -52,15 +51,15 @@ public class PapayaFileRegistryRepositorySolr implements PapayaFileRegistryRepos
             query.setQuery("fileId:" + fileId);
             query.setRows(1);
             QueryResponse response = solrClient.query(query);
-
-            PapayaFileRegistry result = response.getBeans(PapayaFileRegistry.class)
-                    .stream()
-                    .findFirst()
-                    .orElse(null);
-
-            return Optional.ofNullable(result);
+            return papayaFileRegistryMapper.fromSolrDocumentList(response.getResults());
         } catch (Exception e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<Path> findPathByFileId(String fileId) {
+        Optional<PapayaFileRegistry> maybePapayaFileRegistry = findByFileId(fileId);
+        return maybePapayaFileRegistry.map(fileSystemRegistryManager::getAbolutePath);
     }
 }

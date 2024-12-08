@@ -2,15 +2,25 @@ package dev.tronxi.papayaregistryback.models;
 
 
 import dev.tronxi.papayaregistryback.models.papayafile.PapayaFile;
+import org.apache.solr.client.solrj.beans.Field;
 
 import java.nio.file.Path;
 
 public class PapayaFileRegistry {
 
+    @Field("fileId")
     private String fileId;
+
+    @Field("fileName")
     private String fileName;
+
+    @Field("path")
     private Path path;
+
+    @Field("description")
     private String description;
+
+    @Field("downloads")
     private Long downloads;
     private PapayaFile papayaFile;
 
@@ -73,5 +83,17 @@ public class PapayaFileRegistry {
 
     public void setPapayaFile(PapayaFile papayaFile) {
         this.papayaFile = papayaFile;
+    }
+
+    @Override
+    public String toString() {
+        return "PapayaFileRegistry{" +
+                "fileId='" + fileId + '\'' +
+                ", fileName='" + fileName + '\'' +
+                ", path=" + path +
+                ", description='" + description + '\'' +
+                ", downloads=" + downloads +
+                ", papayaFile=" + papayaFile +
+                '}';
     }
 }
