@@ -4,6 +4,7 @@ import dev.tronxi.papayaregistryback.models.PapayaFileRegistry;
 import dev.tronxi.papayaregistryback.usecases.AddPapayaFileToRegistryUseCase;
 import dev.tronxi.papayaregistryback.usecases.DownloadPapayaFilePathUseCase;
 import dev.tronxi.papayaregistryback.usecases.RetrieveTopDownloadsUseCase;
+import dev.tronxi.papayaregistryback.usecases.RetrieveWithQueryUseCase;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +23,13 @@ public class PapayaFileRegistryController {
     private final AddPapayaFileToRegistryUseCase addPapayaFileToRegistryUseCase;
     private final DownloadPapayaFilePathUseCase downloadPapayaFilePathUseCase;
     private final RetrieveTopDownloadsUseCase retrieveTopDownloadsUseCase;
+    private final RetrieveWithQueryUseCase retrieveWithQueryUseCase;
 
-    public PapayaFileRegistryController(AddPapayaFileToRegistryUseCase addPapayaFileToRegistryUseCase, DownloadPapayaFilePathUseCase downloadPapayaFilePathUseCase, RetrieveTopDownloadsUseCase retrieveTopDownloadsUseCase) {
+    public PapayaFileRegistryController(AddPapayaFileToRegistryUseCase addPapayaFileToRegistryUseCase, DownloadPapayaFilePathUseCase downloadPapayaFilePathUseCase, RetrieveTopDownloadsUseCase retrieveTopDownloadsUseCase, RetrieveWithQueryUseCase retrieveWithQueryUseCase) {
         this.addPapayaFileToRegistryUseCase = addPapayaFileToRegistryUseCase;
         this.downloadPapayaFilePathUseCase = downloadPapayaFilePathUseCase;
         this.retrieveTopDownloadsUseCase = retrieveTopDownloadsUseCase;
+        this.retrieveWithQueryUseCase = retrieveWithQueryUseCase;
     }
 
     @PostMapping
@@ -67,5 +70,10 @@ public class PapayaFileRegistryController {
     @GetMapping("topdownloads")
     public ResponseEntity<List<PapayaFileRegistry>> topDownloads(@RequestParam int pageNumber, @RequestParam int pageSize) {
         return ResponseEntity.ok(retrieveTopDownloadsUseCase.retrieve(pageNumber, pageSize));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PapayaFileRegistry>> query(@RequestParam String query) {
+        return ResponseEntity.ok(retrieveWithQueryUseCase.retrieveWithQuery(query));
     }
 }

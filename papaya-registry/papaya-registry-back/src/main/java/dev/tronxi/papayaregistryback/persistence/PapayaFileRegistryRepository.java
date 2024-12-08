@@ -9,7 +9,12 @@ import java.util.Optional;
 public interface PapayaFileRegistryRepository {
 
     void save(PapayaFileRegistry papayaFileRegistry);
+
     Optional<PapayaFileRegistry> findByFileId(String fileId);
+
     Optional<Path> findPathByFileIdForDownload(String fileId);
+
     List<PapayaFileRegistry> retrieveTopDownloads(int pageNumber, int pageSize);
+
+    List<PapayaFileRegistry> retrieveWithQuery(String query);
 }

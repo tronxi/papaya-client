@@ -100,4 +100,18 @@ public class PapayaFileRegistryRepositorySolr implements PapayaFileRegistryRepos
             return List.of();
         }
     }
+
+    @Override
+    public List<PapayaFileRegistry> retrieveWithQuery(String query) {
+        try {
+            SolrQuery solrQuery = new SolrQuery();
+            solrQuery.setQuery(String.format("fileId:*%s* OR description:*%s* OR fileName:*%s*", query, query, query));
+            solrQuery.setSort("downloads", SolrQuery.ORDER.desc);
+            solrQuery.setRows(20);
+            QueryResponse response = solrClient.query(solrQuery);
+            return papayaFileRegistryMapper.listFromSolrDocumentList(response.getResults());
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
 }
