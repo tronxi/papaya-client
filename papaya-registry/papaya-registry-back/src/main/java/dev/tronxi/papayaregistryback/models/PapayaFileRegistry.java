@@ -1,12 +1,17 @@
 package dev.tronxi.papayaregistryback.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import dev.tronxi.papayaregistryback.models.papayafile.PapayaFile;
 import org.apache.solr.client.solrj.beans.Field;
 
-import java.nio.file.Path;
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PapayaFileRegistry {
+
+    @Field("id")
+    @JsonIgnore
+    private String id;
 
     @Field("fileId")
     private String fileId;
@@ -15,7 +20,7 @@ public class PapayaFileRegistry {
     private String fileName;
 
     @Field("path")
-    private Path path;
+    private String path;
 
     @Field("description")
     private String description;
@@ -24,16 +29,12 @@ public class PapayaFileRegistry {
     private Long downloads;
     private PapayaFile papayaFile;
 
-    public PapayaFileRegistry(String fileId, String fileName, Path path, String description, Long downloads, PapayaFile papayaFile) {
-        this.fileId = fileId;
-        this.fileName = fileName;
-        this.path = path;
-        this.description = description;
-        this.downloads = downloads;
-        this.papayaFile = papayaFile;
+    public String getId() {
+        return id;
     }
 
-    public PapayaFileRegistry() {
+    public void setId(String id) {
+        this.id = id;
     }
 
 
@@ -53,11 +54,11 @@ public class PapayaFileRegistry {
         this.fileName = fileName;
     }
 
-    public Path getPath() {
+    public String getPath() {
         return path;
     }
 
-    public void setPath(Path path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
@@ -96,4 +97,5 @@ public class PapayaFileRegistry {
                 ", papayaFile=" + papayaFile +
                 '}';
     }
+
 }

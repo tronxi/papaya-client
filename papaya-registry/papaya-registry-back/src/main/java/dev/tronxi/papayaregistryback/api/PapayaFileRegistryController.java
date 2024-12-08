@@ -1,7 +1,9 @@
 package dev.tronxi.papayaregistryback.api;
 
+import dev.tronxi.papayaregistryback.models.PapayaFileRegistry;
 import dev.tronxi.papayaregistryback.usecases.AddPapayaFileToRegistryUseCase;
-import dev.tronxi.papayaregistryback.usecases.RetrievePapayaFilePathUseCase;
+import dev.tronxi.papayaregistryback.usecases.DownloadPapayaFilePathUseCase;
+import dev.tronxi.papayaregistryback.usecases.RetrieveTopDownloadsUseCase;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -17,11 +20,13 @@ import java.util.Optional;
 public class PapayaFileRegistryController {
 
     private final AddPapayaFileToRegistryUseCase addPapayaFileToRegistryUseCase;
-    private final RetrievePapayaFilePathUseCase retrievePapayaFilePathUseCase;
+    private final DownloadPapayaFilePathUseCase downloadPapayaFilePathUseCase;
+    private final RetrieveTopDownloadsUseCase retrieveTopDownloadsUseCase;
 
-    public PapayaFileRegistryController(AddPapayaFileToRegistryUseCase addPapayaFileToRegistryUseCase, RetrievePapayaFilePathUseCase retrievePapayaFilePathUseCase) {
+    public PapayaFileRegistryController(AddPapayaFileToRegistryUseCase addPapayaFileToRegistryUseCase, DownloadPapayaFilePathUseCase downloadPapayaFilePathUseCase, RetrieveTopDownloadsUseCase retrieveTopDownloadsUseCase) {
         this.addPapayaFileToRegistryUseCase = addPapayaFileToRegistryUseCase;
-        this.retrievePapayaFilePathUseCase = retrievePapayaFilePathUseCase;
+        this.downloadPapayaFilePathUseCase = downloadPapayaFilePathUseCase;
+        this.retrieveTopDownloadsUseCase = retrieveTopDownloadsUseCase;
     }
 
     @PostMapping
@@ -33,7 +38,7 @@ public class PapayaFileRegistryController {
 
     @GetMapping("{fileId}/download")
     public ResponseEntity<StreamingResponseBody> downloadFileStream(@PathVariable String fileId) {
-        Optional<Path> maybeFilePath = retrievePapayaFilePathUseCase.retrieve(fileId);
+        Optional<Path> maybeFilePath = downloadPapayaFilePathUseCase.retrieve(fileId);
 
         if (maybeFilePath.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -57,5 +62,10 @@ public class PapayaFileRegistryController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.getFileName() + "\"")
                 .body(stream);
+    }
+
+    @GetMapping("topdownloads")
+    public ResponseEntity<List<PapayaFileRegistry>> topDownloads(@RequestParam int pageNumber, @RequestParam int pageSize) {
+        return ResponseEntity.ok(retrieveTopDownloadsUseCase.retrieve(pageNumber, pageSize));
     }
 }

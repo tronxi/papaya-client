@@ -28,7 +28,7 @@ public class AddPapayaFileToRegistryUseCase {
             PapayaFileRegistry papayaFileRegistry = new PapayaFileRegistry();
             papayaFileRegistry.setFileId(papayaFile.getFileId());
             papayaFileRegistry.setFileName(papayaFile.getFileName());
-            papayaFileRegistry.setPath(Path.of(papayaFile.getFileId() + ".papaya"));
+            papayaFileRegistry.setPath(papayaFile.getFileId() + ".papaya");
             papayaFileRegistry.setDownloads(0L);
             papayaFileRegistry.setDescription(description);
             papayaFileRegistry.setPapayaFile(papayaFile);

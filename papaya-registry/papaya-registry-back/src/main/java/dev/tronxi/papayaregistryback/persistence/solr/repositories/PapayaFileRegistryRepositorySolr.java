@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -58,8 +61,43 @@ public class PapayaFileRegistryRepositorySolr implements PapayaFileRegistryRepos
     }
 
     @Override
-    public Optional<Path> findPathByFileId(String fileId) {
+    public Optional<Path> findPathByFileIdForDownload(String fileId) {
         Optional<PapayaFileRegistry> maybePapayaFileRegistry = findByFileId(fileId);
-        return maybePapayaFileRegistry.map(fileSystemRegistryManager::getAbolutePath);
+        if (maybePapayaFileRegistry.isPresent()) {
+            PapayaFileRegistry papayaFileRegistry = maybePapayaFileRegistry.get();
+            updateDownloads(papayaFileRegistry);
+            return Optional.of(fileSystemRegistryManager.getAbsolutePath(papayaFileRegistry));
+        }
+        return Optional.empty();
+    }
+
+    private void updateDownloads(PapayaFileRegistry papayaFileRegistry) {
+        try {
+            SolrInputDocument document = new SolrInputDocument();
+            document.addField("id", papayaFileRegistry.getId());
+            Map<String, Object> fieldModifier = new HashMap<>();
+            fieldModifier.put("set", papayaFileRegistry.getDownloads() + 1);
+            document.addField("downloads", fieldModifier);
+            solrClient.add(document);
+            solrClient.commit();
+        } catch (SolrServerException | IOException ignored) {
+        }
+    }
+
+    @Override
+    public List<PapayaFileRegistry> retrieveTopDownloads(int pageNumber, int pageSize) {
+        try {
+            SolrQuery query = new SolrQuery();
+            query.setQuery("*:*");
+            query.setSort("downloads", SolrQuery.ORDER.desc);
+            query.setRows(1);
+            int start = (pageNumber - 1) * pageSize;
+            query.setStart(start);
+            query.setRows(pageSize);
+            QueryResponse response = solrClient.query(query);
+            return papayaFileRegistryMapper.listFromSolrDocumentList(response.getResults());
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 }

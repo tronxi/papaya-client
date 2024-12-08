@@ -7,15 +7,15 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Service
-public class RetrievePapayaFilePathUseCase {
+public class DownloadPapayaFilePathUseCase {
 
     private final PapayaFileRegistryRepository papayaFileRegistryRepository;
 
-    public RetrievePapayaFilePathUseCase(PapayaFileRegistryRepository papayaFileRegistryRepository) {
+    public DownloadPapayaFilePathUseCase(PapayaFileRegistryRepository papayaFileRegistryRepository) {
         this.papayaFileRegistryRepository = papayaFileRegistryRepository;
     }
 
     public Optional<Path> retrieve(String fileId) {
-        return papayaFileRegistryRepository.findPathByFileId(fileId);
+        return papayaFileRegistryRepository.findPathByFileIdForDownload(fileId);
     }
 }

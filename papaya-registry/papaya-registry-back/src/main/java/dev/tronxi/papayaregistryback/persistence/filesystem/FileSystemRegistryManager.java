@@ -28,7 +28,7 @@ public class FileSystemRegistryManager {
         return true;
     }
 
-    public Path getAbolutePath(PapayaFileRegistry papayaFileRegistry) {
+    public Path getAbsolutePath(PapayaFileRegistry papayaFileRegistry) {
         return registryPath.resolve(papayaFileRegistry.getPath());
     }
 }
