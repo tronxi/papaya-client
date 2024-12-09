@@ -18,12 +18,15 @@
 .search {
   padding: 10px;
   width: 60%;
+  display: flex;
 }
 
 .input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
+  margin-right: 10px;
 }
 
 .icon {

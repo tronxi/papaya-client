@@ -24,4 +24,12 @@ export class PapayaRegistryService {
     const url = `${environment.url}/registry/${fileId}/download`;
     window.open(url, '_blank');
   }
+
+  uploadFile(file: File, description: string) {
+    const formData = new FormData();
+    formData.append('papayaFile', file);
+    formData.append('description', description);
+
+    return this.httpClient.post(environment.url + "/registry", formData);
+  }
 }

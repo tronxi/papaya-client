@@ -10,6 +10,7 @@ import {
 } from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
 import {PapayaRegistryService} from '../../../services/papaya-registry.service';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-registry-card',
@@ -21,7 +22,8 @@ import {PapayaRegistryService} from '../../../services/papaya-registry.service';
     MatCardHeader,
     MatCardContent,
     MatCardActions,
-    MatButton
+    MatButton,
+    MatIcon
   ],
   templateUrl: './registry-card.component.html',
   styleUrl: './registry-card.component.css'

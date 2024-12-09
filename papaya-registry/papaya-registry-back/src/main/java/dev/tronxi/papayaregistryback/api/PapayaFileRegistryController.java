@@ -18,6 +18,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("registry")
+@CrossOrigin(origins = "*")
 public class PapayaFileRegistryController {
 
     private final AddPapayaFileToRegistryUseCase addPapayaFileToRegistryUseCase;
