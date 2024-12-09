@@ -17,7 +17,7 @@ public class FileSystemRegistryManager {
 
     public boolean savePapayaFile(PapayaFileRegistry papayaFileRegistry) {
         Path filePath = registryPath.resolve(papayaFileRegistry.getPath());
-        if(filePath.toFile().exists()) return false;
+        if (filePath.toFile().exists()) return false;
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
