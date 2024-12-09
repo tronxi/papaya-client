@@ -6,6 +6,7 @@ import {SearchStateService} from '../../../state/search-state.service';
 import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {UploadFileModalComponent} from '../upload-file-modal/upload-file-modal.component';
+import {SearchStateEvent} from '../../../state/searchStateEvent';
 
 @Component({
   selector: 'app-search-bar',
@@ -35,17 +36,17 @@ export class SearchBarComponent {
 
   onSearch(query: string): void {
     if (query.length >= 3) {
-      this.papayaRegistryService.retrieveWithQuery(query).subscribe(response => {
-        this.searchStateService.update(response);
+      this.papayaRegistryService.retrieveWithQuery(query, 1).subscribe(response => {
+        this.searchStateService.update(SearchStateEvent.fromQuery(response, query));
       });
     } else if (query.length === 0) {
-      this.papayaRegistryService.retrieveTopDownloads().subscribe(response => {
-        this.searchStateService.update(response);
+      this.papayaRegistryService.retrieveTopDownloads(1).subscribe(response => {
+        this.searchStateService.update(SearchStateEvent.fromDownload(response));
       })
     }
   }
 
   uploadFile() {
-    const dialogRef = this.dialog.open(UploadFileModalComponent, {});
+    this.dialog.open(UploadFileModalComponent, {});
   }
 }

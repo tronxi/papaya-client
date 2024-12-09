@@ -13,18 +13,19 @@
 }
 
 .file-card mat-card-title {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
 }
 
 .file-card mat-card-subtitle {
+  font-size: 14px;
   color: gray;
 }
 
 .file-card mat-card-content p {
   margin: 8px 0;
-  color: #555;
-  font-size: 14px;
+  color: rgba(143, 143, 143, 0.96);
+  font-size: 12px;
 }
 
 .file-card mat-card-actions {
@@ -41,8 +42,6 @@
 .file-card mat-card-subtitle,
 .file-card mat-card-content p,
 .file-card mat-card-footer {
-  color: #555;
-  font-size: 14px;
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;

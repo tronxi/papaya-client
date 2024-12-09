@@ -2,3 +2,21 @@
   width: 100%;
   height: 100%;
 }
+
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.current-page {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 8px;
+}
+
+button {
+  color: rgb(38, 91, 181);
+}
+

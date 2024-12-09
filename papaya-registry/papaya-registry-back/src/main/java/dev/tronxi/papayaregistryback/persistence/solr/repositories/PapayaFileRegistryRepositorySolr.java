@@ -1,5 +1,6 @@
 package dev.tronxi.papayaregistryback.persistence.solr.repositories;
 
+import dev.tronxi.papayaregistryback.models.PaginatedQuery;
 import dev.tronxi.papayaregistryback.models.PapayaFileRegistry;
 import dev.tronxi.papayaregistryback.persistence.PapayaFileRegistryRepository;
 import dev.tronxi.papayaregistryback.persistence.filesystem.FileSystemRegistryManager;
@@ -85,35 +86,43 @@ public class PapayaFileRegistryRepositorySolr implements PapayaFileRegistryRepos
     }
 
     @Override
-    public List<PapayaFileRegistry> retrieveTopDownloads(int pageNumber, int pageSize) {
+    public PaginatedQuery retrieveTopDownloads(int pageNumber, int pageSize) {
         try {
             SolrQuery query = new SolrQuery();
             query.setQuery("*:*");
             query.setSort("downloads", SolrQuery.ORDER.desc);
-            query.setRows(1);
             int start = (pageNumber - 1) * pageSize;
             query.setStart(start);
             query.setRows(pageSize);
             QueryResponse response = solrClient.query(query);
-            return papayaFileRegistryMapper.listFromSolrDocumentList(response.getResults());
+            return getPaginatedQuery(pageNumber, pageSize, response);
         } catch (Exception e) {
-            return List.of();
+            return new PaginatedQuery(pageNumber, 1, pageSize, 0, List.of());
         }
     }
 
     @Override
-    public List<PapayaFileRegistry> retrieveWithQuery(String query) {
+    public PaginatedQuery retrieveWithQuery(String query, int pageNumber, int pageSize) {
         try {
             SolrQuery solrQuery = new SolrQuery();
             solrQuery.setQuery(String.format("fileId:*%s* OR description:*%s* OR fileName:*%s*", query, query, query));
             solrQuery.set("defType", "edismax");
             solrQuery.set("qf", "fileId^3 description^3 fileName^3");
             solrQuery.setSort("downloads", SolrQuery.ORDER.desc);
-            solrQuery.setRows(20);
+            int start = (pageNumber - 1) * pageSize;
+            solrQuery.setStart(start);
+            solrQuery.setRows(pageSize);
             QueryResponse response = solrClient.query(solrQuery);
-            return papayaFileRegistryMapper.listFromSolrDocumentList(response.getResults());
+            return getPaginatedQuery(pageNumber, pageSize, response);
         } catch (Exception e) {
-            return List.of();
+            return new PaginatedQuery(pageNumber, 1, pageSize, 0, List.of());
         }
+    }
+
+    private PaginatedQuery getPaginatedQuery(int pageNumber, int pageSize, QueryResponse response) {
+        List<PapayaFileRegistry> files = papayaFileRegistryMapper.listFromSolrDocumentList(response.getResults());
+        long totalItems = response.getResults().getNumFound();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+        return new PaginatedQuery(pageNumber, totalPages, pageSize, totalItems, files);
     }
 }

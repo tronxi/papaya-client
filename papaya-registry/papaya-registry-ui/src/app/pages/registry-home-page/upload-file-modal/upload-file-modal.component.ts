@@ -5,6 +5,7 @@ import {MatIcon} from '@angular/material/icon';
 import {FormsModule} from '@angular/forms';
 import {PapayaRegistryService} from '../../../services/papaya-registry.service';
 import {SearchStateService} from '../../../state/search-state.service';
+import {SearchStateEvent} from '../../../state/searchStateEvent';
 
 @Component({
   selector: 'app-upload-file-modal',
@@ -33,8 +34,8 @@ export class UploadFileModalComponent {
   upload() {
     this.papayaRegistryService.uploadFile(this.selectedFile, this.description).subscribe({
       next: _ => {
-        this.papayaRegistryService.retrieveTopDownloads().subscribe(response => {
-          this.searchStateService.update(response);
+        this.papayaRegistryService.retrieveTopDownloads(1).subscribe(response => {
+          this.searchStateService.update(SearchStateEvent.fromDownload(response));
         });
         this.dialogRef.close();
       },

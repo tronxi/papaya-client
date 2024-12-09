@@ -1,10 +1,9 @@
 package dev.tronxi.papayaregistryback.usecases;
 
-import dev.tronxi.papayaregistryback.models.PapayaFileRegistry;
+import dev.tronxi.papayaregistryback.models.PaginatedQuery;
 import dev.tronxi.papayaregistryback.persistence.PapayaFileRegistryRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class RetrieveTopDownloadsUseCase {
@@ -15,7 +14,7 @@ public class RetrieveTopDownloadsUseCase {
         this.papayaFileRegistryRepository = papayaFileRegistryRepository;
     }
 
-    public List<PapayaFileRegistry> retrieve(int pageNumber, int pageSize) {
+    public PaginatedQuery retrieve(int pageNumber, int pageSize) {
         return papayaFileRegistryRepository.retrieveTopDownloads(pageNumber, pageSize);
     }
 }

@@ -1,6 +1,6 @@
 package dev.tronxi.papayaregistryback.api;
 
-import dev.tronxi.papayaregistryback.models.PapayaFileRegistry;
+import dev.tronxi.papayaregistryback.models.PaginatedQuery;
 import dev.tronxi.papayaregistryback.usecases.AddPapayaFileToRegistryUseCase;
 import dev.tronxi.papayaregistryback.usecases.DownloadPapayaFilePathUseCase;
 import dev.tronxi.papayaregistryback.usecases.RetrieveTopDownloadsUseCase;
@@ -13,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -69,12 +68,12 @@ public class PapayaFileRegistryController {
     }
 
     @GetMapping("topdownloads")
-    public ResponseEntity<List<PapayaFileRegistry>> topDownloads(@RequestParam int pageNumber, @RequestParam int pageSize) {
+    public ResponseEntity<PaginatedQuery> topDownloads(@RequestParam int pageNumber, @RequestParam int pageSize) {
         return ResponseEntity.ok(retrieveTopDownloadsUseCase.retrieve(pageNumber, pageSize));
     }
 
     @GetMapping
-    public ResponseEntity<List<PapayaFileRegistry>> query(@RequestParam String query) {
-        return ResponseEntity.ok(retrieveWithQueryUseCase.retrieveWithQuery(query));
+    public ResponseEntity<PaginatedQuery> query(@RequestParam String query, @RequestParam int pageNumber, @RequestParam int pageSize) {
+        return ResponseEntity.ok(retrieveWithQueryUseCase.retrieveWithQuery(query, pageNumber, pageSize));
     }
 }

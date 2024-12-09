@@ -1,6 +1,33 @@
 <div class="registry-home">
   <app-search-bar></app-search-bar>
-  <div *ngFor="let registry of papayaFilesRegister">
-    <app-registry-card [papayaFileRegistry]="registry"></app-registry-card>
+  <div *ngIf="searchStateEvent">
+    <div *ngFor="let registry of searchStateEvent.paginatedQuery.files">
+      <app-registry-card [papayaFileRegistry]="registry"></app-registry-card>
+    </div>
+    <div class="pagination-container" mat-card>
+      <button mat-icon-button [disabled]="searchStateEvent.paginatedQuery.currentPage === 1" (click)="goToPage(1)">
+        <mat-icon>first_page</mat-icon>
+      </button>
+
+      <button mat-icon-button [disabled]="searchStateEvent.paginatedQuery.currentPage === 1"
+              (click)="goToPage(searchStateEvent.paginatedQuery.currentPage - 1)">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <span class="current-page">{{ searchStateEvent.paginatedQuery.currentPage }}</span>
+
+      <button mat-icon-button
+              [disabled]="searchStateEvent.paginatedQuery.currentPage === searchStateEvent.paginatedQuery.totalPages"
+              (click)="goToPage(searchStateEvent.paginatedQuery.currentPage + 1)">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+
+      <button mat-icon-button
+              [disabled]="searchStateEvent.paginatedQuery.currentPage === searchStateEvent.paginatedQuery.totalPages"
+              (click)="goToPage(searchStateEvent.paginatedQuery.totalPages)">
+        <mat-icon>last_page</mat-icon>
+      </button>
+    </div>
+
   </div>
 </div>

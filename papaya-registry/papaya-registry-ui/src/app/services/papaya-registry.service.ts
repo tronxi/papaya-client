@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {PapayaFileRegistry} from '../models/papayaFileRegistry';
 import {environment} from '../../environments/environment';
+import {PaginatedQuery} from '../models/paginatedQuery';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +12,12 @@ export class PapayaRegistryService {
   constructor(private httpClient: HttpClient) {
   }
 
-  retrieveTopDownloads(): Observable<PapayaFileRegistry[]> {
-    return this.httpClient.get<PapayaFileRegistry[]>(environment.url + "/registry/topdownloads?pageNumber=1&pageSize=10");
+  retrieveTopDownloads(pageNumber: number): Observable<PaginatedQuery> {
+    return this.httpClient.get<PaginatedQuery>(environment.url + "/registry/topdownloads?pageNumber=" + pageNumber + "&pageSize=" + environment.pageSize);
   }
 
-  retrieveWithQuery(query: string): Observable<PapayaFileRegistry[]> {
-    return this.httpClient.get<PapayaFileRegistry[]>(environment.url + "/registry?query=" + query);
+  retrieveWithQuery(query: string, pageNumber: number): Observable<PaginatedQuery> {
+    return this.httpClient.get<PaginatedQuery>(environment.url + "/registry?query=" + query + "&pageNumber=" + pageNumber + "&pageSize=" + environment.pageSize);
   }
 
   download(fileId: string): void {
