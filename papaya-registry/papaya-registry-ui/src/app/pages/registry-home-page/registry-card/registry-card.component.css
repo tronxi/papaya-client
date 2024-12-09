@@ -1,0 +1,49 @@
+.file-card {
+  background-color: #fff;
+  margin: 20px 200px;
+  padding: 16px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 1000px) {
+  .file-card {
+    margin: 20px 20px;
+  }
+}
+
+.file-card mat-card-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.file-card mat-card-subtitle {
+  color: gray;
+}
+
+.file-card mat-card-content p {
+  margin: 8px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.file-card mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.file-card mat-card-footer {
+  margin-left: 16px;
+  color: gray;
+}
+
+.file-card mat-card-title,
+.file-card mat-card-subtitle,
+.file-card mat-card-content p,
+.file-card mat-card-footer {
+  color: #555;
+  font-size: 14px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}

@@ -1,0 +1,6 @@
+<div class="registry-home">
+  <app-search-bar></app-search-bar>
+  <div *ngFor="let registry of papayaFilesRegister">
+    <app-registry-card [papayaFileRegistry]="registry"></app-registry-card>
+  </div>
+</div>
