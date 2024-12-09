@@ -105,9 +105,9 @@ public class PapayaFileRegistryRepositorySolr implements PapayaFileRegistryRepos
     public List<PapayaFileRegistry> retrieveWithQuery(String query) {
         try {
             SolrQuery solrQuery = new SolrQuery();
-            solrQuery.setQuery(String.format("fileId:%s OR description:%s OR fileName:%s", query, query, query));
+            solrQuery.setQuery(String.format("fileId:*%s* OR description:*%s* OR fileName:*%s*", query, query, query));
             solrQuery.set("defType", "edismax");
-            solrQuery.set("qf", "fileId^3 description^2 fileName");
+            solrQuery.set("qf", "fileId^3 description^3 fileName^3");
             solrQuery.setSort("downloads", SolrQuery.ORDER.desc);
             solrQuery.setRows(20);
             QueryResponse response = solrClient.query(solrQuery);

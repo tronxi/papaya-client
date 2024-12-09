@@ -34,7 +34,7 @@ export class SearchBarComponent {
   }
 
   onSearch(query: string): void {
-    if (query.length >= 4) {
+    if (query.length >= 3) {
       this.papayaRegistryService.retrieveWithQuery(query).subscribe(response => {
         this.searchStateService.update(response);
       });
