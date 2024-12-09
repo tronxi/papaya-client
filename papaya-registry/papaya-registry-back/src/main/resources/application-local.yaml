@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: papaya-registry-back
+registry:
+  path: /Users/tronxi/papaya/registry
+  solr:
+    host: http://localhost:8983/solr/
+    core: papayaregistry

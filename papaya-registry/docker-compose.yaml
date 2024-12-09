@@ -1,0 +1,27 @@
+services:
+  solr:
+    container_name: solr
+    image: solr:9.7.0
+    ports:
+      - "8983:8983"
+    volumes:
+      - ./solr:/var/solr
+    command:
+      - solr-precreate
+      - papayaregistry
+    networks:
+      - papaya-registry-net
+  papaya-registry-back:
+    container_name: papaya-registry-back
+    image: papaya-registry-back:latest
+    build:
+      context: papaya-registry-back
+      dockerfile: Dockerfile
+    volumes:
+      - ./registry:/registry
+    ports:
+      - "8080:8080"
+    networks:
+      - papaya-registry-net
+networks:
+  papaya-registry-net:
