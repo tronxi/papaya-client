@@ -64,6 +64,7 @@ public class PapayaFileRegistryController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filePath.getFileName() + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, "application/octet-stream")
                 .body(stream);
     }
 
