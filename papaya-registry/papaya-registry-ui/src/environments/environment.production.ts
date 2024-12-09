@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  url: 'http://localhost:8080',
+  url: 'https://tronxi.ddns.net/papaya',
   pageSize: 10
 };

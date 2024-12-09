@@ -1,0 +1,11 @@
+FROM node:22.7.0-slim AS builder
+WORKDIR /front
+COPY . /front
+RUN npm install -y
+RUN npm install -g @angular/cli -y
+RUN ng build --configuration=production
+
+FROM nginx:1.17.6-alpine
+RUN rm -r /usr/share/nginx/html/
+COPY --from="builder" /front/dist/papaya-registry-ui/browser/ /usr/share/nginx/html/
+CMD ["/bin/sh",  "-c",  "exec nginx -g 'daemon off;'"]

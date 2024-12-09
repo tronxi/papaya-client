@@ -23,5 +23,14 @@ services:
       - "8080:8080"
     networks:
       - papaya-registry-net
+  papaya-registry-ui:
+    container_name: papaya-registry-ui
+    image: papaya-registry-ui:latest
+    build:
+      context: papaya-registry-ui
+    ports:
+      - "81:80"
+    networks:
+      - papaya-registry-net
 networks:
   papaya-registry-net:
