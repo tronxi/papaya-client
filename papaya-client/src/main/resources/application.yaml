@@ -15,6 +15,7 @@ papaya:
   port: 3390
   workspace: /home/tronxi/papaya
   tracker: https://tronxi.ddns.net/tracker
+  useOnlyLocalAddress: false
 logging:
   level:
     root: WARN

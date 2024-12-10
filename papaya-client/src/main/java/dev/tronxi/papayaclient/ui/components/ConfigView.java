@@ -21,21 +21,25 @@ public class ConfigView {
         TextField trackerTextField = new TextField(configService.retrieveTracker());
         HBox trackerProperty = createPropertyRow("Tracker:", trackerTextField);
 
-        Button saveButton = createSaveButton(stage, configService, workspaceTextField, trackerTextField);
+        CheckBox useOnlyLocalAddressCheckBox = new CheckBox("");
+        useOnlyLocalAddressCheckBox.setSelected(configService.retrieveUseOnlyLocalAddress());
+        HBox useOnlyLocalAddressProperty = createPropertyRow("UseOnlyLocalAddress:", useOnlyLocalAddressCheckBox);
 
-        VBox mainLayout = new VBox(workspaceProperty, trackerProperty, saveButton);
+        Button saveButton = createSaveButton(stage, configService, workspaceTextField, trackerTextField, useOnlyLocalAddressCheckBox);
+
+        VBox mainLayout = new VBox(workspaceProperty, trackerProperty, useOnlyLocalAddressProperty, saveButton);
         mainLayout.setSpacing(20);
         mainLayout.setPadding(new Insets(20));
         mainLayout.setAlignment(Pos.TOP_CENTER);
 
-        Scene scene = new Scene(mainLayout, 400, 250);
+        Scene scene = new Scene(mainLayout, 500, 300);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(scene);
         stage.setTitle("Configuration");
         stage.showAndWait();
     }
 
-    private Button createSaveButton(Stage stage, ConfigService configService, TextField workspaceTextField, TextField trackerTextField) {
+    private Button createSaveButton(Stage stage, ConfigService configService, TextField workspaceTextField, TextField trackerTextField, CheckBox useOnlyLocalAddressCheckBox) {
         Button saveButton = new Button("\uD83D\uDCBE Save");
         saveButton.getStyleClass().add("success");
         saveButton.setOnAction(event -> {
@@ -43,6 +47,7 @@ public class ConfigView {
             if (userConfirmed) {
                 configService.saveWorkspace(workspaceTextField.getText());
                 configService.saveTracker(trackerTextField.getText());
+                configService.saveUseOnlyLocalAddress(useOnlyLocalAddressCheckBox.isSelected());
                 stage.close();
             }
         });
@@ -60,11 +65,11 @@ public class ConfigView {
         return alert.getResult() == ButtonType.OK;
     }
 
-    private HBox createPropertyRow(String labelText, TextField textField) {
+    private HBox createPropertyRow(String labelText, Control control) {
         Label label = new Label(labelText);
         label.setMinWidth(100);
-        textField.setMinWidth(250);
-        HBox propertyRow = new HBox(label, textField);
+        control.setMinWidth(250);
+        HBox propertyRow = new HBox(label, control);
         propertyRow.setSpacing(10);
         propertyRow.setAlignment(Pos.CENTER_LEFT);
         return propertyRow;

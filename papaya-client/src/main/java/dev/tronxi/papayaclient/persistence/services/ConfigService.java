@@ -12,12 +12,16 @@ public class ConfigService {
 
     private final String workspaceName = "workspace";
     private final String trackerName = "tracker";
+    private final String useOnlyLocalAddressName = "useOnlyLocalAddress";
 
     @Value("${papaya.workspace}")
     private String defaultWorkspace;
 
     @Value("${papaya.tracker}")
     private String defaultTracker;
+
+    @Value("${papaya.useOnlyLocalAddress}")
+    private Boolean defaultUseOnlyLocalAddress;
 
     private final ConfigRepository configRepository;
 
@@ -37,12 +41,22 @@ public class ConfigService {
                 .orElse(defaultTracker);
     }
 
+    public Boolean retrieveUseOnlyLocalAddress() {
+        return configRepository.findById(useOnlyLocalAddressName)
+                .map(config -> Boolean.parseBoolean(config.getValue()))
+                .orElse(defaultUseOnlyLocalAddress);
+    }
+
     public void saveWorkspace(String workspace) {
         saveProperty(workspaceName, workspace);
     }
 
     public void saveTracker(String tracker) {
         saveProperty(trackerName, tracker);
+    }
+
+    public void saveUseOnlyLocalAddress(Boolean useOnlyLocalAddress) {
+        saveProperty(useOnlyLocalAddressName, useOnlyLocalAddress.toString());
     }
 
     private void saveProperty(String name, String value) {

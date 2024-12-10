@@ -20,6 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.bitlet.weupnp.GatewayDevice;
 import org.springframework.boot.SpringApplication;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +33,15 @@ public class UIInitializer extends Application {
     private FileManager fileManager;
     private PeerConnectionManager peerConnectionManager;
     private ConfigService configService;
+    private GatewayDevice gatewayDevice;
+
 
     @Override
     public void init() {
         fileManager = PapayaClientApplication.getContext().getBean(FileManager.class);
         peerConnectionManager = PapayaClientApplication.getContext().getBean(PeerConnectionManagerTCP.class);
         configService = PapayaClientApplication.getContext().getBean(ConfigService.class);
+        gatewayDevice = PapayaClientApplication.getContext().getBean(GatewayDevice.class);
     }
 
     @Override
@@ -97,6 +101,14 @@ public class UIInitializer extends Application {
         stage.setTitle("Papaya");
         stage.setScene(scene);
         stage.show();
+
+        if (gatewayDevice.getLocalAddress() == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Papaya - Port Mapping");
+            alert.setHeaderText("Port Mapping Failed");
+            alert.setContentText("The port could not be mapped automatically. To be accessible from external networks, you need to configure port mapping manually in your router.");
+            alert.showAndWait();
+        }
     }
 
     private void setColorScheme() {

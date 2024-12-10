@@ -31,7 +31,9 @@ public class StopService {
         peerTrackerService.remove();
         try {
             logger.info("Delete port mapping");
-            gatewayDevice.deletePortMapping(port, "TCP");
+            if (gatewayDevice.getLocalAddress() != null) {
+                gatewayDevice.deletePortMapping(port, "TCP");
+            }
         } catch (IOException | SAXException e) {
             logger.severe(e.getMessage());
         }
