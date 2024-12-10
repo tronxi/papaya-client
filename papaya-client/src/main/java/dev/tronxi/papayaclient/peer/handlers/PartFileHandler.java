@@ -76,7 +76,7 @@ public class PartFileHandler extends Handler {
                     }
                 });
                 if (statusFile.getStatus() != PapayaStatus.COMPLETE && !filesJoined.containsKey(statusFile.getFileId())) {
-                    askForPartFileSender.send(statusFile);
+                    askForPartFileSender.send(clientSocket, statusFile);
                 }
             } else {
                 logger.severe("Could not find PapayaStatusFile for " + fileId);

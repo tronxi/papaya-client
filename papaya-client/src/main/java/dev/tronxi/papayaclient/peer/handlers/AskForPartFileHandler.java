@@ -1,7 +1,6 @@
 package dev.tronxi.papayaclient.peer.handlers;
 
 import dev.tronxi.papayaclient.persistence.FileManager;
-import dev.tronxi.papayaclient.peer.Peer;
 import dev.tronxi.papayaclient.peer.PeerMessageType;
 import org.springframework.stereotype.Service;
 
@@ -59,10 +58,8 @@ public class AskForPartFileHandler extends Handler {
         logger.info("Sending part: " + part.toString() + " fileId: " + fileId.toString());
         Path partFilePath = storePath.resolve(fileId.toString()).resolve(part.toString());
         if (partFilePath.toFile().exists()) {
-            Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), Integer.parseInt(port.toString()));
-            try (Socket socket = new Socket(peer.address(), peer.port());
-                 OutputStream outputStream = socket.getOutputStream()) {
-
+            try {
+                OutputStream outputStream = clientSocket.getOutputStream();
                 ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
                 dataStream.write(PeerMessageType.PART_FILE.getValue());
                 dataStream.write(fileId.toString().getBytes());

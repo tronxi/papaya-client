@@ -48,9 +48,10 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                 @Override
                 protected Void call() {
                     while (true) {
-                        try (Socket clientSocket = serverSocket.accept();
-                             InputStream inputStream = clientSocket.getInputStream();
-                             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                        try {
+                            Socket clientSocket = serverSocket.accept();
+                            InputStream inputStream = clientSocket.getInputStream();
+                            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                             logger.info("Receiving...");
 
                             byte[] buffer = new byte[80000];
@@ -69,7 +70,13 @@ public class PeerConnectionManagerTCP implements PeerConnectionManager {
                                         textArea.appendText(newText);
                                         textArea.appendText("");
                                     }
-                                }));
+                                })).whenComplete((result, exception) -> {
+                                    try {
+                                        clientSocket.close();
+                                    } catch (IOException e) {
+                                        logger.severe("Error closing server socket");
+                                    }
+                                });
                             } else {
                                 logger.info("Received empty message");
                             }

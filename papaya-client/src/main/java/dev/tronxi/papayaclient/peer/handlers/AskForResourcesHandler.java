@@ -41,20 +41,20 @@ public class AskForResourcesHandler extends Handler {
             } while (charAtIndex != '#');
             Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), Integer.parseInt(port.toString()));
             message += ":" + port + " AskForResources with fileId: " + fileId;
-            responseAskForResources(peer, fileId.toString());
+            responseAskForResources(clientSocket, peer, fileId.toString());
         } catch (IOException e) {
             logger.severe(e.getMessage());
         }
         return message;
     }
 
-    private void responseAskForResources(Peer peer, String fileId) {
+    private void responseAskForResources(Socket socket, Peer peer, String fileId) {
         logger.info("response ask for resources: " + fileId + " to " + peer);
         List<String> completedParts = fileManager.getCompletedParts(fileId);
         logger.info("found: " + completedParts.size() + " parts");
         if (!completedParts.isEmpty()) {
-            try (Socket socket = new Socket(peer.address(), peer.port());
-                 OutputStream outputStream = socket.getOutputStream()) {
+            try {
+                OutputStream outputStream = socket.getOutputStream();
                 ByteArrayOutputStream dataStream = new ByteArrayOutputStream();
                 dataStream.write(PeerMessageType.RESPONSE_ASK_FOR_RESOURCES.getValue());
                 dataStream.write(fileId.getBytes());

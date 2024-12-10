@@ -59,7 +59,7 @@ public class ResponseAskForResourcesHandler extends Handler {
             logger.info("found: " + completedParts.size() + " parts");
             Peer peer = new Peer(clientSocket.getInetAddress().getHostAddress(), Integer.parseInt(port.toString()));
             Optional<PapayaStatusFile> maybePapayaStatusFileUpdated = updateStatus(fileId.toString(), peer, completedParts);
-            maybePapayaStatusFileUpdated.ifPresent(askForPartFileSender::send);
+            maybePapayaStatusFileUpdated.ifPresent(papayaStatusFile -> askForPartFileSender.send(clientSocket, papayaStatusFile));
             message += ":" + port + " ResponseAskForResources with fileId: " + fileId + " parts: " + completedParts.size();
         } catch (IOException e) {
             logger.severe(e.getMessage());

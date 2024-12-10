@@ -22,7 +22,7 @@ public class AskForPartFileSender {
     private static final Map<Peer, Long> peerAskedFiles = new HashMap<>();
     private static final Map<Long, PapayaStatus> partStatus = new HashMap<>();
 
-    public void send(PapayaStatusFile papayaStatusFile) {
+    public void send(Socket clientSocket, PapayaStatusFile papayaStatusFile) {
         logger.info("Ask for part file started: " + papayaStatusFile.getFileId());
 
         papayaStatusFile.getPartStatusFiles().stream()
@@ -42,28 +42,28 @@ public class AskForPartFileSender {
                             .ifPresentOrElse(partPeerStatusFile -> {
                                 partStatus.put(status.getId(), PapayaStatus.ASKED);
                                 peerAskedFiles.put(partPeerStatusFile.getPeer(), peerAskedFiles.get(partPeerStatusFile.getPeer()) + 1);
-                                sendMessage(papayaStatusFile, status, partPeerStatusFiles, partPeerStatusFile);
+                                sendMessage(clientSocket, papayaStatusFile, status, partPeerStatusFiles, partPeerStatusFile);
                                 logger.info("PeerAskedFiles after: " + peerAskedFiles);
                             }, () -> {
                                 partStatus.put(status.getId(), PapayaStatus.ASKED);
-                                send(papayaStatusFile);
+                                send(clientSocket, papayaStatusFile);
                             });
                 }, () -> {
                     logger.info("Removing part status");
                     papayaStatusFile.getPartStatusFiles().forEach(status -> partStatus.remove(status.getId()));
                     if (papayaStatusFile.getStatus() != PapayaStatus.COMPLETE) {
                         logger.info("Retry send");
-                        send(papayaStatusFile);
+                        send(clientSocket, papayaStatusFile);
                     }
                 });
     }
 
 
-    private void sendMessage(PapayaStatusFile papayaStatusFile, PartStatusFile partStatusFile, Set<PartPeerStatusFile> partPeerStatusFileList, PartPeerStatusFile partPeerStatusFile) {
+    private void sendMessage(Socket clientSocket, PapayaStatusFile papayaStatusFile, PartStatusFile partStatusFile, Set<PartPeerStatusFile> partPeerStatusFileList, PartPeerStatusFile partPeerStatusFile) {
         logger.info("Sending message: ask for part file: " + papayaStatusFile.getFileId() + " partFileName: " + partStatusFile.getFileName() + " Peer: " + partPeerStatusFile);
         if (partPeerStatusFileList.isEmpty()) {
             partStatus.put(partStatusFile.getId(), PapayaStatus.ASKED);
-            send(papayaStatusFile);
+            send(clientSocket, papayaStatusFile);
         }
         if (!partPeerStatusFileList.isEmpty()) {
             partPeerStatusFileList.remove(partPeerStatusFile);
@@ -85,7 +85,7 @@ public class AskForPartFileSender {
                 partPeerStatusFileList.stream()
                         .filter(pf -> !pf.equals(partPeerStatusFile))
                         .min(Comparator.comparingLong(pf -> peerAskedFiles.getOrDefault(pf.getPeer(), 0L)))
-                        .ifPresent(pf -> sendMessage(papayaStatusFile, partStatusFile, partPeerStatusFileList, pf));
+                        .ifPresent(pf -> sendMessage(clientSocket, papayaStatusFile, partStatusFile, partPeerStatusFileList, pf));
             }
         }
 
