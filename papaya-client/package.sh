@@ -1,7 +1,7 @@
  mvn clean install
 
  if [ -d "output" ]; then
-   rm -r output
+   rm -rf output
  fi
 
 
