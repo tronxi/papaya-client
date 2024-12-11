@@ -13,7 +13,6 @@ spring:
       hibernate.jdbc.lob.non_contextual_creation: true
 papaya:
   port: 3390
-  workspace: /home/tronxi/papaya
   tracker: https://tronxi.ddns.net/tracker
   useOnlyLocalAddress: false
 logging:

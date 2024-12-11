@@ -46,7 +46,7 @@ public class FileManager {
         this.papayaStatusFileService = papayaStatusFileService;
         this.partStatusFileRepository = partStatusFileRepository;
         this.hashGenerator = hashGenerator;
-        this.workspace = configService.retrieveWorkspace();
+        this.workspace = configService.retrieveWorkspace().orElse("");
     }
 
     @PostConstruct

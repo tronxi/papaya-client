@@ -8,9 +8,7 @@ import dev.tronxi.papayaclient.persistence.papayafile.PapayaFile;
 import dev.tronxi.papayaclient.peer.PeerConnectionManager;
 import dev.tronxi.papayaclient.peer.PeerConnectionManagerTCP;
 import dev.tronxi.papayaclient.persistence.services.ConfigService;
-import dev.tronxi.papayaclient.ui.components.ConfigView;
-import dev.tronxi.papayaclient.ui.components.CreateFileChooserButton;
-import dev.tronxi.papayaclient.ui.components.PapayaProgress;
+import dev.tronxi.papayaclient.ui.components.*;
 import javafx.application.Application;
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
@@ -101,6 +99,10 @@ public class UIInitializer extends Application {
         stage.setTitle("Papaya");
         stage.setScene(scene);
         stage.show();
+
+        if (configService.retrieveWorkspace().isEmpty()) {
+            new WorkspaceDialog().createWorkspaceDialog(stage, configService);
+        }
 
         if (gatewayDevice.getLocalAddress() == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);

@@ -15,7 +15,7 @@ public class ConfigView {
     public void render(ConfigService configService) {
         Stage stage = new Stage();
 
-        TextField workspaceTextField = new TextField(configService.retrieveWorkspace());
+        TextField workspaceTextField = new TextField(configService.retrieveWorkspace().orElse(""));
         HBox workspaceProperty = createPropertyRow("Workspace:", workspaceTextField);
 
         TextField trackerTextField = new TextField(configService.retrieveTracker());

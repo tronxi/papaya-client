@@ -14,9 +14,6 @@ public class ConfigService {
     private final String trackerName = "tracker";
     private final String useOnlyLocalAddressName = "useOnlyLocalAddress";
 
-    @Value("${papaya.workspace}")
-    private String defaultWorkspace;
-
     @Value("${papaya.tracker}")
     private String defaultTracker;
 
@@ -29,10 +26,9 @@ public class ConfigService {
         this.configRepository = configRepository;
     }
 
-    public String retrieveWorkspace() {
+    public Optional<String> retrieveWorkspace() {
         return configRepository.findById(workspaceName)
-                .map(Config::getValue)
-                .orElse(defaultWorkspace);
+                .map(Config::getValue);
     }
 
     public String retrieveTracker() {
