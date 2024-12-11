@@ -17,7 +17,7 @@
         <java.version>21</java.version>
         <javafx.version>23.0.1</javafx.version>
         <javafx-maven-plugin-version>0.0.8</javafx-maven-plugin-version>
-        <mainClassName>dev.tronxi.papayaclient.PapayaLauncher</mainClassName>
+        <mainClassName>dev.tronxi.papayaclient.PapayaClientApplication</mainClassName>
     </properties>
     <dependencies>
         <dependency>
@@ -92,32 +92,6 @@
                 <configuration>
                     <mainClass>${mainClassName}</mainClass>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>${javafx-maven-plugin-version}</version>
-                <configuration>
-                    <mainClass>${mainClassName}</mainClass>
-                    <options>
-                        <option>--add-opens=javafx.graphics/com.sun.javafx=ALL-UNNAMED</option>
-                        <option>--add-opens=javafx.base/com.sun.javafx.runtime=ALL-UNNAMED</option>
-                    </options>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>default-cli</id>
-                        <configuration>
-                            <mainClass>${mainClassName}</mainClass>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>debug</id>
-                        <configuration>
-                            <mainClass>${mainClassName}</mainClass>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
