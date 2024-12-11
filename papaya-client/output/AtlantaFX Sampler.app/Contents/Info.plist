@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>CFBundleAllowMixedLocalizations</key>
+        <true/>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>English</string>
+        <key>CFBundleDisplayName</key>
+        <string>AtlantaFX Sampler</string>
+        <key>CFBundleExecutable</key>
+        <string>AtlantaFX Sampler</string>
+        <key>CFBundleIconFile</key>
+        <string>app.icns</string>
+        <key>CFBundleIdentifier</key>
+        <string>dev.hydraulic.downloads.atlantafx-sampler</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleName</key>
+        <string>AtlantaFX Sampler</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleShortVersionString</key>
+        <string>0.1</string>
+        <key>CFBundleSignature</key>
+        <string>????</string>
+        <key>CFBundleVersion</key>
+        <string>0.1.0</string>
+        <key>COEnableAggressiveUpdates</key>
+        <false/>
+        <key>LSMinimumSystemVersion</key>
+        <string>11.0</string>
+        <key>NSCameraUsageDescription</key>
+        <string>The application is requesting access to the camera.</string>
+        <key>NSHighResolutionCapable</key>
+        <true/>
+        <key>NSHumanReadableCopyright</key>
+        <string>Proprietary</string>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>The application is requesting access to the microphone.</string>
+        <key>NSSupportsAutomaticGraphicsSwitching</key>
+        <true/>
+        <key>SUAllowsAutomaticUpdates</key>
+        <true/>
+        <key>SUAutomaticallyUpdate</key>
+        <true/>
+        <key>SUEnableAutomaticChecks</key>
+        <true/>
+        <key>SUEnableSystemProfiling</key>
+        <false/>
+        <key>SUFeedURL</key>
+        <string>https://downloads.hydraulic.dev/atlantafx/sampler/appcast-aarch64.rss</string>
+        <key>SUPublicEDKey</key>
+        <string>cCQMtYFpSBJNsUBtNtilM+E7gPcwV1NtJvVjH2zjvW0=</string>
+        <key>SUScheduledCheckInterval</key>
+        <integer>3600</integer>
+        <key>SUShowReleaseNotes</key>
+        <false/>
+    </dict>
+</plist>

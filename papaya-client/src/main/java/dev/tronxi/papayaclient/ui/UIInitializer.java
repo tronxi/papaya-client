@@ -20,6 +20,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.bitlet.weupnp.GatewayDevice;
 import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -33,13 +34,16 @@ public class UIInitializer extends Application {
     private ConfigService configService;
     private GatewayDevice gatewayDevice;
 
+    private ConfigurableApplicationContext context;
+
 
     @Override
     public void init() {
-        fileManager = PapayaClientApplication.getContext().getBean(FileManager.class);
-        peerConnectionManager = PapayaClientApplication.getContext().getBean(PeerConnectionManagerTCP.class);
-        configService = PapayaClientApplication.getContext().getBean(ConfigService.class);
-        gatewayDevice = PapayaClientApplication.getContext().getBean(GatewayDevice.class);
+        context = SpringApplication.run(PapayaClientApplication.class);
+        fileManager = context.getBean(FileManager.class);
+        peerConnectionManager = context.getBean(PeerConnectionManagerTCP.class);
+        configService = context.getBean(ConfigService.class);
+        gatewayDevice = context.getBean(GatewayDevice.class);
     }
 
     @Override
@@ -197,6 +201,6 @@ public class UIInitializer extends Application {
     @Override
     public void stop() {
         peerConnectionManager.stop();
-        SpringApplication.exit(PapayaClientApplication.getContext(), () -> 0);
+        SpringApplication.exit(context, () -> 0);
     }
 }

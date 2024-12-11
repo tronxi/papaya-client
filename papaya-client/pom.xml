@@ -17,7 +17,7 @@
         <java.version>21</java.version>
         <javafx.version>23.0.1</javafx.version>
         <javafx-maven-plugin-version>0.0.8</javafx-maven-plugin-version>
-        <mainClassName>dev.tronxi.papayaclient.PapayaClientApplication</mainClassName>
+        <mainClassName>dev.tronxi.papayaclient.PapayaLauncher</mainClassName>
     </properties>
     <dependencies>
         <dependency>
@@ -89,6 +89,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>${mainClassName}</mainClass>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.openjfx</groupId>
