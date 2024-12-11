@@ -1,3 +1,10 @@
+ mvn clean install
+
+ if [ -d "output" ]; then
+   rm -r output
+ fi
+
+
  jpackage \
     --input target \
     --name "Papaya" \
