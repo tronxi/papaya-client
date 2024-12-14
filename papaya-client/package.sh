@@ -8,7 +8,11 @@ fi
 
 OS=$(uname)
 
-if [ "$OS" == "Darwin" ]; then
+OS=$(uname)
+if [[ "$OS" == *"MINGW"* ]]; then
+  ICON="icons/icon.ico"
+  echo "Detected Windows. Using icon: $ICON"
+elif [ "$OS" == "Darwin" ]; then
   ICON="icons/icon.icns"
   echo "Detected macOS. Using icon: $ICON"
 elif [ "$OS" == "Linux" ]; then
@@ -17,6 +21,10 @@ elif [ "$OS" == "Linux" ]; then
 fi
 
 VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+
+echo "OS detected: $OS"
+echo "Using icon: $ICON"
+echo "Project version: $VERSION"
 
 jpackage \
   --input target \
