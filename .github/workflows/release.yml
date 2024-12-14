@@ -27,9 +27,8 @@ jobs:
           release_name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
-
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      - name: Save upload_url to environment
+        run: echo "UPLOAD_URL=${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_ENV
 
   release-linux:
     runs-on: ubuntu-latest
@@ -66,7 +65,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          upload_url: ${{ env.UPLOAD_URL }}
           asset_path: papaya-client/Papaya_${{ github.ref_name }}_linux.zip
           asset_name: Papaya_${{ github.ref_name }}_linux.zip
           asset_content_type: application/zip
@@ -106,7 +105,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          upload_url: ${{ env.UPLOAD_URL }}
           asset_path: papaya-client/Papaya_${{ github.ref_name }}_mac.zip
           asset_name: Papaya_${{ github.ref_name }}_mac.zip
           asset_content_type: application/zip
