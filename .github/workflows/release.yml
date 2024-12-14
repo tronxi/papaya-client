@@ -126,7 +126,9 @@ jobs:
           ./package.sh
 
       - name: Compress output directory
-        run: zip -r Papaya_${{ github.ref_name }}_windows.zip ./output
+        run: |
+          Compress-Archive -Path .\output\* -DestinationPath Papaya_${{ github.ref_name }}_windows.zip
+        shell: pwsh
 
       - name: Upload Mac artifact
         run: |
