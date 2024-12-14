@@ -17,18 +17,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Create Release
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh -y
+
+      - name: Create or get release
         id: create_release
-        uses: actions/create-release@v1
+        run: |
+          gh release view ${{ github.ref_name }} || gh release create ${{ github.ref_name }} --title "Release ${{ github.ref_name }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-      - name: Save upload_url to environment
-        run: echo "UPLOAD_URL=${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_ENV
 
   release-linux:
     runs-on: ubuntu-latest
@@ -60,15 +57,11 @@ jobs:
       - name: Compress output directory
         run: zip -r Papaya_${{ github.ref_name }}_linux.zip ./output
 
-      - name: Upload artifact to release
-        uses: actions/upload-release-asset@v1
+      - name: Upload Linux artifact
+        run: |
+          gh release upload ${{ github.ref_name }} papaya-client/Papaya_${{ github.ref_name }}_linux.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: papaya-client/Papaya_${{ github.ref_name }}_linux.zip
-          asset_name: Papaya_${{ github.ref_name }}_linux.zip
-          asset_content_type: application/zip
 
   release-mac:
     runs-on: macos-latest
@@ -100,12 +93,8 @@ jobs:
       - name: Compress output directory
         run: zip -r Papaya_${{ github.ref_name }}_mac.zip ./output
 
-      - name: Upload artifact to release
-        uses: actions/upload-release-asset@v1
+      - name: Upload Mac artifact
+        run: |
+          gh release upload ${{ github.ref_name }} papaya-client/Papaya_${{ github.ref_name }}_mac.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ env.UPLOAD_URL }}
-          asset_path: papaya-client/Papaya_${{ github.ref_name }}_mac.zip
-          asset_name: Papaya_${{ github.ref_name }}_mac.zip
-          asset_content_type: application/zip
