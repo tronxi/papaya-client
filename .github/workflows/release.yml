@@ -65,7 +65,7 @@ jobs:
 
   release-mac:
     runs-on: macos-latest
-    needs: release-linux
+    needs: create-release
 
     steps:
       - name: Checkout repository
@@ -96,5 +96,40 @@ jobs:
       - name: Upload Mac artifact
         run: |
           gh release upload ${{ github.ref_name }} Papaya_${{ github.ref_name }}_mac.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release-windows:
+    runs-on: windows-latest
+    needs: create-release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 21
+          distribution: 'temurin'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven
+
+      - name: Run build script
+        run: |
+          chmod +x package.sh
+          ./package.sh
+
+      - name: Compress output directory
+        run: zip -r Papaya_${{ github.ref_name }}_windows.zip ./output
+
+      - name: Upload Mac artifact
+        run: |
+          gh release upload ${{ github.ref_name }} Papaya_${{ github.ref_name }}_windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
