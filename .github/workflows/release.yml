@@ -126,10 +126,6 @@ jobs:
       - name: Run build script
         run: bash package.sh
 
-      - name: List all files and directories
-        run: Get-ChildItem -Recurse
-        shell: pwsh
-
       - name: Compress output directory
         run: |
           Compress-Archive -Path .\output\* -DestinationPath Papaya_${{ github.ref_name }}_windows.zip
