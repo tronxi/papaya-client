@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - "v*"
+defaults:
+  run:
+    working-directory: papaya-client
 
 jobs:
   build:
