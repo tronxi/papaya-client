@@ -49,12 +49,18 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Verify ZIP file location
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Files:"
+          ls -l
+
       - name: Upload artifact to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./Papaya_${{ github.ref_name }}_linux.zip
+          asset_path: papaya-client/Papaya_${{ github.ref_name }}_linux.zip
           asset_name: Papaya_${{ github.ref_name }}_linux.zip
           asset_content_type: application/zip
