@@ -10,7 +10,7 @@
     </parent>
     <groupId>dev.tronxi</groupId>
     <artifactId>papaya-client</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>papaya-client</name>
     <description>papaya-client</description>
     <properties>
