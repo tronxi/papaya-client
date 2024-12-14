@@ -120,10 +120,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven
 
+      - name: Install Git Bash
+        run: choco install git -y
+
       - name: Run build script
-        run: |
-          chmod +x package.sh
-          ./package.sh
+        run: bash package.sh
 
       - name: List all files and directories
         run: Get-ChildItem -Recurse
