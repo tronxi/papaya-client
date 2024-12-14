@@ -27,7 +27,9 @@ public class ConfigView {
 
         Button saveButton = createSaveButton(stage, configService, workspaceTextField, trackerTextField, useOnlyLocalAddressCheckBox);
 
-        VBox mainLayout = new VBox(workspaceProperty, trackerProperty, useOnlyLocalAddressProperty, saveButton);
+        Label versionLabel = new Label(configService.getVersion());
+
+        VBox mainLayout = new VBox(workspaceProperty, trackerProperty, useOnlyLocalAddressProperty, saveButton, versionLabel);
         mainLayout.setSpacing(20);
         mainLayout.setPadding(new Insets(20));
         mainLayout.setAlignment(Pos.TOP_CENTER);

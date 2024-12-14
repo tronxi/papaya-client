@@ -14,6 +14,9 @@ public class ConfigService {
     private final String trackerName = "tracker";
     private final String useOnlyLocalAddressName = "useOnlyLocalAddress";
 
+    @Value("${build.version}")
+    private String version;
+
     @Value("${papaya.tracker}")
     private String defaultTracker;
 
@@ -24,6 +27,10 @@ public class ConfigService {
 
     public ConfigService(ConfigRepository configRepository) {
         this.configRepository = configRepository;
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     public Optional<String> retrieveWorkspace() {

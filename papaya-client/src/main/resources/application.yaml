@@ -8,6 +8,8 @@ spring:
       ddl-auto: update
     properties:
       hibernate.jdbc.lob.non_contextual_creation: true
+build:
+  version: @project.version@
 papaya:
   port: 3390
   tracker: https://tronxi.ddns.net/tracker
