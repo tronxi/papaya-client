@@ -61,6 +61,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: Papaya_${{ github.ref_name }}_linux.zip
+          asset_path: papaya-client/Papaya_${{ github.ref_name }}_linux.zip
           asset_name: Papaya_${{ github.ref_name }}_linux.zip
           asset_content_type: application/zip
