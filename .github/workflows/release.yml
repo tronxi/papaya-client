@@ -60,6 +60,7 @@ jobs:
           asset_content_type: application/zip
   release-mac:
     runs-on: macos-latest
+    needs: release-linux
 
     steps:
       - name: Checkout repository
