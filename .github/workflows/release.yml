@@ -59,7 +59,7 @@ jobs:
 
       - name: Upload Linux artifact
         run: |
-          gh release upload ${{ github.ref_name }} papaya-client/Papaya_${{ github.ref_name }}_linux.zip
+          gh release upload ${{ github.ref_name }} Papaya_${{ github.ref_name }}_linux.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -95,6 +95,6 @@ jobs:
 
       - name: Upload Mac artifact
         run: |
-          gh release upload ${{ github.ref_name }} papaya-client/Papaya_${{ github.ref_name }}_mac.zip
+          gh release upload ${{ github.ref_name }} Papaya_${{ github.ref_name }}_mac.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
