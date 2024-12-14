@@ -4,13 +4,36 @@ on:
   push:
     tags:
       - "v*"
+
 defaults:
   run:
     working-directory: papaya-client
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+
   release-linux:
     runs-on: ubuntu-latest
+    needs: create-release
 
     steps:
       - name: Checkout repository
@@ -38,26 +61,16 @@ jobs:
       - name: Compress output directory
         run: zip -r Papaya_${{ github.ref_name }}_linux.zip ./output
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-
       - name: Upload artifact to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: papaya-client/Papaya_${{ github.ref_name }}_linux.zip
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: Papaya_${{ github.ref_name }}_linux.zip
           asset_name: Papaya_${{ github.ref_name }}_linux.zip
           asset_content_type: application/zip
+
   release-mac:
     runs-on: macos-latest
     needs: release-linux
@@ -93,7 +106,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: papaya-client/Papaya_${{ github.ref_name }}_mac.zip
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: Papaya_${{ github.ref_name }}_mac.zip
           asset_name: Papaya_${{ github.ref_name }}_mac.zip
           asset_content_type: application/zip
