@@ -12,4 +12,5 @@
     --main-class org.springframework.boot.loader.launch.JarLauncher \
     --type app-image \
     --dest output \
+    --icon icons/icon.icns \
     --verbose
