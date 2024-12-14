@@ -9,8 +9,8 @@ defaults:
     working-directory: papaya-client
 
 jobs:
-  release-linux:
-    runs-on: ubuntu-latest
+  release-mac:
+    runs-on: macos-latest
 
     steps:
       - name: Checkout repository
@@ -36,7 +36,7 @@ jobs:
           ./package.sh
 
       - name: Compress output directory
-        run: zip -r Papaya_${{ github.ref_name }}_linux.zip ./output
+        run: zip -r Papaya_${{ github.ref_name }}_mac.zip ./output
 
       - name: Create Release
         id: create_release
@@ -61,6 +61,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: papaya-client/Papaya_${{ github.ref_name }}_linux.zip
-          asset_name: Papaya_${{ github.ref_name }}_linux.zip
+          asset_path: papaya-client/Papaya_${{ github.ref_name }}_mac.zip
+          asset_name: Papaya_${{ github.ref_name }}_mac.zip
           asset_content_type: application/zip
