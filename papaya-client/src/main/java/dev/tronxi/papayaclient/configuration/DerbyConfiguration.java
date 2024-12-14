@@ -29,7 +29,6 @@ public class DerbyConfiguration {
         File jarFile = new File(jarDir);
         File parentDir = jarFile.getParentFile();
 
-        System.out.println(parentDir.getAbsolutePath());
         String databaseUrl = "jdbc:derby:" + parentDir.getAbsolutePath() + "/db;create=true";
 
         DriverManagerDataSource dataSource = new DriverManagerDataSource();

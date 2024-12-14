@@ -14,5 +14,6 @@ papaya:
   useOnlyLocalAddress: false
 logging:
   level:
+    org.hibernate.engine.jdbc.spi.SqlExceptionHelper: ERROR
     root: WARN
 
