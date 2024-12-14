@@ -36,7 +36,8 @@ public class UpnpConfiguration {
 
     @Bean
     public GatewayDevice gatewayDevice() throws IOException, ParserConfigurationException, SAXException {
-        if (configService.retrieveUseOnlyLocalAddress()) {
+        Boolean useOnlyLocalAddress = configService.retrieveUseOnlyLocalAddress();
+        if (useOnlyLocalAddress) {
             try (Socket socket = new Socket()) {
                 logger.info("Using local address");
                 socket.connect(new InetSocketAddress("google.com", 80));
@@ -44,13 +45,14 @@ public class UpnpConfiguration {
                 Peer peer = new Peer(privateIp, port);
                 peerTrackerService.initialSend(peer);
             }
-        } else {
-            logger.info("Using public address");
-            URL checkIpUrl = URI.create("https://checkip.amazonaws.com").toURL();
-            String publicIp = new BufferedReader(new InputStreamReader(checkIpUrl.openStream())).readLine();
-            Peer peer = new Peer(publicIp, port);
-            peerTrackerService.initialSend(peer);
+            return new GatewayDevice();
         }
+        logger.info("Using public address");
+        URL checkIpUrl = URI.create("https://checkip.amazonaws.com").toURL();
+        String publicIp = new BufferedReader(new InputStreamReader(checkIpUrl.openStream())).readLine();
+        Peer peer = new Peer(publicIp, port);
+        peerTrackerService.initialSend(peer);
+
         GatewayDiscover gatewayDiscover = new GatewayDiscover();
         gatewayDiscover.discover();
         GatewayDevice gatewayDevice = gatewayDiscover.getValidGateway();

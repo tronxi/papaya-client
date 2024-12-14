@@ -3,9 +3,6 @@ server:
 spring:
   application:
     name: papaya-client
-  datasource:
-    url: jdbc:derby:db;create=true
-    driver-class-name: org.apache.derby.jdbc.EmbeddedDriver
   jpa:
     hibernate:
       ddl-auto: update

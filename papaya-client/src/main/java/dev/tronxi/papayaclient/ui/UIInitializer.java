@@ -104,7 +104,7 @@ public class UIInitializer extends Application {
             new WorkspaceDialog().createWorkspaceDialog(stage, configService);
         }
 
-        if (gatewayDevice.getLocalAddress() == null) {
+        if (!configService.retrieveUseOnlyLocalAddress() && gatewayDevice.getLocalAddress() == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Papaya - Port Mapping");
             alert.setHeaderText("Port Mapping Failed");
