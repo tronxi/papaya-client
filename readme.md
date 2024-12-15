@@ -33,6 +33,14 @@ download files directly between peers.
 2. **Run the client**:
    Launch the downloaded file to start the Papaya-P2P client.
 
+   #### Additional Setup for macOS Users
+
+   If you encounter an error or warning saying that the application cannot be opened because it is from an unidentified
+   developer or downloaded from the internet, you can remove the macOS quarantine attribute with the following command:
+
+   ```bash
+   xattr -dr com.apple.quarantine /Applications/Papaya.app
+
 3. **Connect to the tracker and registry**:
    The tracker is preconfigured in the client, so no additional setup is needed. Use the following details to connect to
    the online services:
